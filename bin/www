@@ -7,7 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('projectsocket:server');
 var http = require('http');
-
+var mysql = require('mysql')
 /**
  * Get port from environment and store in Express.
  */
@@ -20,6 +20,21 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+
+/**
+ * Setup Socket env
+ */
+
+ var io = require('socket.io')(server, {
+  cors: {
+    origin: "*"
+  }
+});
+
+io.on('connection', (socket) => {
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+  });
 
 /**
  * Listen on provided port, on all network interfaces.
