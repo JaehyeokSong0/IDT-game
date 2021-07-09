@@ -1,11 +1,21 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-  </body>
+
+<head>
+  <title><%= title %></title>
+  <link rel='stylesheet' href='/stylesheets/style.css' />
+  <link rel='stylesheet' href='/stylesheets/game.css' />
+</head>
+
+<body>
+  <div id="game_title">
+    <p>ProjectSocket</p>
+  </div>
+  <canvas id="game_canvas"></canvas>
+  <div id="game_index">
+    <p> Input your nickname </p>
+    <input id = "nickname" placeholder="nickname"></input>
+    <button id = "start_btn">START</button>
+  </div>
+</body>
 </html>
