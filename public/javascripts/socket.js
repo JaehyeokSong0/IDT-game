@@ -4,6 +4,7 @@ $('#start_btn').click(() => {
     var id = $('#nickname').val();
     // #중복체크 필요
     $('#game_index').hide();
+    $('body').css('backgroundColor','white');
     socket.emit('joinLobby', id);
 });
 
