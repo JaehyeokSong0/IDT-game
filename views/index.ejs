@@ -8,17 +8,16 @@
 </head>
 
 <body>
-  <div id="game_title">
-    <p>ProjectSocket</p>
-  </div>
   <canvas id="game_canvas"></canvas>
-  <div id="game_index">
+  <div id="game_index" style="display: none;">
     <p> Input your nickname </p>
-    <input id = "nickname" placeholder="nickname"></input>
-    <button id = "start_btn">START</button>
+    <input id="nickname" placeholder="nickname"></input>
+    <button id="start_btn">START</button>
   </div>
+  <%- include ("lobby.ejs") %>
   <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script type="module" src="javascripts/socket.js"></script>
 </body>
+
 </html>

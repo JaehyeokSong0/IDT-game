@@ -5,6 +5,7 @@ $('#start_btn').click(() => {
     // #중복체크 필요
     $('#game_index').hide();
     $('body').css('backgroundColor','white');
+    $('#game_lobby').show();
     socket.emit('joinLobby', id);
 });
 
