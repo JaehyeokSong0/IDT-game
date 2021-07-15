@@ -1,6 +1,7 @@
 # To-Do List
 1. MYSQL setup
-2. Implement main page
-3. Design project structure
-4. Implement Waiting room page
-5. Verify ID
+2. Design project structure
+3. Implement Lobby
+    - Dynamic paging
+    - Link room info to table
+4. Verify ID
