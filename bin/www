@@ -30,17 +30,18 @@ var io = require('socket.io')(server, {
     origin: "*"
   }
 });
+var roomNum = 1;
 
 io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });
 
-  socket.on('joinLobby', joinLobby);
-
-  async function joinLobby(id) {
-    await socket.join('Lobby');
-    io.to('Lobby').emit('joinLobby', id);
+  socket.on('createRoom', createRoom);
+  async function createRoom(id,roomTitle) {
+    await socket.join(roomNum);
+    io.emit('createRoom', id, roomNum,roomTitle);
+    roomNum+=1;
   }
 });
 /**
