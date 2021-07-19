@@ -42,10 +42,12 @@ io.on('connection', (socket) => {
     await socket.join(roomNum);
     var clients = io.sockets.adapter.rooms.get(roomNum);
     var clientsNum = clients.size;
-    io.emit('createRoom', id, roomNum, roomTitle, clientsNum);
+    var host = id;
+    io.emit('createRoom', host, roomNum, roomTitle, clientsNum);
     roomNum += 1;
   }
 });
+
 /**
  * Listen on provided port, on all network interfaces.
  */

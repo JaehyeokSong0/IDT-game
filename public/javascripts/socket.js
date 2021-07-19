@@ -10,18 +10,23 @@ $('#start_btn').click(() => {
 });
 
 $('#createRoom_btn').click(() => {
-    $(".modal").fadeIn();
+    $('#roomModal').fadeIn();
 });
 
 $('#createRoomInfo button').click(() => {
     var roomTitle = $('#createRoomInfo input').val();
     socket.emit('createRoom', id, roomTitle);
-    $("#test").hide();
+    $('#createRoomInfo').hide();
+    $('#waitingRoom').show();
+});
+
+$('#waitingRoom button').click(() => {
+    $('#roomModal').fadeOut();
+    $('#game_lobby').hide();
 });
 
 var trNum = 1;
-socket.on('createRoom', (id, roomNum, roomTitle, clientsNum) => {
-    //TEST CODE
+socket.on('createRoom', (host, roomNum, roomTitle, clientsNum) => {
     $('#lobby_table tr:eq(' + trNum + ')>' + 'td:eq(0)').html(roomNum);
     $('#lobby_table tr:eq(' + trNum + ')>' + 'td:eq(1)').html(roomTitle);
     $('#lobby_table tr:eq(' + trNum + ')>' + 'td:eq(2)').html(clientsNum);
