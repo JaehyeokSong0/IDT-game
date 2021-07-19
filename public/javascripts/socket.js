@@ -11,19 +11,25 @@ $('#start_btn').click(() => {
 
 $('#createRoom_btn').click(() => {
     $(".modal").fadeIn();
-    $(".modal button").click(() => {
-        $(".modal").fadeOut();
-    });
 });
 
-$('#createRoom button').click(()=> {
-    var roomTitle = $('#createRoom input').val();
-    socket.emit('createRoom', id,roomTitle);
+$('#createRoomInfo button').click(() => {
+    var roomTitle = $('#createRoomInfo input').val();
+    socket.emit('createRoom', id, roomTitle);
+    $("#test").hide();
 });
 
-socket.on('createRoom', (id, roomNum,roomTitle) => {
-    console.log(id, 'created ', roomNum);
+var trNum = 1;
+socket.on('createRoom', (id, roomNum, roomTitle, clientsNum) => {
     //TEST CODE
-    $('#lobby_table td:eq(0)').html(roomNum);
-    $('#lobby_table td:eq(1)').html(roomTitle);
+    $('#lobby_table tr:eq(' + trNum + ')>' + 'td:eq(0)').html(roomNum);
+    $('#lobby_table tr:eq(' + trNum + ')>' + 'td:eq(1)').html(roomTitle);
+    $('#lobby_table tr:eq(' + trNum + ')>' + 'td:eq(2)').html(clientsNum);
+    if (clientsNum == 1) {
+        $('#lobby_table tr:eq(' + trNum + ')>' + 'td:eq(3)').html('Waiting');
+    }
+    trNum += 1;
+    if (trNum > 4) {
+        trNum = 1;
+    }
 });

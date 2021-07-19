@@ -38,10 +38,12 @@ io.on('connection', (socket) => {
   });
 
   socket.on('createRoom', createRoom);
-  async function createRoom(id,roomTitle) {
+  async function createRoom(id, roomTitle) {
     await socket.join(roomNum);
-    io.emit('createRoom', id, roomNum,roomTitle);
-    roomNum+=1;
+    var clients = io.sockets.adapter.rooms.get(roomNum);
+    var clientsNum = clients.size;
+    io.emit('createRoom', id, roomNum, roomTitle, clientsNum);
+    roomNum += 1;
   }
 });
 /**
