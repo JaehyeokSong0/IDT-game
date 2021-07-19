@@ -5,16 +5,8 @@ body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
-.modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translateY(-50%) translateX(-50%);
-  background: rgba(0, 0, 0, 0.8);
+.modal{
   display: none;
-}
-
-.modal_content {
   width: 44rem;
   height: 22rem;
   background: white;
