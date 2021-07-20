@@ -20,12 +20,17 @@
 }
 
 #game_lobby th {
-    border-bottom: 1px solid grey;
     padding: 0.5rem;
 }
 
 #game_lobby td {
+    border-top: 1px solid grey;
     border-bottom: 1px solid grey;
     padding: 0.5rem;
     font-size: 1rem;
+}
+
+#lobby_table {
+    height: 22vh;
+    overflow-y: auto;
 }
