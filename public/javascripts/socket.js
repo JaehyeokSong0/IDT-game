@@ -29,12 +29,16 @@ var trNum = 1;
 socket.on('createRoom', (host, roomNum, roomTitle, clientsNum) => {
     $('#lobby_table tr:eq(' + trNum + ')>' + 'td:eq(0)').html(roomNum);
     $('#lobby_table tr:eq(' + trNum + ')>' + 'td:eq(1)').html(roomTitle);
-    $('#lobby_table tr:eq(' + trNum + ')>' + 'td:eq(2)').html(clientsNum);
-    if (clientsNum == 1) {
-        $('#lobby_table tr:eq(' + trNum + ')>' + 'td:eq(3)').html('Waiting');
-    }
-    trNum += 1;
-    if (trNum > 4) {
-        trNum = 1;
+    $('#lobby_table tr:eq(' + trNum + ')>' + 'td:eq(2)').html(clientsNum+'/2');
+    $('#lobby_table tr:eq(' + trNum + ')>' + 'td:eq(3)').html('Waiting');
+    trNum++;
+    if (trNum > 5) {
+        $('#lobby_table table').append(`<tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td><button>JoinRoom</button></td>
+      </tr>`)
     }
 });
