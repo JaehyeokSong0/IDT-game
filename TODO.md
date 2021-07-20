@@ -2,8 +2,7 @@
 
 ## <u>Currently working on...
 1. Implement Lobby
-    - Dynamic paging
-    - JoinRoom button
+    - Verify length of the room title
 2. Implement Waiting Room
     - Get player info
     - Design room
