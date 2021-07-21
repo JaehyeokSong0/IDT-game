@@ -3,6 +3,7 @@
 ## <u>Currently working on...
 1. Implement Lobby
     - Verify length of the room title
+    - JoinRoom function
 2. Implement Waiting Room
     - Get player info
     - Design room
