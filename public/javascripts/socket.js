@@ -25,12 +25,12 @@ $('#waitingRoom button').click(() => {
     $('#game_lobby').hide();
 });
 
-$('#lobby_table button').click((e)=> {
-    var roomNum = $(e.target).parent().siblings('.roomNum').text();
+$('#lobby_table button').click((e) => {
+    var roomNum = Number($(e.target).parent().siblings('.roomNum').text());
     var playersCnt = $(e.target).parent().siblings('.roomPlayers').text().split('/')[0];
-    if(playersCnt == '1') {
-        socket.emit('joinRoom',roomNum);
-    } else {
+    if (playersCnt == '1') {
+        socket.emit('joinRoom', id, roomNum);
+    } else if (playersCnt == '2') {
         alert("The room already has been full!!");
     }
 });
@@ -51,4 +51,13 @@ socket.on('createRoom', (host, roomNum, roomTitle, clientsNum) => {
         <td><button>JoinRoom</button></td>
       </tr>`)
     }
+});
+
+socket.on('joinRoom', (roomNum, clientsNum) => {
+    $('#lobby_table .roomNum').each((index, item) => {
+        if ($(item).html() == roomNum) {
+            $(item).siblings('.roomPlayers').html(clientsNum + '/2');
+            return false; //each문 내에서 break의 기능 수행       
+        }
+    });
 });

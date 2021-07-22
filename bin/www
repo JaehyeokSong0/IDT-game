@@ -38,6 +38,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('createRoom', createRoom);
+  socket.on('joinRoom', joinRoom);
+
   async function createRoom(id, roomTitle) {
     await socket.join(roomNum);
     var clients = io.sockets.adapter.rooms.get(roomNum);
@@ -45,6 +47,15 @@ io.on('connection', (socket) => {
     var host = id;
     io.emit('createRoom', host, roomNum, roomTitle, clientsNum);
     roomNum += 1;
+  }
+  async function joinRoom(id, roomNum) {
+    await socket.join(roomNum);
+    var clients = io.sockets.adapter.rooms.get(roomNum);
+    var clientsNum = clients.size;
+    var guest = id;
+    io.emit('joinRoom', roomNum, clientsNum);
+    //for waiting room
+    //io.sockets.in(roomNum).emit('joinedRoom',guest);
   }
 });
 
