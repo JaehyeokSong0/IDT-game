@@ -4,6 +4,7 @@
 1. Implement Lobby
     - Verify length of the room title
     - JoinRoom function
+        - Show waiting room to guest user
 2. Implement Waiting Room
     - Get player info
     - Design room
