@@ -25,19 +25,29 @@ $('#waitingRoom button').click(() => {
     $('#game_lobby').hide();
 });
 
+$('#lobby_table button').click((e)=> {
+    var roomNum = $(e.target).parent().siblings('.roomNum').text();
+    var playersCnt = $(e.target).parent().siblings('.roomPlayers').text().split('/')[0];
+    if(playersCnt == '1') {
+        socket.emit('joinRoom',roomNum);
+    } else {
+        alert("The room already has been full!!");
+    }
+});
+
 var trNum = 1;
 socket.on('createRoom', (host, roomNum, roomTitle, clientsNum) => {
     $('#lobby_table tr:eq(' + trNum + ')>' + 'td:eq(0)').html(roomNum);
     $('#lobby_table tr:eq(' + trNum + ')>' + 'td:eq(1)').html(roomTitle);
-    $('#lobby_table tr:eq(' + trNum + ')>' + 'td:eq(2)').html(clientsNum+'/2');
+    $('#lobby_table tr:eq(' + trNum + ')>' + 'td:eq(2)').html(clientsNum + '/2');
     $('#lobby_table tr:eq(' + trNum + ')>' + 'td:eq(3)').html('Waiting');
     trNum++;
     if (trNum > 5) {
         $('#lobby_table table').append(`<tr>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td class = "roomNum"></td>
+        <td class = "roomTitle"></td>
+        <td class = "roomPlayers"></td>
+        <td class = "roomStatus"></td>
         <td><button>JoinRoom</button></td>
       </tr>`)
     }
