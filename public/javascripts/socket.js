@@ -26,10 +26,10 @@ $('#createRoomInfo button').click(() => {
 function verifyTitle(roomTitle) {
     const regex = /^[a-z|A-Z|0-9]+$/;
     if (regex.test(roomTitle)) {
-        if (roomTitle.length <= 8) {
+        if (roomTitle.length <= 10) {
             return true;
         } else {
-            alert("Please create a title within 8 characters.");
+            alert("Please create a title within 10 characters.");
         }
     } else {
         alert("Please create a room with only english and numbers. Blank and special characters cannot be used.");
