@@ -39,6 +39,7 @@ io.on('connection', (socket) => {
 
   socket.on('createRoom', createRoom);
   socket.on('joinRoom', joinRoom);
+  socket.on('getReady', getReady);
 
   async function createRoom(id, roomTitle) {
     await socket.join(roomNum);
@@ -56,6 +57,11 @@ io.on('connection', (socket) => {
     io.emit('joinRoom', roomNum, clientsNum);
     //for waiting room
     //io.sockets.in(roomNum).emit('joinedRoom',guest);
+  }
+
+  function getReady() {
+    const roomNum = [...socket.rooms][1];
+    io.sockets.in(roomNum).emit('getReady');
   }
 });
 

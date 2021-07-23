@@ -10,7 +10,9 @@ $('#start_btn').click(() => {
 });
 
 $('#createRoom_btn').click(() => {
+    $('#game_lobby').hide();
     $('#roomModal').fadeIn();
+    $('#createRoomInfo').show();
 });
 
 $('#createRoomInfo button').click(() => {
@@ -18,7 +20,7 @@ $('#createRoomInfo button').click(() => {
     if (verifyTitle(roomTitle)) {
         socket.emit('createRoom', id, roomTitle);
         $('#createRoomInfo').hide();
-        $('#waitingRoom').show();
+        $('#waitingRoom_host').show();
     }
 });
 
@@ -37,9 +39,12 @@ function verifyTitle(roomTitle) {
     return false;
 }
 
-$('#waitingRoom button').click(() => {
+$('#waitingRoom_host button').click(() => {
     $('#roomModal').fadeOut();
-    $('#game_lobby').hide();
+});
+
+$('#waitingRoom_guest button').click(() => {
+    socket.emit('getReady');
 });
 
 $('#lobby_table button').click((e) => {
@@ -47,6 +52,11 @@ $('#lobby_table button').click((e) => {
     var playersCnt = $(e.target).parent().siblings('.roomPlayers').text().split('/')[0];
     if (playersCnt == '1') {
         socket.emit('joinRoom', id, roomNum);
+        $('#roomModal').fadeIn();
+        $('#createRoomInfo').hide();
+        $('#waitingRoom_guest').show();
+        $('#game_lobby').hide();
+
     } else if (playersCnt == '2') {
         alert("The room already has been full!!");
     }
@@ -78,4 +88,8 @@ socket.on('joinRoom', (roomNum, clientsNum) => {
             return false; //each문 내에서 break의 기능 수행       
         }
     });
+});
+
+socket.on('getReady', () => {
+    $('#waitingRoom_host button').attr('disabled', false);
 });

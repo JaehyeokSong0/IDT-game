@@ -1,11 +1,14 @@
 <!-- CreateRoom / WaitingRoom -->
 
 <div class="modal" id="roomModal">
-    <div id="createRoomInfo">
+    <div id="createRoomInfo" style="display: none;">
         <input placeholder="Input Game Title">
         <button>CREATE</button>
     </div>
-    <div id="waitingRoom" style="display: none;">
-        <button>START GAME</button>
+    <div id="waitingRoom_host" style="display: none;">
+        <button disabled>START GAME</button>
+    </div>
+    <div id="waitingRoom_guest" style="display: none;">
+        <button>GET READY</button>
     </div>
 </div>
