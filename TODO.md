@@ -2,8 +2,7 @@
 
 ## <u>Currently working on...
 1. Implement Lobby
-    - JoinRoom function
-        - Show waiting room to guest user
+    - Show same rooms to all users 
 2. Implement Waiting Room
     - Get player info
     - Design room
