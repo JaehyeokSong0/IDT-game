@@ -2,7 +2,6 @@
 
 ## <u>Currently working on...
 1. Implement Lobby
-    - Verify length of the room title
     - JoinRoom function
         - Show waiting room to guest user
 2. Implement Waiting Room
