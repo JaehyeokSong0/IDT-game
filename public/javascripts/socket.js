@@ -58,6 +58,7 @@ socket.on('createRoom', (host, roomNum, roomTitle, clientsNum) => {
     $('#lobby_table tr:eq(' + trNum + ')>' + 'td:eq(1)').html(roomTitle);
     $('#lobby_table tr:eq(' + trNum + ')>' + 'td:eq(2)').html(clientsNum + '/2');
     $('#lobby_table tr:eq(' + trNum + ')>' + 'td:eq(3)').html('Waiting');
+    $('#lobby_table tr:eq(' + trNum + ') button').attr('disabled', false);
     trNum++;
     if (trNum > 5) {
         $('#lobby_table table').append(`<tr>
@@ -65,7 +66,7 @@ socket.on('createRoom', (host, roomNum, roomTitle, clientsNum) => {
         <td class = "roomTitle"></td>
         <td class = "roomPlayers"></td>
         <td class = "roomStatus"></td>
-        <td><button>JoinRoom</button></td>
+        <td><button disabled>JoinRoom</button></td>
       </tr>`)
     }
 });
