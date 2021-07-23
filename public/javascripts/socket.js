@@ -15,10 +15,27 @@ $('#createRoom_btn').click(() => {
 
 $('#createRoomInfo button').click(() => {
     var roomTitle = $('#createRoomInfo input').val();
-    socket.emit('createRoom', id, roomTitle);
-    $('#createRoomInfo').hide();
-    $('#waitingRoom').show();
+    if (verifyTitle(roomTitle)) {
+        socket.emit('createRoom', id, roomTitle);
+        $('#createRoomInfo').hide();
+        $('#waitingRoom').show();
+    }
 });
+
+// verify condition of roomTitle
+function verifyTitle(roomTitle) {
+    const regex = /^[a-z|A-Z|0-9]+$/;
+    if (regex.test(roomTitle)) {
+        if (roomTitle.length <= 8) {
+            return true;
+        } else {
+            alert("Please create a title within 8 characters.");
+        }
+    } else {
+        alert("Please create a room with only english and numbers. Blank and special characters cannot be used.");
+    }
+    return false;
+}
 
 $('#waitingRoom button').click(() => {
     $('#roomModal').fadeOut();

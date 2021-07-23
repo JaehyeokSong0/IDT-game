@@ -2,10 +2,10 @@ body {
   margin: 0;
   padding: 0;
   background-color: grey;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  font: 14px "Lucida Console", monospace;
 }
 
-.modal{
+.modal {
   display: none;
   width: 44rem;
   height: 22rem;
