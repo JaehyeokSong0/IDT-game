@@ -19,3 +19,15 @@ body {
   text-align: center;
   box-sizing: border-box;
 }
+
+#createRoomInfo {
+  display: none;
+}
+
+#waitingRoom_host {
+  display: none;
+}
+
+#waitingRoom_guest {
+  display: none;
+}
