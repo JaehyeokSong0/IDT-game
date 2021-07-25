@@ -3,10 +3,17 @@ var id;
 
 $('#start_btn').click(() => {
     id = $('#nickname').val();
-    // #중복체크 필요
-    $('#game_index').hide();
-    $('body').css('backgroundColor', 'white');
-    $('#game_lobby').show();
+    socket.emit('createId', id);
+    socket.on('checkId',(isValidId) => {
+        if(isValidId) {
+            alert("Successfully created ID!");
+            $('#game_index').hide();
+            $('body').css('backgroundColor', 'white');
+            $('#game_lobby').show();
+        } else {
+            alert("The ID already exists! Please try with a different ID.");
+        }
+    })
 });
 
 $('#createRoom_btn').click(() => {
@@ -83,7 +90,7 @@ socket.on('joinRoom', (roomNum, clientsNum) => {
     });
 });
 
-socket.on('removeRoom', (rooms) => {
+socket.on('deleteRoom', (rooms) => {
     refreshRoom(rooms);
 });
 

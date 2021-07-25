@@ -31,17 +31,34 @@ var io = require('socket.io')(server, {
   }
 });
 var roomNum = 1;
+var usersId = [];
 var rooms = [];
+
 io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });
 
+  socket.on('createId',createId);
   socket.on('createRoom', createRoom);
   socket.on('joinRoom', joinRoom);
   socket.on('getReady', getReady);
-  socket.on('leaveRoom',leaveRoom);
-
+  socket.on('leaveRoom', leaveRoom);
+ 
+  function createId (id) {
+    const index = usersId.findIndex((item) => {
+      return item == id;
+    });
+    var isValidId;
+    console.log(usersId);
+    if (index > -1) {
+      isValidId = false;
+    } else {      
+      usersId.push(id);
+      isValidId = true;
+    }
+    io.to(socket.id).emit('checkId',isValidId);
+  }
   async function createRoom(id, roomTitle) {
     await socket.join(roomNum);
     var clients = io.sockets.adapter.rooms.get(roomNum);
@@ -57,21 +74,25 @@ io.on('connection', (socket) => {
     var clientsNum = clients.size;
     var guest = id;
     io.emit('joinRoom', roomNum, clientsNum);
-    //for waiting room
-    //io.sockets.in(roomNum).emit('joinedRoom',guest);
   }
+
   function getReady() {
     const roomNum = [...socket.rooms][1];
     io.sockets.in(roomNum).emit('getReady');
   }
   function leaveRoom() {
     const roomNum = [...socket.rooms][1];
-    const index = rooms.findIndex((item)=>{return item[1] == roomNum});
-    if(index >-1) {
-      rooms.splice(index,1);
-    }
     socket.leave(roomNum);
-    io.emit('leaveRoom',rooms);
+    deleteRoom(roomNum);    
+  }
+  function deleteRoom(roomNum) {
+    const index = rooms.findIndex((item) => {
+      return item[1] == roomNum
+    });
+    if (index > -1) {
+      rooms.splice(index, 1);
+    }
+    io.emit('deleteRoom', rooms);
   }
 });
 
