@@ -31,7 +31,7 @@ var io = require('socket.io')(server, {
   }
 });
 var roomNum = 1;
-
+var rooms = [];
 io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('user disconnected');
@@ -46,7 +46,8 @@ io.on('connection', (socket) => {
     var clients = io.sockets.adapter.rooms.get(roomNum);
     var clientsNum = clients.size;
     var host = id;
-    io.emit('createRoom', host, roomNum, roomTitle, clientsNum);
+    rooms.push([host, roomNum, roomTitle, clientsNum]);
+    io.emit('createRoom', rooms);
     roomNum += 1;
   }
   async function joinRoom(id, roomNum) {

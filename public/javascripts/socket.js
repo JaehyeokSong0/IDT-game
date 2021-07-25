@@ -62,15 +62,15 @@ $('#lobby_table button').click((e) => {
     }
 });
 
-var trNum = 1;
-socket.on('createRoom', (host, roomNum, roomTitle, clientsNum) => {
-    $('#lobby_table tr:eq(' + trNum + ')>' + 'td:eq(0)').html(roomNum);
-    $('#lobby_table tr:eq(' + trNum + ')>' + 'td:eq(1)').html(roomTitle);
-    $('#lobby_table tr:eq(' + trNum + ')>' + 'td:eq(2)').html(clientsNum + '/2');
-    $('#lobby_table tr:eq(' + trNum + ')>' + 'td:eq(3)').html('Waiting');
-    $('#lobby_table tr:eq(' + trNum + ') button').attr('disabled', false);
-    trNum++;
-    if (trNum > 5) {
+socket.on('createRoom', (rooms) => {
+    for (var trNum = 0; trNum < rooms.length; trNum++) {
+        $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(0)').html(rooms[trNum][1]);
+        $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(1)').html(rooms[trNum][2]);
+        $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(2)').html(rooms[trNum][3] + '/2');
+        $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(3)').html('Waiting');
+        $('#lobby_table tr:eq(' + (trNum + 1) + ') button').attr('disabled', false);
+    }
+    if (trNum > 4) {
         $('#lobby_table table').append(`<tr>
         <td class = "roomNum"></td>
         <td class = "roomTitle"></td>
