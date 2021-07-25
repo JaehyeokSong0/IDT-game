@@ -40,6 +40,7 @@ io.on('connection', (socket) => {
   socket.on('createRoom', createRoom);
   socket.on('joinRoom', joinRoom);
   socket.on('getReady', getReady);
+  socket.on('leaveRoom',leaveRoom);
 
   async function createRoom(id, roomTitle) {
     await socket.join(roomNum);
@@ -59,10 +60,18 @@ io.on('connection', (socket) => {
     //for waiting room
     //io.sockets.in(roomNum).emit('joinedRoom',guest);
   }
-
   function getReady() {
     const roomNum = [...socket.rooms][1];
     io.sockets.in(roomNum).emit('getReady');
+  }
+  function leaveRoom() {
+    const roomNum = [...socket.rooms][1];
+    const index = rooms.findIndex((item)=>{return item[1] == roomNum});
+    if(index >-1) {
+      rooms.splice(index,1);
+    }
+    socket.leave(roomNum);
+    io.emit('leaveRoom',rooms);
   }
 });
 

@@ -47,6 +47,14 @@ $('#waitingRoom_guest button').click(() => {
     socket.emit('getReady');
 });
 
+$('#exit_btn').click(() => {
+    $('#waitingRoom_host').hide();
+    $('#waitingRoom_guest').hide();
+    $('#roomModal').hide();
+    $('#game_lobby').show();
+    socket.emit('leaveRoom');
+});
+
 $('#lobby_table button').click((e) => {
     var roomNum = Number($(e.target).parent().siblings('.roomNum').text());
     var playersCnt = $(e.target).parent().siblings('.roomPlayers').text().split('/')[0];
@@ -63,22 +71,7 @@ $('#lobby_table button').click((e) => {
 });
 
 socket.on('createRoom', (rooms) => {
-    for (var trNum = 0; trNum < rooms.length; trNum++) {
-        $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(0)').html(rooms[trNum][1]);
-        $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(1)').html(rooms[trNum][2]);
-        $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(2)').html(rooms[trNum][3] + '/2');
-        $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(3)').html('Waiting');
-        $('#lobby_table tr:eq(' + (trNum + 1) + ') button').attr('disabled', false);
-    }
-    if (trNum > 4) {
-        $('#lobby_table table').append(`<tr>
-        <td class = "roomNum"></td>
-        <td class = "roomTitle"></td>
-        <td class = "roomPlayers"></td>
-        <td class = "roomStatus"></td>
-        <td><button disabled>JoinRoom</button></td>
-      </tr>`)
-    }
+    refreshRoom(rooms);
 });
 
 socket.on('joinRoom', (roomNum, clientsNum) => {
@@ -90,6 +83,38 @@ socket.on('joinRoom', (roomNum, clientsNum) => {
     });
 });
 
+socket.on('leaveRoom', (rooms) => {
+    refreshRoom(rooms);
+});
+
 socket.on('getReady', () => {
     $('#waitingRoom_host button').attr('disabled', false);
 });
+
+function refreshRoom(rooms) {
+    if (rooms.length == 0) {
+        $('#lobby_table tr:eq(1)> td:eq(0)').html('');
+        $('#lobby_table tr:eq(1)> td:eq(1)').html('');
+        $('#lobby_table tr:eq(1)> td:eq(2)').html('');
+        $('#lobby_table tr:eq(1)> td:eq(3)').html('');
+        $('#lobby_table tr:eq(1) button').attr('disabled', true);
+    } else {
+        var trNum = 0;
+        for (trNum = 0; trNum < rooms.length; trNum++) {
+            $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(0)').html(rooms[trNum][1]);
+            $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(1)').html(rooms[trNum][2]);
+            $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(2)').html(rooms[trNum][3] + '/2');
+            $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(3)').html('Waiting');
+            $('#lobby_table tr:eq(' + (trNum + 1) + ') button').attr('disabled', false);
+        }
+        if (trNum > 4) {
+            $('#lobby_table table').append(`<tr>
+        <td class = "roomNum"></td>
+        <td class = "roomTitle"></td>
+        <td class = "roomPlayers"></td>
+        <td class = "roomStatus"></td>
+        <td><button disabled>JoinRoom</button></td>
+      </tr>`)
+        }
+    }
+}

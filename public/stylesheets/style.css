@@ -31,3 +31,7 @@ body {
 #waitingRoom_guest {
   display: none;
 }
+
+#exit_btn {
+  margin-top: 2rem;
+}
