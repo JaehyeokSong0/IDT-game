@@ -1,9 +1,7 @@
 # To-Do List
 
 ## <u>Currently working on...
-1. Implement Lobby
-    - Show same rooms to all users 
-2. Implement Waiting Room
+1. Implement Waiting Room
     - Get player info
     - Design room
 
