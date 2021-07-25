@@ -1,8 +1,8 @@
 const socket = io();
-var id = 'tmp'; // TEST CODE
+var id;
 
 $('#start_btn').click(() => {
-    var id = $('#nickname').val();
+    id = $('#nickname').val();
     // #중복체크 필요
     $('#game_index').hide();
     $('body').css('backgroundColor', 'white');
@@ -83,7 +83,7 @@ socket.on('joinRoom', (roomNum, clientsNum) => {
     });
 });
 
-socket.on('leaveRoom', (rooms) => {
+socket.on('removeRoom', (rooms) => {
     refreshRoom(rooms);
 });
 

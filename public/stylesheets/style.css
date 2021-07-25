@@ -1,7 +1,7 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: grey;
+  background-color: white;
   font: 14px "Lucida Console", monospace;
 }
 
@@ -9,7 +9,7 @@ body {
   display: none;
   width: 44rem;
   height: 22rem;
-  background: white;
+  background: lightgrey;
   border-radius: 10px;
   position: fixed;
   top: 50%;
