@@ -1,14 +1,11 @@
 # To-Do List
 
 ## <u>Currently working on...
-1. Implement Waiting Room
-    - Improve leaveRoom
-      - Change guest to host when existing host leaves
+- Implement Waiting Room
     - Show lobby to new user
     - Get player info
-    - Design room
-
+    - Refactor
 ## <u>To be worked on later...
 - Implement game
 - Improve design
-- Refactor
+- Design room
