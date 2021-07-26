@@ -39,32 +39,32 @@ io.on('connection', (socket) => {
     console.log('user disconnected');
   });
 
-  socket.on('createId',createId);
+  socket.on('createId', createId);
   socket.on('createRoom', createRoom);
   socket.on('joinRoom', joinRoom);
   socket.on('getReady', getReady);
   socket.on('leaveRoom', leaveRoom);
- 
-  function createId (id) {
+
+  function createId(id) {
     const index = usersId.findIndex((item) => {
       return item == id;
     });
     var isValidId;
-    console.log(usersId);
     if (index > -1) {
       isValidId = false;
-    } else {      
+    } else {
       usersId.push(id);
       isValidId = true;
     }
-    io.to(socket.id).emit('checkId',isValidId);
+    io.to(socket.id).emit('checkId', isValidId);
   }
   async function createRoom(id, roomTitle) {
     await socket.join(roomNum);
     var clients = io.sockets.adapter.rooms.get(roomNum);
     var clientsNum = clients.size;
     var host = id;
-    rooms.push([host, roomNum, roomTitle, clientsNum]);
+    var guest = "";
+    rooms.push([roomNum, roomTitle, host, guest, clientsNum]);
     io.emit('createRoom', rooms);
     roomNum += 1;
   }
@@ -73,6 +73,11 @@ io.on('connection', (socket) => {
     var clients = io.sockets.adapter.rooms.get(roomNum);
     var clientsNum = clients.size;
     var guest = id;
+    const index = rooms.findIndex((item) => {
+      return item[0] == roomNum
+    });
+    rooms[index][3] = guest;
+    rooms[index][4] = clientsNum;
     io.emit('joinRoom', roomNum, clientsNum);
   }
 
@@ -80,19 +85,41 @@ io.on('connection', (socket) => {
     const roomNum = [...socket.rooms][1];
     io.sockets.in(roomNum).emit('getReady');
   }
-  function leaveRoom() {
+
+  function leaveRoom(id) {
     const roomNum = [...socket.rooms][1];
+    const index = rooms.findIndex((item) => {
+      return item[0] == roomNum
+    });
+    const host = rooms[index][2];
+    const guest = rooms[index][3];
+    if (id == host) {
+      //If there's no guest and only host exists
+      if (rooms[index][4] == 1) {
+        deleteRoom(roomNum);
+      } else {
+        rooms[index][2] = guest;
+        rooms[index][3] = "";
+        rooms[index][4] = 1;
+        socket.broadcast.to(roomNum).emit("changeHost");
+      }
+    } else {
+      socket.broadcast.to(roomNum).emit("guestExit");
+      rooms[index][3] = "";
+      rooms[index][4] = 1;
+    }
+    io.emit("refreshRoom", rooms);
     socket.leave(roomNum);
-    deleteRoom(roomNum);    
   }
+
   function deleteRoom(roomNum) {
     const index = rooms.findIndex((item) => {
-      return item[1] == roomNum
+      return item[0] == roomNum
     });
     if (index > -1) {
       rooms.splice(index, 1);
     }
-    io.emit('deleteRoom', rooms);
+    io.emit('refreshRoom', rooms);
   }
 });
 

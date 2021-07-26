@@ -59,7 +59,7 @@ $('#exit_btn').click(() => {
     $('#waitingRoom_guest').hide();
     $('#roomModal').hide();
     $('#game_lobby').show();
-    socket.emit('leaveRoom');
+    socket.emit('leaveRoom',id);
 });
 
 $('#lobby_table button').click((e) => {
@@ -90,7 +90,7 @@ socket.on('joinRoom', (roomNum, clientsNum) => {
     });
 });
 
-socket.on('deleteRoom', (rooms) => {
+socket.on('refreshRoom', (rooms) => {
     refreshRoom(rooms);
 });
 
@@ -98,6 +98,15 @@ socket.on('getReady', () => {
     $('#waitingRoom_host button').attr('disabled', false);
 });
 
+socket.on('guestExit',() => {
+    $('#waitingRoom_host button').attr('disabled', true);
+})
+
+socket.on('changeHost', () => {
+    $('#waitingRoom_guest').hide();
+    $('#waitingRoom_host').show();
+    $('#waitingRoom_host button').attr('disabled', true);
+})
 function refreshRoom(rooms) {
     if (rooms.length == 0) {
         $('#lobby_table tr:eq(1)> td:eq(0)').html('');
@@ -108,9 +117,9 @@ function refreshRoom(rooms) {
     } else {
         var trNum = 0;
         for (trNum = 0; trNum < rooms.length; trNum++) {
-            $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(0)').html(rooms[trNum][1]);
-            $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(1)').html(rooms[trNum][2]);
-            $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(2)').html(rooms[trNum][3] + '/2');
+            $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(0)').html(rooms[trNum][0]);
+            $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(1)').html(rooms[trNum][1]);
+            $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(2)').html(rooms[trNum][4] + '/2');
             $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(3)').html('Waiting');
             $('#lobby_table tr:eq(' + (trNum + 1) + ') button').attr('disabled', false);
         }
