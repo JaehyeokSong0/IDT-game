@@ -44,6 +44,7 @@ io.on('connection', (socket) => {
   socket.on('joinRoom', joinRoom);
   socket.on('getReady', getReady);
   socket.on('leaveRoom', leaveRoom);
+  socket.on('refreshRoom',refreshRoom);
 
   function createId(id) {
     const index = usersId.findIndex((item) => {
@@ -101,17 +102,19 @@ io.on('connection', (socket) => {
         rooms[index][2] = guest;
         rooms[index][3] = "";
         rooms[index][4] = 1;
-        socket.broadcast.to(roomNum).emit("changeHost");
+        socket.broadcast.to(roomNum).emit('changeHost');
       }
     } else {
-      socket.broadcast.to(roomNum).emit("guestExit");
+      socket.broadcast.to(roomNum).emit('guestExit');
       rooms[index][3] = "";
       rooms[index][4] = 1;
     }
-    io.emit("refreshRoom", rooms);
+    io.emit('refreshRoom', rooms);
     socket.leave(roomNum);
   }
-
+  function refreshRoom() {
+    io.emit('refreshRoom',rooms);
+  }
   function deleteRoom(roomNum) {
     const index = rooms.findIndex((item) => {
       return item[0] == roomNum

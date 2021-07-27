@@ -10,6 +10,7 @@ $('#start_btn').click(() => {
             $('#game_index').hide();
             $('body').css('backgroundColor', 'white');
             $('#game_lobby').show();
+            socket.emit('refreshRoom');
         } else {
             alert("The ID already exists! Please try with a different ID.");
         }
