@@ -7,4 +7,3 @@
 ## <u>To be worked on later...
 - Implement game
 - Improve design
-- Design room
