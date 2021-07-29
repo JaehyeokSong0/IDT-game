@@ -15,7 +15,7 @@ body {
   top: 50%;
   left: 50%;
   transform: translateY(-50%) translateX(-50%);
-  padding: 11rem 0;
+  padding: 1rem 0;
   text-align: center;
   box-sizing: border-box;
 }
