@@ -81,7 +81,12 @@ $('#lobby_table button').click((e) => {
 socket.on('createRoom', (rooms) => {
     refreshRoom(rooms);
 });
-
+socket.on('createdRoom', (roomInfo) => {
+    $('#roomNumInfo').html(roomInfo[0]);
+    $('#roomTitleInfo').html(roomInfo[1]);
+    $('#hostInfo').html(roomInfo[2]);
+    $('#guestInfo').html(roomInfo[3]);
+})
 socket.on('joinRoom', (roomNum, clientsNum) => {
     $('#lobby_table .roomNum').each((index, item) => {
         if ($(item).html() == roomNum) {
@@ -90,7 +95,12 @@ socket.on('joinRoom', (roomNum, clientsNum) => {
         }
     });
 });
-
+socket.on('joinedRoom', (roomInfo) => {
+    $('#roomNumInfo').html(roomInfo[0]);
+    $('#roomTitleInfo').html(roomInfo[1]);
+    $('#hostInfo').html(roomInfo[2]);
+    $('#guestInfo').html(roomInfo[3]);
+})
 socket.on('refreshRoom', (rooms) => {
     refreshRoom(rooms);
 });

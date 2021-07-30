@@ -65,8 +65,10 @@ io.on('connection', (socket) => {
     var clientsNum = clients.size;
     var host = id;
     var guest = "";
-    rooms.push([roomNum, roomTitle, host, guest, clientsNum]);
+    var roomInfo = [roomNum, roomTitle, host, guest, clientsNum];
+    rooms.push(roomInfo);
     io.emit('createRoom', rooms);
+    io.sockets.in(roomNum).emit('createdRoom',roomInfo);
     roomNum += 1;
   }
   async function joinRoom(id, roomNum) {
@@ -79,7 +81,9 @@ io.on('connection', (socket) => {
     });
     rooms[index][3] = guest;
     rooms[index][4] = clientsNum;
+    var roomInfo = rooms[index];
     io.emit('joinRoom', roomNum, clientsNum);
+    io.sockets.in(roomNum).emit('joinedRoom',roomInfo);
   }
 
   function getReady() {
@@ -92,6 +96,9 @@ io.on('connection', (socket) => {
     const index = rooms.findIndex((item) => {
       return item[0] == roomNum
     });
+    //for catch bug
+    console.log(roomNum," ,rooms : ", [...socket.rooms]);
+    console.log("rooms : ",rooms," index : ",index);
     const host = rooms[index][2];
     const guest = rooms[index][3];
     if (id == host) {
