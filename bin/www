@@ -96,9 +96,10 @@ io.on('connection', (socket) => {
     const index = rooms.findIndex((item) => {
       return item[0] == roomNum
     });
-    //for catch bug
-    console.log(roomNum," ,rooms : ", [...socket.rooms]);
-    console.log("rooms : ",rooms," index : ",index);
+    //If no room has been created, terminate the function.
+    if(index == -1) {
+      return;
+    }
     const host = rooms[index][2];
     const guest = rooms[index][3];
     if (id == host) {
