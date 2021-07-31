@@ -1,0 +1,75 @@
+.modal {
+    display: none;
+    width: 44rem;
+    height: 22rem;
+    background: lightgrey;
+    border-radius: 10px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translateY(-50%) translateX(-50%);
+    padding: 1rem 0;
+    text-align: center;
+    box-sizing: border-box;
+  }
+  
+  #waitingRoom {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .playerInfo {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    border-radius: 10px;
+    width: 8rem;
+    height: 8rem;
+  }
+  
+  #hostInfo {
+    background-color: white;
+    float: left;
+    margin-left: 3rem;
+  }
+  
+  #guestInfo {
+    color: white;
+    background-color: black;
+    float: right;
+    margin-right: 3rem;
+  }
+  
+  .roomInfo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 10px;
+    background-color: silver;
+  }
+  
+  #roomNumInfo {
+    width: 2rem;
+  }
+  
+  #roomTitleInfo {
+    width: 16rem;
+  }
+  
+  #createRoomInfo {
+    display: none;
+  }
+  
+  #waitingRoom_host {
+    display: none;
+  }
+  
+  #waitingRoom_guest {
+    display: none;
+  }
+  
+  #exit_btn {
+    margin-top: 2rem;
+  }

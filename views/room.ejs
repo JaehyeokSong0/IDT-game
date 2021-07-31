@@ -1,11 +1,11 @@
 <!-- CreateRoom / WaitingRoom -->
-
+<link rel='stylesheet' href='/stylesheets/room.css' />
 <div class="modal" id="roomModal">
-    <div id="playerInfo" style="position: relative; overflow: hidden; ">
-        <span id="hostInfo" style="align-items: center; display:flex; justify-content:center; float:left; margin-left:3rem; border-radius: 10px; background-color: white; width: 8rem; height: 8rem;"></span>
-        <span id = "roomNumInfo" style="display: inline-flex; align-items: center;justify-content:center;width: 2rem; height:2rem; border-radius: 10px; background-color: silver;"></span>
-        <span id = "roomTitleInfo" style="display: inline-flex; align-items: center;justify-content:center; width: 16rem; height:2rem; border-radius: 10px; background-color: silver;"></span>
-        <span id="guestInfo" style="align-items: center; color:white;display:flex; justify-content:center; float:right; margin-right:3rem; border-radius: 10px; background-color: black; width: 8rem; height: 8rem;"></span>
+    <div id="waitingRoom">
+        <span class="playerInfo" id="hostInfo"></span>
+        <span class="roomInfo" id="roomNumInfo"></span>
+        <span class="roomInfo" id="roomTitleInfo"></span>
+        <span class="playerInfo" id="guestInfo"></span>
     </div>
     <div id="createRoomInfo">
         <input placeholder="Input Game Title">
