@@ -61,6 +61,7 @@ $('#exit_btn').click(() => {
     $('#roomModal').hide();
     $('#game_lobby').show();
     socket.emit('leaveRoom',id);
+    refreshRoomInfo();
 });
 
 $('#lobby_table button').click((e) => {
@@ -72,7 +73,6 @@ $('#lobby_table button').click((e) => {
         $('#createRoomInfo').hide();
         $('#waitingRoom_guest').show();
         $('#game_lobby').hide();
-
     } else if (playersCnt == '2') {
         alert("The room already has been full!!");
     }
@@ -144,4 +144,12 @@ function refreshRoom(rooms) {
       </tr>`)
         }
     }
+}
+
+function refreshRoomInfo () {
+    $('#roomNumInfo').html('');
+    $('#roomTitleInfo').html('');
+    $('#hostInfo').html('');
+    $('#guestInfo').html('');
+    $('#createRoomInfo input').val('');
 }
