@@ -4,8 +4,8 @@ var id;
 $('#start_btn').click(() => {
     id = $('#nickname').val();
     socket.emit('createId', id);
-    socket.on('checkId',(isValidId) => {
-        if(isValidId) {
+    socket.on('checkId', (isValidId) => {
+        if (isValidId) {
             alert("Successfully created ID!");
             $('#game_index').hide();
             $('body').css('backgroundColor', 'white');
@@ -60,7 +60,7 @@ $('#exit_btn').click(() => {
     $('#waitingRoom_guest').hide();
     $('#roomModal').hide();
     $('#game_lobby').show();
-    socket.emit('leaveRoom',id);
+    socket.emit('leaveRoom', id);
     refreshRoomInfo();
 });
 
@@ -109,7 +109,7 @@ socket.on('getReady', () => {
     $('#waitingRoom_host button').attr('disabled', false);
 });
 
-socket.on('guestExit',() => {
+socket.on('guestExit', () => {
     $('#waitingRoom_host button').attr('disabled', true);
 })
 
@@ -118,8 +118,10 @@ socket.on('changeHost', () => {
     $('#waitingRoom_host').show();
     $('#waitingRoom_host button').attr('disabled', true);
 })
+
 function refreshRoom(rooms) {
-    if (rooms.length == 0) {
+    var roomsLen = rooms.length;
+    if (roomsLen == 0) {
         $('#lobby_table tr:eq(1)> td:eq(0)').html('');
         $('#lobby_table tr:eq(1)> td:eq(1)').html('');
         $('#lobby_table tr:eq(1)> td:eq(2)').html('');
@@ -127,7 +129,7 @@ function refreshRoom(rooms) {
         $('#lobby_table tr:eq(1) button').attr('disabled', true);
     } else {
         var trNum = 0;
-        for (trNum = 0; trNum < rooms.length; trNum++) {
+        for (trNum = 0; trNum < roomsLen; trNum++) {
             $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(0)').html(rooms[trNum][0]);
             $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(1)').html(rooms[trNum][1]);
             $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(2)').html(rooms[trNum][4] + '/2');
@@ -144,9 +146,15 @@ function refreshRoom(rooms) {
       </tr>`)
         }
     }
+    //Remove the lowermost room.
+    $('#lobby_table tr:eq(' + (roomsLen + 1) + ')> td:eq(0)').html('');
+    $('#lobby_table tr:eq(' + (roomsLen + 1) + ')> td:eq(1)').html('');
+    $('#lobby_table tr:eq(' + (roomsLen + 1) + ')> td:eq(2)').html('');
+    $('#lobby_table tr:eq(' + (roomsLen + 1) + ')> td:eq(3)').html('');
+    $('#lobby_table tr:eq(' + (roomsLen + 1) + ') button').attr('disabled', true);
 }
 
-function refreshRoomInfo () {
+function refreshRoomInfo() {
     $('#roomNumInfo').html('');
     $('#roomTitleInfo').html('');
     $('#hostInfo').html('');
