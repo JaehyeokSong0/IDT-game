@@ -4,17 +4,6 @@ var id;
 $('#start_btn').click(() => {
     id = $('#nickname').val();
     socket.emit('createId', id);
-    socket.on('checkId', (isValidId) => {
-        if (isValidId) {
-            alert("Successfully created ID!");
-            $('#game_index').hide();
-            $('body').css('backgroundColor', 'white');
-            $('#game_lobby').show();
-            socket.emit('refreshRoom');
-        } else {
-            alert("The ID already exists! Please try with a different ID.");
-        }
-    })
 });
 
 $('#createRoom_btn').click(() => {
@@ -75,6 +64,18 @@ $('#lobby_table button').click((e) => {
         $('#game_lobby').hide();
     } else if (playersCnt == '2') {
         alert("The room already has been full!!");
+    }
+});
+
+socket.on('checkId', (isValidId) => {
+    if (isValidId) {
+        alert("Successfully created ID!");
+        $('#game_index').hide();
+        $('body').css('backgroundColor', 'white');
+        $('#game_lobby').show();
+        socket.emit('refreshRoom');
+    } else {
+        alert("The ID already exists! Please try with a different ID.");
     }
 });
 
