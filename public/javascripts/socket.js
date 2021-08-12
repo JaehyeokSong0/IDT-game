@@ -120,6 +120,7 @@ socket.on('changeHost', () => {
     $('#waitingRoom_host button').attr('disabled', true);
 })
 
+var roomFormNum = 5; //Number of room forms created
 function refreshRoom(rooms) {
     var roomsLen = rooms.length;
     if (roomsLen == 0) {
@@ -131,20 +132,27 @@ function refreshRoom(rooms) {
     } else {
         var trNum = 0;
         for (trNum = 0; trNum < roomsLen; trNum++) {
+            if (roomFormNum <= roomsLen) {
+                $('#lobby_table table').append(`<tr>
+        <td class = "roomNum"></td>
+        <td class = "roomTitle"></td>
+        <td class = "roomPlayers"></td>
+        <td class = "roomStatus"></td>
+        <td><button disabled>JoinRoom</button></td>
+      </tr>`);
+                roomFormNum += 1;
+            }
             $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(0)').html(rooms[trNum][0]);
             $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(1)').html(rooms[trNum][1]);
             $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(2)').html(rooms[trNum][4] + '/2');
             $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(3)').html('Waiting');
             $('#lobby_table tr:eq(' + (trNum + 1) + ') button').attr('disabled', false);
         }
-        if (trNum > 4) {
-            $('#lobby_table table').append(`<tr>
-        <td class = "roomNum"></td>
-        <td class = "roomTitle"></td>
-        <td class = "roomPlayers"></td>
-        <td class = "roomStatus"></td>
-        <td><button disabled>JoinRoom</button></td>
-      </tr>`)
+        if (roomFormNum > 5) {
+            while (roomFormNum > roomsLen + 1) {
+                $('#lobby_table table tr:last').remove();
+                roomFormNum -= 1;
+            }
         }
     }
     //Remove the lowermost room.

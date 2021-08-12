@@ -121,7 +121,7 @@ io.on('connection', (socket) => {
     socket.leave(roomNum);
   }
   function refreshRoom() {
-    io.emit('refreshRoom',rooms);
+    io.to(socket.id).emit('refreshRoom',rooms);
   }
   function deleteRoom(roomNum) {
     const index = rooms.findIndex((item) => {
