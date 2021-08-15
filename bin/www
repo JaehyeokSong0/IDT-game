@@ -44,7 +44,8 @@ io.on('connection', (socket) => {
   socket.on('joinRoom', joinRoom);
   socket.on('getReady', getReady);
   socket.on('leaveRoom', leaveRoom);
-  socket.on('refreshRoom',refreshRoom);
+  socket.on('refreshRoom', refreshRoom);
+  socket.on('startGame', startGame);
 
   function createId(id) {
     const index = usersId.findIndex((item) => {
@@ -68,7 +69,7 @@ io.on('connection', (socket) => {
     var roomInfo = [roomNum, roomTitle, host, guest, clientsNum];
     rooms.push(roomInfo);
     io.emit('createRoom', rooms);
-    io.sockets.in(roomNum).emit('createdRoom',roomInfo);
+    io.sockets.in(roomNum).emit('createdRoom', roomInfo);
     roomNum += 1;
   }
   async function joinRoom(id, roomNum) {
@@ -83,7 +84,7 @@ io.on('connection', (socket) => {
     rooms[index][4] = clientsNum;
     var roomInfo = rooms[index];
     io.emit('joinRoom', roomNum, clientsNum);
-    io.sockets.in(roomNum).emit('joinedRoom',roomInfo);
+    io.sockets.in(roomNum).emit('joinedRoom', roomInfo);
   }
 
   function getReady() {
@@ -97,7 +98,7 @@ io.on('connection', (socket) => {
       return item[0] == roomNum
     });
     //If no room has been created, terminate the function.
-    if(index == -1) {
+    if (index == -1) {
       return;
     }
     const host = rooms[index][2];
@@ -120,9 +121,11 @@ io.on('connection', (socket) => {
     io.emit('refreshRoom', rooms);
     socket.leave(roomNum);
   }
+
   function refreshRoom() {
-    io.to(socket.id).emit('refreshRoom',rooms);
+    io.to(socket.id).emit('refreshRoom', rooms);
   }
+
   function deleteRoom(roomNum) {
     const index = rooms.findIndex((item) => {
       return item[0] == roomNum
@@ -131,6 +134,18 @@ io.on('connection', (socket) => {
       rooms.splice(index, 1);
     }
     io.emit('refreshRoom', rooms);
+  }
+
+  //Game
+  function startGame() {
+    const roomNum = [...socket.rooms][1];
+    const index = rooms.findIndex((item) => {
+      return item[0] == roomNum
+    });
+    if (index > -1) {
+      const room = rooms[index];
+      io.sockets.in(roomNum).emit('startGame', room);
+    }
   }
 });
 

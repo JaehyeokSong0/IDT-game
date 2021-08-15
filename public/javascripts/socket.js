@@ -1,4 +1,4 @@
-const socket = io();
+export const socket = io();
 var id;
 
 $('#start_btn').click(() => {
@@ -37,7 +37,7 @@ function verifyTitle(roomTitle) {
 }
 
 $('#waitingRoom_host button').click(() => {
-    $('#roomModal').fadeOut();
+    socket.emit('startGame');
 });
 
 $('#waitingRoom_guest button').click(() => {
