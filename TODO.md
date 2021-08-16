@@ -4,6 +4,8 @@
 - Implement game
     - Divide the field for different players
     - Improve moveChar
+        - Planning arguments : [player, from, to]
+        - Function or Method
     - Create a sample of moveCard
 
 ## <u>To be worked on later...
