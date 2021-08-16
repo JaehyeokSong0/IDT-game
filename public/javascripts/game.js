@@ -1,13 +1,15 @@
 import {
     socket
 } from './socket.js';
+var roomInfo = [1, "roomTitle", "host", "guest", 2];
 
-var roomInfo;
+//var roomInfo;
 class Player {
     constructor(id) {
         this.id = id;
     }
 }
+var player1, player2;
 
 socket.on('startGame', (room) => {
     $('#roomModal').fadeOut();
@@ -60,23 +62,39 @@ function getFieldCenter(XY) {
     return ret;
 }
 
-function drawCharacter(color, x, y) {
-    var circle = new Path2D();
-    circle.arc(x, y, 25, 0, 2 * Math.PI);
-    ctx.fillStyle = color;
-    ctx.fill(circle);
+function getCharacter(color, _x, _y) {
+    var circle = {
+        x: 0,
+        y: 0,
+        vx: 1,
+        vy: 1,
+        draw: () => {
+            ctx.beginPath();
+            ctx.arc(_x, _y, 25, 0, 2 * Math.PI);
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
+    };
+    circle.x = _x;
+    circle.y = _y;
+    return circle;
 }
 
+function drawCharacter(character) {
+    character.draw();
+}
 function initPlayer() {
-    var player1 = new Player(roomInfo[2]);
+    player1 = new Player(roomInfo[2]);
     player1.location = 5;
     var p1StartLoc = getFieldCenter(getField(5));
-    drawCharacter("magenta", p1StartLoc[0], p1StartLoc[1]);
+    player1.character = getCharacter("magenta",p1StartLoc[0], p1StartLoc[1]);
+    drawCharacter(player1.character);
 
-    var player2 = new Player(roomInfo[3]);
+    player2 = new Player(roomInfo[3]);
     player2.location = 8;
     var p2StartLoc = getFieldCenter(getField(8));
-    drawCharacter("cyan", p2StartLoc[0], p2StartLoc[1])
+    player2.character = getCharacter("cyan", p2StartLoc[0], p2StartLoc[1]);
+    drawCharacter(player2.character);
 }
 
 function getField(fieldNum) {
@@ -86,3 +104,5 @@ function getField(fieldNum) {
     });
     return XY;
 }
+
+initPlayer();
