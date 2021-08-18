@@ -12,14 +12,37 @@ class Player {
         var fromField = getFieldByNum(this.location);
         // Get toField
         var toField;
-        if (testCard.left > 0) {
+        if (testCard.up > 0) {
+            if ((this.location - 1) - testCard.up * 4 > 0) {
+                toField = this.location - testCard.up * 4;
+            } else {
+                toField = ((this.location - 1) % 4) + 1;
+            }
+        } else if (testCard.down > 0) {
+            if (this.location + testCard.down * 4 <= 12) {
+                toField = this.location + testCard.down * 4;
+            } else {
+                if (this.location % 4 == 0) {
+                    toField = 12;
+                } else {
+                    toField = this.location % 4 + 8;
+                }
+            }
+        } else if (testCard.left > 0) {
             if ((this.location - 1) % 4 >= testCard.left) {
                 toField = this.location - testCard.left;
             } else {
-                toField = ((this.location - 1) / 4) * 4 + 1;
+                toField = Math.floor((this.location - 1) / 4) * 4 + 1;
+            }
+        } else if (testCard.right > 0) {
+            if (this.location + testCard.right <= (Math.floor((this.location - 1) / 4) + 1) * 4) {
+                toField = this.location + testCard.right;
+            } else {
+                toField = (Math.floor((this.location - 1) / 4) + 1) * 4;
             }
         }
         this.location = toField;
+
         toField = getFieldByNum(toField);
         var dx = toField.left - fromField.left;
         var dy = fromField.top - toField.top;
@@ -125,13 +148,11 @@ function getFieldByNum(fieldNum) {
 
 initPlayer();
 
-var i = 1;
 canvas.on('mouse:down', (evt) => player2.moveChar(testCard));
-
 var testCard = {
     "type": "move",
     "up": 0,
     "down": 0,
-    "left": 1,
+    "left": 2,
     "right": 0
 }
