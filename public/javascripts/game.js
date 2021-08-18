@@ -7,6 +7,41 @@ class Player {
     constructor(id) {
         this.id = id;
     }
+    // Function to move character
+    moveChar(testCard) {
+        var fromField = getFieldByNum(this.location);
+        // Get toField
+        var toField;
+        if (testCard.left > 0) {
+            if ((this.location - 1) % 4 >= testCard.left) {
+                toField = this.location - testCard.left;
+            } else {
+                toField = ((this.location - 1) / 4) * 4 + 1;
+            }
+        }
+        this.location = toField;
+        toField = getFieldByNum(toField);
+        var dx = toField.left - fromField.left;
+        var dy = fromField.top - toField.top;
+        if (dx >= 0) {
+            this.character.animate('left', '+=' + dx, {
+                onChange: canvas.renderAll.bind(canvas)
+            });
+        } else {
+            this.character.animate('left', '-=' + Math.abs(dx), {
+                onChange: canvas.renderAll.bind(canvas)
+            });
+        }
+        if (dy >= 0) {
+            this.character.animate('top', '-=' + dy, {
+                onChange: canvas.renderAll.bind(canvas)
+            });
+        } else {
+            this.character.animate('top', '+=' + Math.abs(dy), {
+                onChange: canvas.renderAll.bind(canvas)
+            });
+        }
+    }
 }
 var player1, player2;
 
@@ -90,33 +125,13 @@ function getFieldByNum(fieldNum) {
 
 initPlayer();
 
-canvas.on('mouse:down', (evt) => moveChar(evt, 12));
+var i = 1;
+canvas.on('mouse:down', (evt) => player2.moveChar(testCard));
 
-// Function to move character by click
-function moveChar(evt, to) {
-    try {
-        if (evt.target.objType == 'character') {
-            var toField = getFieldByNum(to);
-            var dx = toField.left - evt.target.left - evt.target.radius + fieldWidth / 2;
-            var dy = evt.target.top - toField.top + evt.target.radius - fieldHeight / 2;
-            if (dx >= 0) {
-                evt.target.animate('left', '+=' + dx, {
-                    onChange: canvas.renderAll.bind(canvas)
-                });
-            } else {
-                evt.target.animate('left', '-=' + Math.abs(dx), {
-                    onChange: canvas.renderAll.bind(canvas)
-                });
-            }
-            if (dy >= 0) {
-                evt.target.animate('top', '-=' + dy, {
-                    onChange: canvas.renderAll.bind(canvas)
-                });
-            } else {
-                evt.target.animate('top', '+=' + Math.abs(dy), {
-                    onChange: canvas.renderAll.bind(canvas)
-                });
-            }
-        }
-    } catch (error) {}
+var testCard = {
+    "type": "move",
+    "up": 0,
+    "down": 0,
+    "left": 1,
+    "right": 0
 }
