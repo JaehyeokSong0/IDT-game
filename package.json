@@ -13,7 +13,6 @@
     "express": "~4.17.1",
     "http-errors": "~1.8.0",
     "morgan": "~1.10.0",
-    "mysql": "^2.18.1",
     "nodemon": "^2.0.12",
     "socket.io": "^4.1.3"
   }

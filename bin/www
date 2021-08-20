@@ -7,7 +7,6 @@
 var app = require('../app');
 var debug = require('debug')('projectsocket:server');
 var http = require('http');
-var mysql = require('mysql')
 /**
  * Get port from environment and store in Express.
  */
