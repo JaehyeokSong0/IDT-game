@@ -2,14 +2,13 @@
 
 ## <u>Currently working on...
 - Implement game
-    - Divide the field for different players
     - Develop Class player
-    - Implement select character
-    - Implement character & card selection page
+    - Implement selection page
 ## <u>To be worked on later...
-- Improve Waiting Room
+- Waiting Room
     - Refactor
     - Disconnnect socket if player refresh or leave page
-- Implement game
+- Game
     - Figure out a way to get to the game screen
+    - Implement & design various characters
 - Improve design
