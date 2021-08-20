@@ -6,6 +6,7 @@ var roomInfo = [1, "roomTitle", "host", "guest", 2];
 class Player {
     constructor(nickname) {
         this.nickname = nickname;
+        this.turn = [];
     }
     // Function to move character
     move(testCard) {
@@ -109,7 +110,9 @@ socket.on('startGame', (room) => {
     initPlayer();
 });
 
-const canvas = new fabric.Canvas('game_canvas');
+const canvas = new fabric.Canvas('game_canvas', {
+    backgroundColor: "white"
+});
 window.addEventListener('resize', resizeCanvas, false);
 
 function resizeCanvas() {
@@ -117,6 +120,9 @@ function resizeCanvas() {
     canvas.setHeight(window.innerHeight);
     console.info("canvas resized to w : ", canvas.width, ", h : ", canvas.height);
 }
+
+// initialize size of the canvas
+resizeCanvas();
 
 // Make field
 var fieldWidth = canvas.width / 6;
@@ -266,23 +272,128 @@ function checkRange(location, target) {
     return ret;
 }
 
-// initialize size of the canvas
-resizeCanvas();
-
+console.log(fieldHeight)
 drawField(fieldWidth, fieldHeight);
 initPlayer();
 
-var card;
-$.getJSON('json/card.json', (data) => {
-    card = data;
-    canvas.on('mouse:down', (evt) => player2.attack(testCard2));
+// var card;
+// $.getJSON('json/card.json', (data) => {
+//     card = data;
+//     canvas.on('mouse:down', (evt) => player2.attack(testCard2));
 
-    var testCard = card[0];
-    var testCard2 = card[1];
-    var testCard3 = card[2];
-    setTimeout(() => player1.move(testCard3), 1000);
-    setTimeout(() => player2.move(testCard), 2000);
-    setTimeout(() => player1.attack(testCard2), 3000);
-    setTimeout(() => player2.attack(testCard2), 4000);
-    setTimeout(() => player1.attack(testCard2), 5000);
-});
+//     var testCard = card[0];
+//     var testCard2 = card[1];
+//     var testCard3 = card[2];
+//     setTimeout(() => player1.move(testCard3), 1000);
+//     setTimeout(() => player2.move(testCard), 2000);
+//     setTimeout(() => player1.attack(testCard2), 3000);
+//     setTimeout(() => player2.attack(testCard2), 4000);
+//     setTimeout(() => player1.attack(testCard2), 5000);
+// });
+
+function selectPhase() {
+    var gaugeHeight = canvas.height / 24;
+    var gaugeWidth = canvas.width / 3;
+    //나중에 따로 함수로 빼자
+    player1.hpGauge = new fabric.Rect({
+        objType: 'gauge',
+        left: gaugeWidth / 2,
+        top: 0,
+        width: gaugeWidth,
+        height: gaugeHeight,
+        fill: 'IndianRed',
+        stroke: 'CornflowerBlue',
+        strokeWidth: 4,
+        selectable: false,
+        rx: 10,
+    });
+    player2.hpGauge = new fabric.Rect({
+        objType: 'gauge',
+        left: gaugeWidth * 3 / 2,
+        top: 0,
+        width: gaugeWidth,
+        height: gaugeHeight,
+        fill: 'IndianRed',
+        stroke: 'CornflowerBlue',
+        strokeWidth: 4,
+        selectable: false,
+        rx: 10,
+    });
+    player1.enGauge = new fabric.Rect({
+        objType: 'gauge',
+        left: gaugeWidth / 2,
+        top: gaugeHeight,
+        width: gaugeWidth,
+        height: gaugeHeight,
+        fill: 'LemonChiffon',
+        stroke: 'CornflowerBlue',
+        strokeWidth: 4,
+        selectable: false,
+        rx: 10,
+    });
+    player2.enGauge = new fabric.Rect({
+        objType: 'gauge',
+        left: gaugeWidth * 3 / 2,
+        top: gaugeHeight,
+        width: gaugeWidth,
+        height: gaugeHeight,
+        fill: 'LemonChiffon',
+        stroke: 'CornflowerBlue',
+        strokeWidth: 4,
+        selectable: false,
+        rx: 10,
+    });
+    player1.info = new fabric.Group([
+        new fabric.Rect({
+            objType: 'info',
+            left: gaugeWidth / 16,
+            top: 0,
+            width: gaugeWidth / 4,
+            height: gaugeWidth / 4,
+            fill: 'AliceBlue',
+            stroke: 'LightSkyBlue',
+            strokeWidth: 4,
+            selectable: false,
+            rx: 10,
+        }),
+        new fabric.Text(player1.nickname, {
+            fontFamily:'Papyrus',
+            fontSize: 48,
+            textAlign: 'center',
+            originX : 'center',
+            originY : 'center',
+            left: gaugeWidth / 16 * 3,
+            top : gaugeWidth / 8,
+            selectable: false,
+        })
+    ]);
+
+    player2.info = new fabric.Group([
+        new fabric.Rect({
+            objType: 'info',
+            left: gaugeWidth / 16 * 43,
+            top: 0,
+            width: gaugeWidth / 4,
+            height: gaugeWidth / 4,
+            fill: 'AliceBlue',
+            stroke: 'LightSkyBlue',
+            strokeWidth: 4,
+            selectable: false,
+            rx: 10,
+        }),
+        new fabric.Text(player2.nickname, {
+            fontFamily:'Papyrus',
+            fontSize: 48,
+            textAlign: 'center',
+            originX : 'center',
+            originY : 'center',
+            left: gaugeWidth / 16 * 45,
+            top : gaugeWidth / 8,
+            selectable: false,
+        })
+    ]);
+
+    canvas.add(player1.hpGauge, player2.hpGauge, player1.enGauge, player2.enGauge, player1.info, player2.info);
+}
+
+selectPhase();
