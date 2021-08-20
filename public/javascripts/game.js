@@ -110,9 +110,10 @@ socket.on('startGame', (room) => {
     initPlayer();
 });
 
-const canvas = new fabric.Canvas('game_canvas', {
+var canvas = new fabric.Canvas('game_canvas', {
     backgroundColor: "white"
 });
+fabric.Object.prototype.selectable = false;
 window.addEventListener('resize', resizeCanvas, false);
 
 function resizeCanvas() {
@@ -140,7 +141,6 @@ function drawField(width, height) {
                 fill: '',
                 strokeWidth: 8,
                 stroke: 'grey',
-                selectable: false,
                 fieldNum: (i - 1) * 4 + j
             }));
         }
@@ -180,7 +180,6 @@ function setCharacter(color, location, playerNum) {
         left: _field.left + (fieldWidth / 4) * fieldDiv - _radius,
         top: _field.top + (fieldHeight / 2) - _radius,
         fill: color,
-        selectable: false
     });
 }
 
@@ -272,7 +271,6 @@ function checkRange(location, target) {
     return ret;
 }
 
-console.log(fieldHeight)
 drawField(fieldWidth, fieldHeight);
 initPlayer();
 
@@ -304,7 +302,6 @@ function selectPhase() {
         fill: 'IndianRed',
         stroke: 'CornflowerBlue',
         strokeWidth: 4,
-        selectable: false,
         rx: 10,
     });
     player2.hpGauge = new fabric.Rect({
@@ -316,7 +313,6 @@ function selectPhase() {
         fill: 'IndianRed',
         stroke: 'CornflowerBlue',
         strokeWidth: 4,
-        selectable: false,
         rx: 10,
     });
     player1.enGauge = new fabric.Rect({
@@ -328,7 +324,6 @@ function selectPhase() {
         fill: 'LemonChiffon',
         stroke: 'CornflowerBlue',
         strokeWidth: 4,
-        selectable: false,
         rx: 10,
     });
     player2.enGauge = new fabric.Rect({
@@ -340,7 +335,6 @@ function selectPhase() {
         fill: 'LemonChiffon',
         stroke: 'CornflowerBlue',
         strokeWidth: 4,
-        selectable: false,
         rx: 10,
     });
     player1.info = new fabric.Group([
@@ -353,7 +347,6 @@ function selectPhase() {
             fill: 'AliceBlue',
             stroke: 'LightSkyBlue',
             strokeWidth: 4,
-            selectable: false,
             rx: 10,
         }),
         new fabric.Text(player1.nickname, {
@@ -364,8 +357,7 @@ function selectPhase() {
             originY : 'center',
             left: gaugeWidth / 16 * 3,
             top : gaugeWidth / 8,
-            selectable: false,
-        })
+        }), 
     ]);
 
     player2.info = new fabric.Group([
@@ -378,7 +370,6 @@ function selectPhase() {
             fill: 'AliceBlue',
             stroke: 'LightSkyBlue',
             strokeWidth: 4,
-            selectable: false,
             rx: 10,
         }),
         new fabric.Text(player2.nickname, {
@@ -389,7 +380,6 @@ function selectPhase() {
             originY : 'center',
             left: gaugeWidth / 16 * 45,
             top : gaugeWidth / 8,
-            selectable: false,
         })
     ]);
 
