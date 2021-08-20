@@ -4,12 +4,11 @@ import {
 var roomInfo = [1, "roomTitle", "host", "guest", 2];
 
 class Player {
-    constructor(id) {
-        this.id = id;
-        this.hp = 100;
+    constructor(nickname) {
+        this.nickname = nickname;
     }
     // Function to move character
-    moveChar(testCard) {
+    move(testCard) {
         if (testCard.type == "move") {
             var fromField = getFieldByNum(this.location);
             // Get toField
@@ -78,14 +77,28 @@ class Player {
             var attackRange = [];
             testCard.range.forEach((_field) => {
                 var chkPos = checkRange(this.location, _field);
-                if(chkPos != -1) {
-                attackRange.push(chkPos);
+                if (chkPos != -1) {
+                    attackRange.push(chkPos);
+                }
+            });
+            attackRange.forEach((_field) => {
+                if (this.id == 'p1') {
+                    if (_field == player2.location) {
+                        player2.hp -= testCard.damage;
+                        console.log("Player2 got", testCard.damage, ", HP became ", player2.hp);
+                    }
+                } else if (this.id == 'p2') {
+                    if (_field == player1.location) {
+                        player1.hp -= testCard.damage;
+                        console.log("Player1 got", testCard.damage, ", HP became ", player1.hp);
+                    }
+                } else {
+                    console.error("[ERROR] Something went wrong : Wrong player id.");
                 }
             });
         } else {
             console.error("[ERROR] Something went wrong : Not a attack card.");
         }
-        console.log(attackRange);
     }
 }
 var player1, player2;
@@ -134,10 +147,14 @@ drawField(fieldWidth, fieldHeight);
 
 function initPlayer() {
     player1 = new Player(roomInfo[2]);
+    player1.id = 'p1';
+    player1.hp = 100;
     player1.location = 5;
     player1.character = setCharacter('magenta', 5, 'player1');
 
     player2 = new Player(roomInfo[3]);
+    player2.id = 'p2';
+    player2.hp = 100;
     player2.location = 8;
     player2.character = setCharacter('cyan', 8, 'player2');
 
@@ -260,13 +277,16 @@ canvas.on('mouse:down', (evt) => player2.attack(testCard2));
 var testCard = {
     "type": "move",
     "up": 0,
-    "down": 1,
-    "left": 0,
+    "down": 0,
+    "left": 2,
     "right": 0
 }
 var testCard2 = {
     "type": "attack",
-    "range": [1, 2, 5,7, 8],
+    "range": [1, 2, 4, 5, 7, 8],
     "damage": 30,
     "energy": 25
 }
+
+setTimeout(()=>player2.move(testCard),1000);
+setTimeout(()=>player2.attack(testCard2),2500);
