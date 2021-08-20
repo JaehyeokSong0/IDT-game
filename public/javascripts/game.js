@@ -118,9 +118,6 @@ function resizeCanvas() {
     console.info("canvas resized to w : ", canvas.width, ", h : ", canvas.height);
 }
 
-// initialize size of the canvas
-resizeCanvas();
-
 // Make field
 var fieldWidth = canvas.width / 6;
 var fieldHeight = canvas.height / 5;
@@ -143,7 +140,6 @@ function drawField(width, height) {
         }
     }
 }
-drawField(fieldWidth, fieldHeight);
 
 function initPlayer() {
     player1 = new Player(roomInfo[2]);
@@ -270,23 +266,23 @@ function checkRange(location, target) {
     return ret;
 }
 
+// initialize size of the canvas
+resizeCanvas();
 
+drawField(fieldWidth, fieldHeight);
 initPlayer();
 
-canvas.on('mouse:down', (evt) => player2.attack(testCard2));
-var testCard = {
-    "type": "move",
-    "up": 0,
-    "down": 0,
-    "left": 2,
-    "right": 0
-}
-var testCard2 = {
-    "type": "attack",
-    "range": [1, 2, 4, 5, 7, 8],
-    "damage": 30,
-    "energy": 25
-}
+var card;
+$.getJSON('json/card.json', (data) => {
+    card = data;
+    canvas.on('mouse:down', (evt) => player2.attack(testCard2));
 
-setTimeout(()=>player2.move(testCard),1000);
-setTimeout(()=>player2.attack(testCard2),2500);
+    var testCard = card[0];
+    var testCard2 = card[1];
+    var testCard3 = card[2];
+    setTimeout(() => player1.move(testCard3), 1000);
+    setTimeout(() => player2.move(testCard), 2000);
+    setTimeout(() => player1.attack(testCard2), 3000);
+    setTimeout(() => player2.attack(testCard2), 4000);
+    setTimeout(() => player1.attack(testCard2), 5000);
+});

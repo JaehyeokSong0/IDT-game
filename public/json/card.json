@@ -1,0 +1,24 @@
+[{
+        "name": "testCard",
+        "type": "move",
+        "up": 0,
+        "down": 0,
+        "left": 2,
+        "right": 0
+    },
+    {
+        "name": "testCard2",
+        "type": "attack",
+        "range": [1, 2, 4, 5, 6],
+        "damage": 30,
+        "energy": 25
+    },
+    {
+        "name": "testCard3",
+        "type": "move",
+        "up": 0,
+        "down": 0,
+        "left": 0,
+        "right": 2
+    }
+]
