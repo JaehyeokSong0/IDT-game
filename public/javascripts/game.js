@@ -6,66 +6,86 @@ var roomInfo = [1, "roomTitle", "host", "guest", 2];
 class Player {
     constructor(id) {
         this.id = id;
+        this.hp = 100;
     }
     // Function to move character
     moveChar(testCard) {
-        var fromField = getFieldByNum(this.location);
-        // Get toField
-        var toField;
-        if (testCard.up > 0) {
-            if ((this.location - 1) - testCard.up * 4 > 0) {
-                toField = this.location - testCard.up * 4;
-            } else {
-                toField = ((this.location - 1) % 4) + 1;
-            }
-        } else if (testCard.down > 0) {
-            if (this.location + testCard.down * 4 <= 12) {
-                toField = this.location + testCard.down * 4;
-            } else {
-                if (this.location % 4 == 0) {
-                    toField = 12;
+        if (testCard.type == "move") {
+            var fromField = getFieldByNum(this.location);
+            // Get toField
+            var toField;
+            if (testCard.up > 0) {
+                if ((this.location - 1) - testCard.up * 4 > 0) {
+                    toField = this.location - testCard.up * 4;
                 } else {
-                    toField = this.location % 4 + 8;
+                    toField = ((this.location - 1) % 4) + 1;
                 }
-            }
-        } else if (testCard.left > 0) {
-            if ((this.location - 1) % 4 >= testCard.left) {
-                toField = this.location - testCard.left;
+            } else if (testCard.down > 0) {
+                if (this.location + testCard.down * 4 <= 12) {
+                    toField = this.location + testCard.down * 4;
+                } else {
+                    if (this.location % 4 == 0) {
+                        toField = 12;
+                    } else {
+                        toField = this.location % 4 + 8;
+                    }
+                }
+            } else if (testCard.left > 0) {
+                if ((this.location - 1) % 4 >= testCard.left) {
+                    toField = this.location - testCard.left;
+                } else {
+                    toField = Math.floor((this.location - 1) / 4) * 4 + 1;
+                }
+            } else if (testCard.right > 0) {
+                if (this.location + testCard.right <= (Math.floor((this.location - 1) / 4) + 1) * 4) {
+                    toField = this.location + testCard.right;
+                } else {
+                    toField = (Math.floor((this.location - 1) / 4) + 1) * 4;
+                }
             } else {
-                toField = Math.floor((this.location - 1) / 4) * 4 + 1;
+                console.error("[ERROR] Something went wrong : Wrong params in move card.");
             }
-        } else if (testCard.right > 0) {
-            if (this.location + testCard.right <= (Math.floor((this.location - 1) / 4) + 1) * 4) {
-                toField = this.location + testCard.right;
+            this.location = toField;
+
+            toField = getFieldByNum(toField);
+            var dx = toField.left - fromField.left;
+            var dy = fromField.top - toField.top;
+            if (dx >= 0) {
+                this.character.animate('left', '+=' + dx, {
+                    onChange: canvas.renderAll.bind(canvas)
+                });
             } else {
-                toField = (Math.floor((this.location - 1) / 4) + 1) * 4;
+                this.character.animate('left', '-=' + Math.abs(dx), {
+                    onChange: canvas.renderAll.bind(canvas)
+                });
+            }
+            if (dy >= 0) {
+                this.character.animate('top', '-=' + dy, {
+                    onChange: canvas.renderAll.bind(canvas)
+                });
+            } else {
+                this.character.animate('top', '+=' + Math.abs(dy), {
+                    onChange: canvas.renderAll.bind(canvas)
+                });
             }
         } else {
             console.error("[ERROR] Something went wrong : Not a move card.");
         }
-        this.location = toField;
+    }
 
-        toField = getFieldByNum(toField);
-        var dx = toField.left - fromField.left;
-        var dy = fromField.top - toField.top;
-        if (dx >= 0) {
-            this.character.animate('left', '+=' + dx, {
-                onChange: canvas.renderAll.bind(canvas)
+    attack(testCard) {
+        if (testCard.type == "attack") {
+            var attackRange = [];
+            testCard.range.forEach((_field) => {
+                var chkPos = checkRange(this.location, _field);
+                if(chkPos != -1) {
+                attackRange.push(chkPos);
+                }
             });
         } else {
-            this.character.animate('left', '-=' + Math.abs(dx), {
-                onChange: canvas.renderAll.bind(canvas)
-            });
+            console.error("[ERROR] Something went wrong : Not a attack card.");
         }
-        if (dy >= 0) {
-            this.character.animate('top', '-=' + dy, {
-                onChange: canvas.renderAll.bind(canvas)
-            });
-        } else {
-            this.character.animate('top', '+=' + Math.abs(dy), {
-                onChange: canvas.renderAll.bind(canvas)
-            });
-        }
+        console.log(attackRange);
     }
 }
 var player1, player2;
@@ -156,13 +176,97 @@ function getFieldByNum(fieldNum) {
     return ret;
 }
 
+function checkRange(location, target) {
+    var ret = -1;
+    switch (target) {
+        // Top Left
+        case 1:
+            if ((location <= 4) || (location % 4 == 1)) {
+                ret = -1;
+            } else {
+                ret = location - 5;
+            }
+            break;
+            // Top
+        case 2:
+            if (location <= 4) {
+                ret = -1;
+            } else {
+                ret = location - 4;
+            }
+            break;
+            // Top Right
+        case 3:
+            if ((location <= 4) || (location % 4 == 0)) {
+                ret = -1;
+            } else {
+                ret = location - 3;
+            }
+            break;
+            // Left
+        case 4:
+            if (location % 4 == 1) {
+                ret = -1;
+            } else {
+                ret = location - 1;
+            }
+            break;
+            // Center
+        case 5:
+            ret = location;
+            break;
+            // Right
+        case 6:
+            if (location % 4 == 0) {
+                ret = -1;
+            } else {
+                ret = location + 1;
+            }
+            break;
+            // Bottom Left
+        case 7:
+            if ((location >= 9) || (location % 4 == 1)) {
+                ret = -1;
+            } else {
+                ret = location + 3;
+            }
+            break;
+            // Bottom
+        case 8:
+            if (location >= 9) {
+                ret = -1;
+            } else {
+                ret = location + 4;
+            }
+            break;
+            // Bottom Right
+        case 9:
+            if ((location >= 9) || (location % 4 == 0)) {
+                ret = -1;
+            } else {
+                ret = location + 5;
+            }
+            break;
+        default:
+            console.error("[ERROR] Something went wrong : Wrong input in checkRange().");
+    }
+    return ret;
+}
+
+
 initPlayer();
 
-canvas.on('mouse:down', (evt) => player2.moveChar(testCard));
+canvas.on('mouse:down', (evt) => player2.attack(testCard2));
 var testCard = {
     "type": "move",
     "up": 0,
-    "down": 0,
+    "down": 1,
     "left": 0,
     "right": 0
+}
+var testCard2 = {
+    "type": "attack",
+    "range": [1, 2, 5,7, 8],
+    "damage": 30,
+    "energy": 25
 }
