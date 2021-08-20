@@ -40,6 +40,8 @@ class Player {
             } else {
                 toField = (Math.floor((this.location - 1) / 4) + 1) * 4;
             }
+        } else {
+            console.error("[ERROR] Something went wrong : Not a move card.");
         }
         this.location = toField;
 
@@ -113,22 +115,30 @@ drawField(fieldWidth, fieldHeight);
 function initPlayer() {
     player1 = new Player(roomInfo[2]);
     player1.location = 5;
-    player1.character = setCharacter('magenta', 5);
+    player1.character = setCharacter('magenta', 5, 'player1');
 
     player2 = new Player(roomInfo[3]);
     player2.location = 8;
-    player2.character = setCharacter('cyan', 8);
+    player2.character = setCharacter('cyan', 8, 'player2');
 
     canvas.add(player1.character, player2.character);
 }
 
-function setCharacter(color, location) {
+function setCharacter(color, location, playerNum) {
+    var fieldDiv;
+    if (playerNum === 'player1') {
+        fieldDiv = 1;
+    } else if (playerNum === 'player2') {
+        fieldDiv = 3;
+    } else {
+        console.error("[ERROR] Something went wrong : Wrong playerNum.");
+    }
     var _field = getFieldByNum(location);
     var _radius = fieldHeight / 6;
     return new fabric.Circle({
         objType: 'character',
         radius: _radius,
-        left: _field.left + (fieldWidth / 2) - _radius,
+        left: _field.left + (fieldWidth / 4) * fieldDiv - _radius,
         top: _field.top + (fieldHeight / 2) - _radius,
         fill: color,
         selectable: false
@@ -153,6 +163,6 @@ var testCard = {
     "type": "move",
     "up": 0,
     "down": 0,
-    "left": 2,
+    "left": 0,
     "right": 0
 }
