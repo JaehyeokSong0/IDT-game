@@ -140,7 +140,8 @@ function drawField(width, height) {
                 height: height,
                 fill: '',
                 strokeWidth: 8,
-                stroke: 'grey',
+                //stroke: 'grey',
+                stroke: '',
                 fieldNum: (i - 1) * 4 + j
             }));
         }
@@ -152,13 +153,15 @@ function initPlayer() {
     player1.id = 'p1';
     player1.hp = 100;
     player1.location = 5;
-    player1.character = setCharacter('magenta', 5, 'player1');
+    player1.character = setCharacter('', 5, 'player1');
+    //player1.character = setCharacter('magenta', 5, 'player1');
 
     player2 = new Player(roomInfo[3]);
     player2.id = 'p2';
     player2.hp = 100;
     player2.location = 8;
-    player2.character = setCharacter('cyan', 8, 'player2');
+    player2.character = setCharacter('', 8, 'player2');
+    //player2.character = setCharacter('cyan', 8, 'player2');
 
     canvas.add(player1.character, player2.character);
 }
@@ -350,14 +353,14 @@ function selectPhase() {
             rx: 10,
         }),
         new fabric.Text(player1.nickname, {
-            fontFamily:'Papyrus',
-            fontSize: 48,
+            fontFamily: 'Papyrus',
+            fontSize: gaugeWidth / 16,
             textAlign: 'center',
-            originX : 'center',
-            originY : 'center',
+            originX: 'center',
+            originY: 'center',
             left: gaugeWidth / 16 * 3,
-            top : gaugeWidth / 8,
-        }), 
+            top: gaugeWidth / 8,
+        }),
     ]);
 
     player2.info = new fabric.Group([
@@ -373,13 +376,13 @@ function selectPhase() {
             rx: 10,
         }),
         new fabric.Text(player2.nickname, {
-            fontFamily:'Papyrus',
-            fontSize: 48,
+            fontFamily: 'Papyrus',
+            fontSize: gaugeWidth / 16,
             textAlign: 'center',
-            originX : 'center',
-            originY : 'center',
+            originX: 'center',
+            originY: 'center',
             left: gaugeWidth / 16 * 45,
-            top : gaugeWidth / 8,
+            top: gaugeWidth / 8,
         })
     ]);
 
@@ -387,3 +390,48 @@ function selectPhase() {
 }
 
 selectPhase();
+
+var testCard = {
+    "name": "testCard",
+    "type": "move",
+    "up": 0,
+    "down": 0,
+    "left": 2,
+    "right": 0,
+    "damage": 30,
+    "energy": 25
+};
+
+var cardWidth = canvas.width / 12;
+var cardHeight = canvas.height / 6;
+
+function makeCard(card) {
+    return new fabric.Group([
+        new fabric.Rect({
+            width: cardWidth,
+            height: cardHeight,
+            fill: 'PaleGreen',
+            stroke: 'Black',
+            strokeWidth: 2,
+            rx: 10,
+            originX: 'center',
+        }),
+        new fabric.Text(card.name, {
+            fontSize: cardWidth / 6,
+            originX: 'center',
+            fontFamily: 'Lucida Console'
+        }),
+        new fabric.Text(String('[DM]' + card.damage + ' [EN]' + card.energy), {
+            fontSize: cardWidth / 9,
+            top: cardWidth / 4,
+            fontFamily: 'Lucida Console',
+            originX: 'center'
+        }),
+        //getRange(card)
+    ])
+}
+
+canvas.add(makeCard(testCard).set({
+    top: 400,
+    left: 400
+}));
