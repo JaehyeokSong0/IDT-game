@@ -2,8 +2,10 @@
 
 ## <u>Currently working on...
 - Implement game
-    - Develop Class player
     - Implement selection page
+    - Make cards
+    - Develop Class player
+
 ## <u>To be worked on later...
 - Waiting Room
     - Refactor
