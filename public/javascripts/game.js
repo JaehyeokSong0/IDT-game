@@ -399,7 +399,8 @@ var testCard = {
     "left": 2,
     "right": 0,
     "damage": 30,
-    "energy": 25
+    "energy": 25,
+    "range": [1, 2, 4, 5, 6]
 };
 
 var cardWidth = canvas.width / 12;
@@ -427,8 +428,34 @@ function makeCard(card) {
             fontFamily: 'Lucida Console',
             originX: 'center'
         }),
-        //getRange(card)
+        renderRange(card).set({
+            originX: 'center',
+            top: cardWidth / 2,
+        })
     ])
+}
+
+function renderRange(card) {
+    var _width = cardWidth/ 8;
+    var _height = cardHeight/ 8;
+    var _arr = [];
+    for (var i = 0; i < 3; i++) {
+        for (var j = 0; j < 3; j++) {
+            _arr.push(new fabric.Rect({
+                left: j * _width,
+                top: i * _height,
+                width: _width,
+                height: _height,
+                fill: 'White',
+                strokeWidth: 1,
+                stroke: 'Black'
+            }));
+        }
+    }
+    card.range.forEach((r) => {
+        _arr[r-1].set('fill','red');
+    });
+    return new fabric.Group(_arr);
 }
 
 canvas.add(makeCard(testCard).set({
