@@ -1,24 +1,73 @@
 [{
-        "name": "testCard",
+        "name": "move_up",
         "type": "move",
-        "up": 0,
+        "up": 1,
         "down": 0,
-        "left": 2,
+        "left": 0,
         "right": 0
     },
     {
-        "name": "testCard2",
-        "type": "attack",
-        "range": [1, 2, 4, 5, 6],
-        "damage": 30,
-        "energy": 25
+        "name": "move_down",
+        "type": "move",
+        "up": 0,
+        "down": 1,
+        "left": 0,
+        "right": 0
     },
     {
-        "name": "testCard3",
+        "name": "move_left",
+        "type": "move",
+        "up": 0,
+        "down": 0,
+        "left": 1,
+        "right": 0
+    },
+    {
+        "name": "move_right",
         "type": "move",
         "up": 0,
         "down": 0,
         "left": 0,
-        "right": 2
+        "right": 1
+    },
+    {
+        "name": "strike_1",
+        "type": "attack",
+        "range": [2,5,8],
+        "damage": 30,
+        "energy": 25
+    },
+    {
+        "name": "strike_2",
+        "type": "attack",
+        "range": [5,7,8,9],
+        "damage": 50,
+        "energy": 50
+    },
+    {
+        "name": "strike_3",
+        "type": "attack",
+        "range": [2,4,5,6,8],
+        "damage": 25,
+        "energy": 25
+    },
+    {
+        "name": "strike_4",
+        "type": "attack",
+        "range": [1,3,5,7,9],
+        "damage": 25,
+        "energy": 30
+    },
+    {
+        "name": "guard_15",
+        "type": "guard",
+        "value": 15,
+        "energy": 0
+    },
+    {
+        "name": "restore_15",
+        "type": "restore",
+        "value": 15,
+        "energy": 0
     }
 ]
