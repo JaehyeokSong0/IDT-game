@@ -3,8 +3,10 @@
 ## <u>Currently working on...
 - Implement game
     - Implement selection page
-    - Make cards
+        - Click event for card selection
     - Develop Class player
+        - Guard, Restore action, ...
+        - Deck to store cards to use at turn
 
 ## <u>To be worked on later...
 - Waiting Room
