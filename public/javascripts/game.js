@@ -277,20 +277,6 @@ function checkRange(location, target) {
 drawField(fieldWidth, fieldHeight);
 initPlayer();
 
-// var card;
-// $.getJSON('json/card.json', (data) => {
-//     card = data;
-//     canvas.on('mouse:down', (evt) => player2.attack(testCard2));
-
-//     var testCard = card[0];
-//     var testCard2 = card[1];
-//     var testCard3 = card[2];
-//     setTimeout(() => player1.move(testCard3), 1000);
-//     setTimeout(() => player2.move(testCard), 2000);
-//     setTimeout(() => player1.attack(testCard2), 3000);
-//     setTimeout(() => player2.attack(testCard2), 4000);
-//     setTimeout(() => player1.attack(testCard2), 5000);
-// });
 
 function selectPhase() {
     var gaugeHeight = canvas.height / 24;
@@ -392,15 +378,27 @@ function selectPhase() {
 selectPhase();
 
 var testCard = {
-    "name": "testCard",
-    "type": "move",
-    "up": 0,
-    "down": 0,
-    "left": 2,
-    "right": 0,
+    "name": "strike_1",
+    "type": "attack",
+    "range": [2, 5, 8],
     "damage": 30,
-    "energy": 25,
-    "range": [1, 2, 4, 5, 6]
+    "energy": 25
+};
+var testCard2 = {
+    "name": "restore_15",
+    "type": "restore",
+    "damage": 0,
+    "energy": 15
+};
+var testCard3 = {
+    "name": "move_up",
+    "type": "move",
+    "up": 1,
+    "down": 0,
+    "left": 0,
+    "right": 0,
+    "damage": 0,
+    "energy": 0
 };
 
 var cardWidth = canvas.width / 12;
@@ -418,7 +416,7 @@ function makeCard(card) {
             originX: 'center',
         }),
         new fabric.Text(card.name, {
-            fontSize: cardWidth / 6,
+            fontSize: cardWidth / 7,
             originX: 'center',
             fontFamily: 'Lucida Console'
         }),
@@ -436,8 +434,8 @@ function makeCard(card) {
 }
 
 function renderRange(card) {
-    var _width = cardWidth/ 8;
-    var _height = cardHeight/ 8;
+    var _width = cardWidth / 8;
+    var _height = cardHeight / 8;
     var _arr = [];
     for (var i = 0; i < 3; i++) {
         for (var j = 0; j < 3; j++) {
@@ -452,13 +450,82 @@ function renderRange(card) {
             }));
         }
     }
-    card.range.forEach((r) => {
-        _arr[r-1].set('fill','red');
-    });
+    if ((card.type == 'guard') || (card.type == 'restore')) {
+        _arr[4].set('fill', 'blue');
+    } else if (card.type == 'move') {
+        // Need refactor using switch()
+        if (card.up > 0) {
+            _arr[1].set('fill', 'lightgreen');
+            _arr[1] = new fabric.Group([
+                _arr[1],
+                new fabric.Text(String(card.up), {
+                    fontSize: _width,
+                    originX: 'center',
+                    originY: 'center',
+                    left: _arr[1].left + _width/2,
+                    top: _arr[1].top + _height/2
+                })]);
+        } else if (card.down > 0) {
+            _arr[7].set('fill', 'lightgreen');
+            _arr[7] = new fabric.Group([
+                _arr[7],
+                new fabric.Text(String(card.down), {
+                    fontSize: _width,
+                    originX: 'center',
+                    originY: 'center',
+                    left: _arr[7].left + _width/2,
+                    top: _arr[7].top + _height/2
+                })]);
+        } else if (card.left > 0) {
+            _arr[3].set('fill', 'lightgreen');
+            _arr[3] = new fabric.Group([
+                _arr[3],
+                new fabric.Text(String(card.left), {
+                    fontSize: _width,
+                    originX: 'center',
+                    originY: 'center',
+                    left: _arr[3].left + _width/2,
+                    top: _arr[3].top + _height/2
+                })]);
+        } else if (card.right > 0) {
+            _arr[5].set('fill', 'lightgreen');
+            _arr[5] = new fabric.Group([
+                _arr[5],
+                new fabric.Text(String(card.right), {
+                    fontSize: _width,
+                    originX: 'center',
+                    originY: 'center',
+                    left: _arr[5].left + _width/2,
+                    top: _arr[5].top + _height/2
+                })]);
+        }
+    } else {
+        card.range.forEach((r) => {
+            _arr[r - 1].set('fill', 'red');
+        });
+    }
     return new fabric.Group(_arr);
 }
 
-canvas.add(makeCard(testCard).set({
-    top: 400,
-    left: 400
-}));
+$.getJSON('json/card.json', (data) => {
+    for(var i = 0; i<data.length; i++) {
+        canvas.add(makeCard(data[i]).set({
+           top:400,
+           left: 200*(i+1) 
+        }));
+    }
+})
+// var card;
+// $.getJSON('json/card.json', (data) => {
+//     card = data;
+//     canvas.on('mouse:down', (evt) => player2.attack(testCard2));
+
+//     var testCard = card[0];
+//     var testCard2 = card[1];
+//     var testCard3 = card[2];
+//     setTimeout(() => player1.move(testCard3), 1000);
+//     setTimeout(() => player2.move(testCard), 2000);
+//     setTimeout(() => player1.attack(testCard2), 3000);
+//     setTimeout(() => player2.attack(testCard2), 4000);
+//     setTimeout(() => player1.attack(testCard2), 5000);
+// });
