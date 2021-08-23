@@ -462,9 +462,10 @@ function renderRange(card) {
                     fontSize: _width,
                     originX: 'center',
                     originY: 'center',
-                    left: _arr[1].left + _width/2,
-                    top: _arr[1].top + _height/2
-                })]);
+                    left: _arr[1].left + _width / 2,
+                    top: _arr[1].top + _height / 2
+                })
+            ]);
         } else if (card.down > 0) {
             _arr[7].set('fill', 'lightgreen');
             _arr[7] = new fabric.Group([
@@ -473,9 +474,10 @@ function renderRange(card) {
                     fontSize: _width,
                     originX: 'center',
                     originY: 'center',
-                    left: _arr[7].left + _width/2,
-                    top: _arr[7].top + _height/2
-                })]);
+                    left: _arr[7].left + _width / 2,
+                    top: _arr[7].top + _height / 2
+                })
+            ]);
         } else if (card.left > 0) {
             _arr[3].set('fill', 'lightgreen');
             _arr[3] = new fabric.Group([
@@ -484,9 +486,10 @@ function renderRange(card) {
                     fontSize: _width,
                     originX: 'center',
                     originY: 'center',
-                    left: _arr[3].left + _width/2,
-                    top: _arr[3].top + _height/2
-                })]);
+                    left: _arr[3].left + _width / 2,
+                    top: _arr[3].top + _height / 2
+                })
+            ]);
         } else if (card.right > 0) {
             _arr[5].set('fill', 'lightgreen');
             _arr[5] = new fabric.Group([
@@ -495,9 +498,10 @@ function renderRange(card) {
                     fontSize: _width,
                     originX: 'center',
                     originY: 'center',
-                    left: _arr[5].left + _width/2,
-                    top: _arr[5].top + _height/2
-                })]);
+                    left: _arr[5].left + _width / 2,
+                    top: _arr[5].top + _height / 2
+                })
+            ]);
         }
     } else {
         card.range.forEach((r) => {
@@ -507,25 +511,20 @@ function renderRange(card) {
     return new fabric.Group(_arr);
 }
 
-$.getJSON('json/card.json', (data) => {
-    for(var i = 0; i<data.length; i++) {
-        canvas.add(makeCard(data[i]).set({
-           top:400,
-           left: 200*(i+1) 
-        }));
-    }
-})
-// var card;
-// $.getJSON('json/card.json', (data) => {
-//     card = data;
-//     canvas.on('mouse:down', (evt) => player2.attack(testCard2));
-
-//     var testCard = card[0];
-//     var testCard2 = card[1];
-//     var testCard3 = card[2];
-//     setTimeout(() => player1.move(testCard3), 1000);
-//     setTimeout(() => player2.move(testCard), 2000);
-//     setTimeout(() => player1.attack(testCard2), 3000);
-//     setTimeout(() => player2.attack(testCard2), 4000);
-//     setTimeout(() => player1.attack(testCard2), 5000);
-// });
+function showAllCards() {
+    $.getJSON('json/card.json', (data) => {
+        var i = 1;
+        var j = 1;
+        while (i <= data.length) {
+            canvas.add(makeCard(data[i - 1]).set({
+                top: cardHeight * 5 / 4 * j,
+                left: cardWidth * 5 / 2 + cardWidth * ((i - 1) % 5) * 3 / 2
+            }));
+            if (i % 5 == 0) {
+                j += 1;
+            }
+            i += 1;
+        }
+    })
+}
+showAllCards();
