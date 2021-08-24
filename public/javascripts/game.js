@@ -152,6 +152,7 @@ function initPlayer() {
     player1 = new Player(roomInfo[2]);
     player1.id = 'p1';
     player1.hp = 100;
+    player1.en = 100;
     player1.location = 5;
     player1.character = setCharacter('', 5, 'player1');
     //player1.character = setCharacter('magenta', 5, 'player1');
@@ -159,6 +160,7 @@ function initPlayer() {
     player2 = new Player(roomInfo[3]);
     player2.id = 'p2';
     player2.hp = 100;
+    player2.en = 100;
     player2.location = 8;
     player2.character = setCharacter('', 8, 'player2');
     //player2.character = setCharacter('cyan', 8, 'player2');
@@ -282,50 +284,82 @@ function selectPhase() {
     var gaugeHeight = canvas.height / 24;
     var gaugeWidth = canvas.width / 3;
     //나중에 따로 함수로 빼자
-    player1.hpGauge = new fabric.Rect({
-        objType: 'gauge',
-        left: gaugeWidth / 2,
-        top: 0,
-        width: gaugeWidth,
-        height: gaugeHeight,
-        fill: 'IndianRed',
-        stroke: 'CornflowerBlue',
-        strokeWidth: 4,
-        rx: 10,
-    });
-    player2.hpGauge = new fabric.Rect({
-        objType: 'gauge',
-        left: gaugeWidth * 3 / 2,
-        top: 0,
-        width: gaugeWidth,
-        height: gaugeHeight,
-        fill: 'IndianRed',
-        stroke: 'CornflowerBlue',
-        strokeWidth: 4,
-        rx: 10,
-    });
-    player1.enGauge = new fabric.Rect({
-        objType: 'gauge',
-        left: gaugeWidth / 2,
-        top: gaugeHeight,
-        width: gaugeWidth,
-        height: gaugeHeight,
-        fill: 'LemonChiffon',
-        stroke: 'CornflowerBlue',
-        strokeWidth: 4,
-        rx: 10,
-    });
-    player2.enGauge = new fabric.Rect({
-        objType: 'gauge',
-        left: gaugeWidth * 3 / 2,
-        top: gaugeHeight,
-        width: gaugeWidth,
-        height: gaugeHeight,
-        fill: 'LemonChiffon',
-        stroke: 'CornflowerBlue',
-        strokeWidth: 4,
-        rx: 10,
-    });
+    player1.hpGauge = new fabric.Group([new fabric.Rect({
+            objType: 'gauge',
+            left: gaugeWidth / 2,
+            top: 0,
+            width: gaugeWidth,
+            height: gaugeHeight,
+            fill: 'IndianRed',
+            stroke: 'CornflowerBlue',
+            strokeWidth: 4,
+            rx: 10,
+        }),
+        new fabric.Text(String(player1.hp), {
+            fontFamily: 'Papyrus',
+            fontSize: gaugeHeight,
+            textAlign: 'center',
+            left: gaugeWidth * 3 / 2 - gaugeHeight * 3,
+            top: 0,
+        })
+    ]);
+    player2.hpGauge = new fabric.Group([new fabric.Rect({
+            objType: 'gauge',
+            left: gaugeWidth * 3 / 2,
+            top: 0,
+            width: gaugeWidth,
+            height: gaugeHeight,
+            fill: 'IndianRed',
+            stroke: 'CornflowerBlue',
+            strokeWidth: 4,
+            rx: 10,
+        }),
+        new fabric.Text(String(player2.hp), {
+            fontFamily: 'Papyrus',
+            fontSize: gaugeHeight,
+            textAlign: 'center',
+            left: gaugeWidth * 3 / 2 + gaugeHeight,
+            top: 0,
+        })
+    ]);
+    player1.enGauge = new fabric.Group([new fabric.Rect({
+            objType: 'gauge',
+            left: gaugeWidth / 2,
+            top: gaugeHeight,
+            width: gaugeWidth,
+            height: gaugeHeight,
+            fill: 'LemonChiffon',
+            stroke: 'CornflowerBlue',
+            strokeWidth: 4,
+            rx: 10,
+        }),
+        new fabric.Text(String(player1.en), {
+            fontFamily: 'Papyrus',
+            fontSize: gaugeHeight,
+            textAlign: 'center',
+            left: gaugeWidth * 3 / 2 - gaugeHeight * 3,
+            top: gaugeHeight,
+        })
+    ]);
+    player2.enGauge = new fabric.Group([new fabric.Rect({
+            objType: 'gauge',
+            left: gaugeWidth * 3 / 2,
+            top: gaugeHeight,
+            width: gaugeWidth,
+            height: gaugeHeight,
+            fill: 'LemonChiffon',
+            stroke: 'CornflowerBlue',
+            strokeWidth: 4,
+            rx: 10,
+        }),
+        new fabric.Text(String(player2.en), {
+            fontFamily: 'Papyrus',
+            fontSize: gaugeHeight,
+            textAlign: 'center',
+            left: gaugeWidth * 3 / 2 + gaugeHeight,
+            top: gaugeHeight,
+        })
+    ]);
     player1.info = new fabric.Group([
         new fabric.Rect({
             objType: 'info',
@@ -373,6 +407,8 @@ function selectPhase() {
     ]);
 
     canvas.add(player1.hpGauge, player2.hpGauge, player1.enGauge, player2.enGauge, player1.info, player2.info);
+    player1.hpGauge.bringToFront();
+    player2.hpGauge.bringToFront();
 }
 
 selectPhase();
