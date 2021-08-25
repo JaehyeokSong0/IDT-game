@@ -129,6 +129,9 @@ resizeCanvas();
 var fieldWidth = canvas.width / 6;
 var fieldHeight = canvas.height / 5;
 
+var cardWidth = canvas.width / 12;
+var cardHeight = canvas.height / 6;
+
 function drawField(width, height) {
     for (var i = 1; i <= 3; i++) {
         for (var j = 1; j <= 4; j++) {
@@ -412,33 +415,6 @@ function selectPhase() {
 }
 
 selectPhase();
-
-var testCard = {
-    "name": "strike_1",
-    "type": "attack",
-    "range": [2, 5, 8],
-    "damage": 30,
-    "energy": 25
-};
-var testCard2 = {
-    "name": "restore_15",
-    "type": "restore",
-    "damage": 0,
-    "energy": 15
-};
-var testCard3 = {
-    "name": "move_up",
-    "type": "move",
-    "up": 1,
-    "down": 0,
-    "left": 0,
-    "right": 0,
-    "damage": 0,
-    "energy": 0
-};
-
-var cardWidth = canvas.width / 12;
-var cardHeight = canvas.height / 6;
 
 function makeCard(card) {
     return new fabric.Group([
