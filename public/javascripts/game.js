@@ -426,6 +426,7 @@ function makeCard(card) {
             strokeWidth: 2,
             rx: 10,
             originX: 'center',
+            selected: 0
         }),
         new fabric.Text(card.name, {
             fontSize: cardWidth / 7,
@@ -442,7 +443,9 @@ function makeCard(card) {
             originX: 'center',
             top: cardWidth / 2,
         })
-    ])
+    ]).set({
+        selected: 0
+    })
 }
 
 function renderRange(card) {
@@ -523,6 +526,7 @@ function renderRange(card) {
     return new fabric.Group(_arr);
 }
 
+
 function showAllCards() {
     $.getJSON('json/card.json', (data) => {
         var i = 1;
@@ -530,11 +534,13 @@ function showAllCards() {
         while (i <= data.length) {
             var _card = makeCard(data[i - 1]).set({
                 top: cardHeight * 5 / 4 * j,
-                left: cardWidth * 5 / 2 + cardWidth * ((i - 1) % 5) * 3 / 2
+                left: cardWidth * 5 / 2 + cardWidth * ((i - 1) % 5) * 3 / 2,
+                originTop: cardHeight * 5 / 4 * j,
+                originLeft: cardWidth * 5 / 2 + cardWidth * ((i - 1) % 5) * 3 / 2,
             });
-            // _card.on('mousedown', (e) => {
-            //     console.log(e);
-            // })
+            _card.on('mousedown', (e) => {
+                clickCard(e);
+            })
             canvas.add(_card);
             if (i % 5 == 0) {
                 j += 1;
@@ -544,6 +550,35 @@ function showAllCards() {
     })
 }
 showAllCards();
+var nextTurn = [];
+
+// For cards already selected, deselect card
+function clickCard(e) {
+    if (e.target.selected == 1) {
+        e.target.selected = 0;
+        nextTurn.splice(nextTurn.indexOf(e.target), 1);
+        e.target.set({
+            top: e.target.originTop,
+            left: e.target.originLeft
+        });
+        e.target.setCoords(); // Function after moving objects
+        refreshTurnCards(nextTurn);
+    } else if (nextTurn.length < 3) {
+        e.target.selected = 1
+        nextTurn.push(e.target);
+        refreshTurnCards(nextTurn);
+    }
+}
+
+function refreshTurnCards(turn) {
+    for (var i = 0; i < turn.length; i++) {
+        turn[i].set({
+            top: cardHeight * 9 / 2,
+            left: cardWidth * 4 + cardWidth * i * 3 / 2
+        });
+        turn[i].setCoords(); // Function after moving objects
+    }
+}
 
 function showTurnList() {
     for (var i = 1; i <= 3; i++) {
@@ -561,7 +596,7 @@ function showTurnList() {
                 fontSize: cardWidth / 6,
                 originX: 'center',
                 fontFamily: 'Lucida Console',
-                fill:'SlateGrey',
+                fill: 'SlateGrey',
                 top: cardHeight / 3
             }),
         ]).set({
