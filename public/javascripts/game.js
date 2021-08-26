@@ -122,7 +122,7 @@ function resizeCanvas() {
     console.info("canvas resized to w : ", canvas.width, ", h : ", canvas.height);
 }
 
-// initialize size of the canvas
+// Initialize size of the canvas
 resizeCanvas();
 
 // Make field
@@ -282,11 +282,52 @@ function checkRange(location, target) {
 drawField(fieldWidth, fieldHeight);
 initPlayer();
 
-
-function selectPhase() {
+function enterSelectPhase() {
     var gaugeHeight = canvas.height / 24;
     var gaugeWidth = canvas.width / 3;
-    //나중에 따로 함수로 빼자
+
+    initGauge(gaugeWidth, gaugeHeight);
+    initPlayerInfo(gaugeWidth);
+
+    var continue_btn = new fabric.Group([new fabric.Rect({
+            width: gaugeWidth / 4,
+            height: gaugeWidth / 12,
+            fill: 'DarkRed',
+            stroke: 'Black',
+            strokeWidth: 1,
+            rx: 10,
+            originX: 'center',
+            originY: 'center'
+        }),
+        new fabric.Text('CONTINUE', {
+            fontFamily: 'Papyrus',
+            fontSize: gaugeWidth / 32,
+            fill: 'White',
+            textAlign: 'center',
+            originX: 'center',
+            originY: 'center'
+        })
+    ]).set({
+        originX: 'center',
+        originY: 'center',
+        left: gaugeWidth * 3 / 2,
+        top: gaugeHeight * 13 / 4,
+    });
+    continue_btn.on('mousedown', (e) => {
+        //     enterBattlePhase();
+        //     socket.emit('continue', player1, player2);
+    })
+    canvas.add(player1.hpGauge, player2.hpGauge, player1.enGauge, player2.enGauge, player1.info, player2.info, continue_btn);
+    player1.hpGauge.bringToFront();
+    player2.hpGauge.bringToFront();
+
+    showAllCards();
+    showTurnList();
+}
+
+enterSelectPhase();
+
+function initGauge(gaugeWidth, gaugeHeight) {
     player1.hpGauge = new fabric.Group([new fabric.Rect({
             objType: 'gauge',
             left: gaugeWidth / 2,
@@ -363,13 +404,16 @@ function selectPhase() {
             top: gaugeHeight,
         })
     ]);
+}
+
+function initPlayerInfo(_width) {
     player1.info = new fabric.Group([
         new fabric.Rect({
             objType: 'info',
-            left: gaugeWidth / 16,
+            left: _width / 16,
             top: 0,
-            width: gaugeWidth / 4,
-            height: gaugeWidth / 4,
+            width: _width / 4,
+            height: _width / 4,
             fill: 'AliceBlue',
             stroke: 'LightSkyBlue',
             strokeWidth: 4,
@@ -377,22 +421,21 @@ function selectPhase() {
         }),
         new fabric.Text(player1.nickname, {
             fontFamily: 'Papyrus',
-            fontSize: gaugeWidth / 16,
+            fontSize: _width / 16,
             textAlign: 'center',
             originX: 'center',
             originY: 'center',
-            left: gaugeWidth / 16 * 3,
-            top: gaugeWidth / 8,
+            left: _width / 16 * 3,
+            top: _width / 8,
         }),
     ]);
-
     player2.info = new fabric.Group([
         new fabric.Rect({
             objType: 'info',
-            left: gaugeWidth / 16 * 43,
+            left: _width / 16 * 43,
             top: 0,
-            width: gaugeWidth / 4,
-            height: gaugeWidth / 4,
+            width: _width / 4,
+            height: _width / 4,
             fill: 'AliceBlue',
             stroke: 'LightSkyBlue',
             strokeWidth: 4,
@@ -400,46 +443,15 @@ function selectPhase() {
         }),
         new fabric.Text(player2.nickname, {
             fontFamily: 'Papyrus',
-            fontSize: gaugeWidth / 16,
+            fontSize: _width / 16,
             textAlign: 'center',
             originX: 'center',
             originY: 'center',
-            left: gaugeWidth / 16 * 45,
-            top: gaugeWidth / 8,
+            left: _width / 16 * 45,
+            top: _width / 8,
         })
     ]);
-
-    var continue_btn = new fabric.Group([new fabric.Rect({
-            width: gaugeWidth / 4,
-            height: gaugeWidth / 12,
-            fill: 'DarkRed',
-            stroke: 'Black',
-            strokeWidth: 1,
-            rx: 10,
-            originX: 'center',
-            originY: 'center'
-        }),
-        new fabric.Text('CONTINUE', {
-            fontFamily: 'Papyrus',
-            fontSize: gaugeWidth / 32,
-            fill: 'White',
-            textAlign: 'center',
-            originX: 'center',
-            originY: 'center'
-        })
-    ]).set({
-        originX: 'center',
-        originY: 'center',
-        left: gaugeWidth * 3 / 2,
-        top: gaugeHeight * 13 / 4,
-    });
-
-    canvas.add(player1.hpGauge, player2.hpGauge, player1.enGauge, player2.enGauge, player1.info, player2.info, continue_btn);
-    player1.hpGauge.bringToFront();
-    player2.hpGauge.bringToFront();
 }
-
-selectPhase();
 
 function makeCard(card) {
     return new fabric.Group([
@@ -493,63 +505,38 @@ function renderRange(card) {
     if ((card.type == 'guard') || (card.type == 'restore')) {
         _arr[4].set('fill', 'blue');
     } else if (card.type == 'move') {
-        // Need refactor using switch()
         if (card.up > 0) {
-            _arr[1].set('fill', 'lightgreen');
-            _arr[1] = new fabric.Group([
-                _arr[1],
-                new fabric.Text(String(card.up), {
-                    fontSize: _width,
-                    originX: 'center',
-                    originY: 'center',
-                    left: _arr[1].left + _width / 2,
-                    top: _arr[1].top + _height / 2
-                })
-            ]);
+            markRange(1,card.up);
         } else if (card.down > 0) {
-            _arr[7].set('fill', 'lightgreen');
-            _arr[7] = new fabric.Group([
-                _arr[7],
-                new fabric.Text(String(card.down), {
-                    fontSize: _width,
-                    originX: 'center',
-                    originY: 'center',
-                    left: _arr[7].left + _width / 2,
-                    top: _arr[7].top + _height / 2
-                })
-            ]);
+            markRange(7,card.down);
         } else if (card.left > 0) {
-            _arr[3].set('fill', 'lightgreen');
-            _arr[3] = new fabric.Group([
-                _arr[3],
-                new fabric.Text(String(card.left), {
-                    fontSize: _width,
-                    originX: 'center',
-                    originY: 'center',
-                    left: _arr[3].left + _width / 2,
-                    top: _arr[3].top + _height / 2
-                })
-            ]);
+            markRange(3,card.left);
         } else if (card.right > 0) {
-            _arr[5].set('fill', 'lightgreen');
-            _arr[5] = new fabric.Group([
-                _arr[5],
-                new fabric.Text(String(card.right), {
-                    fontSize: _width,
-                    originX: 'center',
-                    originY: 'center',
-                    left: _arr[5].left + _width / 2,
-                    top: _arr[5].top + _height / 2
-                })
-            ]);
+            markRange(5,card.right);
         }
     } else {
         card.range.forEach((r) => {
             _arr[r - 1].set('fill', 'red');
         });
     }
+
+    function markRange(num, moveVal) {
+    //Nested function
+        _arr[num].set('fill', 'lightgreen');
+        _arr[num] = new fabric.Group([
+            _arr[num],
+            new fabric.Text(String(moveVal), {
+                fontSize: _width,
+                originX: 'center',
+                originY: 'center',
+                left: _arr[num].left + _width / 2,
+                top: _arr[num].top + _height / 2
+            })
+        ]);
+    }
     return new fabric.Group(_arr);
 }
+
 
 
 function showAllCards() {
@@ -574,7 +561,6 @@ function showAllCards() {
         }
     })
 }
-showAllCards();
 var nextTurn = [];
 
 // For cards already selected, deselect card
@@ -630,5 +616,3 @@ function showTurnList() {
         }));
     }
 }
-
-showTurnList();
