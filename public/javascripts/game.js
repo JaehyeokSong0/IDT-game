@@ -409,7 +409,32 @@ function selectPhase() {
         })
     ]);
 
-    canvas.add(player1.hpGauge, player2.hpGauge, player1.enGauge, player2.enGauge, player1.info, player2.info);
+    var continue_btn = new fabric.Group([new fabric.Rect({
+            width: gaugeWidth / 4,
+            height: gaugeWidth / 12,
+            fill: 'DarkRed',
+            stroke: 'Black',
+            strokeWidth: 1,
+            rx: 10,
+            originX: 'center',
+            originY: 'center'
+        }),
+        new fabric.Text('CONTINUE', {
+            fontFamily: 'Papyrus',
+            fontSize: gaugeWidth / 32,
+            fill: 'White',
+            textAlign: 'center',
+            originX: 'center',
+            originY: 'center'
+        })
+    ]).set({
+        originX: 'center',
+        originY: 'center',
+        left: gaugeWidth * 3 / 2,
+        top: gaugeHeight * 13 / 4,
+    });
+
+    canvas.add(player1.hpGauge, player2.hpGauge, player1.enGauge, player2.enGauge, player1.info, player2.info, continue_btn);
     player1.hpGauge.bringToFront();
     player2.hpGauge.bringToFront();
 }
