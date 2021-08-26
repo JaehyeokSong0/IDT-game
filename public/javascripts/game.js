@@ -528,10 +528,14 @@ function showAllCards() {
         var i = 1;
         var j = 1;
         while (i <= data.length) {
-            canvas.add(makeCard(data[i - 1]).set({
+            var _card = makeCard(data[i - 1]).set({
                 top: cardHeight * 5 / 4 * j,
                 left: cardWidth * 5 / 2 + cardWidth * ((i - 1) % 5) * 3 / 2
-            }));
+            });
+            // _card.on('mousedown', (e) => {
+            //     console.log(e);
+            // })
+            canvas.add(_card);
             if (i % 5 == 0) {
                 j += 1;
             }
@@ -540,3 +544,31 @@ function showAllCards() {
     })
 }
 showAllCards();
+
+function showTurnList() {
+    for (var i = 1; i <= 3; i++) {
+        canvas.add(new fabric.Group([
+            new fabric.Rect({
+                width: cardWidth,
+                height: cardHeight,
+                fill: 'Silver',
+                stroke: 'Black',
+                strokeWidth: 4,
+                rx: 10,
+                originX: 'center',
+            }),
+            new fabric.Text(String('Action ' + i), {
+                fontSize: cardWidth / 6,
+                originX: 'center',
+                fontFamily: 'Lucida Console',
+                fill:'SlateGrey',
+                top: cardHeight / 3
+            }),
+        ]).set({
+            top: cardHeight * 9 / 2,
+            left: cardWidth * 4 + cardWidth * ((i - 1) % 5) * 3 / 2
+        }));
+    }
+}
+
+showTurnList();
