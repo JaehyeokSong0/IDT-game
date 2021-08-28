@@ -121,6 +121,7 @@ function resizeCanvas() {
     canvas.setHeight(window.innerHeight);
     console.info("canvas resized to w : ", canvas.width, ", h : ", canvas.height);
 }
+var nextTurn = [];
 
 // Initialize size of the canvas
 resizeCanvas();
@@ -132,7 +133,8 @@ var fieldHeight = canvas.height / 5;
 var cardWidth = canvas.width / 12;
 var cardHeight = canvas.height / 6;
 
-function drawField(width, height) {
+//draw invincible field
+function initField(width, height) {
     for (var i = 1; i <= 3; i++) {
         for (var j = 1; j <= 4; j++) {
             canvas.add(new fabric.Rect({
@@ -143,12 +145,21 @@ function drawField(width, height) {
                 height: height,
                 fill: '',
                 strokeWidth: 8,
-                //stroke: 'grey',
                 stroke: '',
                 fieldNum: (i - 1) * 4 + j
             }));
         }
     }
+}
+
+function showField() {
+    canvas.getObjects('rect').forEach((obj) => {
+        if (obj.objType == 'field') {
+            obj.set({
+                stroke : 'Grey'
+            })
+        }
+    })
 }
 
 function initPlayer() {
@@ -157,18 +168,14 @@ function initPlayer() {
     player1.hp = 100;
     player1.en = 100;
     player1.location = 5;
-    player1.character = setCharacter('', 5, 'player1');
-    //player1.character = setCharacter('magenta', 5, 'player1');
+    player1.character = setCharacter('magenta', 5, 'player1');
 
     player2 = new Player(roomInfo[3]);
     player2.id = 'p2';
     player2.hp = 100;
     player2.en = 100;
     player2.location = 8;
-    player2.character = setCharacter('', 8, 'player2');
-    //player2.character = setCharacter('cyan', 8, 'player2');
-
-    canvas.add(player1.character, player2.character);
+    player2.character = setCharacter('cyan', 8, 'player2');
 }
 
 function setCharacter(color, location, playerNum) {
@@ -279,7 +286,7 @@ function checkRange(location, target) {
     return ret;
 }
 
-drawField(fieldWidth, fieldHeight);
+initField(fieldWidth, fieldHeight);
 initPlayer();
 
 function enterSelectPhase() {
@@ -289,7 +296,27 @@ function enterSelectPhase() {
     initGauge(gaugeWidth, gaugeHeight);
     initPlayerInfo(gaugeWidth);
 
+    canvas.getObjects().forEach((obj) => {
+        try {
+            if (obj.objType == 'character') {
+                canvas.remove(obj);
+            } else if (obj.objType == 'field') {
+                obj.set({
+                    stroke : ''
+                });
+            }
+        } catch(e) {
+            console.error("[ERROR] Something went wrong : Failed to enter select phase.");
+        }
+    })
+
+    nextTurn.forEach((obj) => {
+        obj.selected = 0;
+    })
+    nextTurn = [];
+    
     var continue_btn = new fabric.Group([new fabric.Rect({
+            objType: 'button',
             width: gaugeWidth / 4,
             height: gaugeWidth / 12,
             fill: 'DarkRed',
@@ -314,7 +341,9 @@ function enterSelectPhase() {
         top: gaugeHeight * 13 / 4,
     });
     continue_btn.on('mousedown', (e) => {
-        //     enterBattlePhase();
+        if(nextTurn.length == 3) {
+            enterBattlePhase();
+        } 
         //     socket.emit('continue', player1, player2);
     })
     canvas.add(player1.hpGauge, player2.hpGauge, player1.enGauge, player2.enGauge, player1.info, player2.info, continue_btn);
@@ -326,6 +355,21 @@ function enterSelectPhase() {
 }
 
 enterSelectPhase();
+
+function enterBattlePhase() {
+    canvas.getObjects().forEach((obj) => {
+        try {
+            if ((obj._objects[0].objType == 'card') || (obj._objects[0].objType == 'turnList') || (obj._objects[0].objType == 'button')) {
+                canvas.remove(obj);
+            }
+        } catch(e) {}
+    })
+    showField();
+    canvas.add(player1.character, player2.character);
+    
+    window.setTimeout(enterSelectPhase,3000);
+
+}
 
 function initGauge(gaugeWidth, gaugeHeight) {
     player1.hpGauge = new fabric.Group([new fabric.Rect({
@@ -456,6 +500,7 @@ function initPlayerInfo(_width) {
 function makeCard(card) {
     return new fabric.Group([
         new fabric.Rect({
+            objType: 'card',
             width: cardWidth,
             height: cardHeight,
             fill: 'PaleGreen',
@@ -506,13 +551,13 @@ function renderRange(card) {
         _arr[4].set('fill', 'blue');
     } else if (card.type == 'move') {
         if (card.up > 0) {
-            markRange(1,card.up);
+            markRange(1, card.up);
         } else if (card.down > 0) {
-            markRange(7,card.down);
+            markRange(7, card.down);
         } else if (card.left > 0) {
-            markRange(3,card.left);
+            markRange(3, card.left);
         } else if (card.right > 0) {
-            markRange(5,card.right);
+            markRange(5, card.right);
         }
     } else {
         card.range.forEach((r) => {
@@ -521,7 +566,7 @@ function renderRange(card) {
     }
 
     function markRange(num, moveVal) {
-    //Nested function
+        //Nested function
         _arr[num].set('fill', 'lightgreen');
         _arr[num] = new fabric.Group([
             _arr[num],
@@ -536,7 +581,6 @@ function renderRange(card) {
     }
     return new fabric.Group(_arr);
 }
-
 
 
 function showAllCards() {
@@ -561,7 +605,6 @@ function showAllCards() {
         }
     })
 }
-var nextTurn = [];
 
 // For cards already selected, deselect card
 function clickCard(e) {
@@ -593,8 +636,9 @@ function refreshTurnCards(turn) {
 
 function showTurnList() {
     for (var i = 1; i <= 3; i++) {
-        canvas.add(new fabric.Group([
+        var turn = new fabric.Group([
             new fabric.Rect({
+                objType: 'turnList',
                 width: cardWidth,
                 height: cardHeight,
                 fill: 'Silver',
@@ -613,6 +657,7 @@ function showTurnList() {
         ]).set({
             top: cardHeight * 9 / 2,
             left: cardWidth * 4 + cardWidth * ((i - 1) % 5) * 3 / 2
-        }));
+        });
+        canvas.add(turn);
     }
 }
