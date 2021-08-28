@@ -107,7 +107,12 @@ var player1, player2;
 socket.on('startGame', (room) => {
     $('#roomModal').fadeOut();
     roomInfo = room;
+    
+    resizeCanvas();
+    initField(fieldWidth, fieldHeight);
     initPlayer();
+
+    enterSelectPhase();
 });
 
 var canvas = new fabric.Canvas('game_canvas', {
@@ -133,7 +138,7 @@ var fieldHeight = canvas.height / 5;
 var cardWidth = canvas.width / 12;
 var cardHeight = canvas.height / 6;
 
-//draw invincible field
+// Draw invincible field
 function initField(width, height) {
     for (var i = 1; i <= 3; i++) {
         for (var j = 1; j <= 4; j++) {
@@ -342,9 +347,9 @@ function enterSelectPhase() {
     });
     continue_btn.on('mousedown', (e) => {
         if(nextTurn.length == 3) {
+            socket.emit('enterBattlePhase', nextTurn);
             enterBattlePhase();
         } 
-        //     socket.emit('continue', player1, player2);
     })
     canvas.add(player1.hpGauge, player2.hpGauge, player1.enGauge, player2.enGauge, player1.info, player2.info, continue_btn);
     player1.hpGauge.bringToFront();
@@ -362,7 +367,9 @@ function enterBattlePhase() {
             if ((obj._objects[0].objType == 'card') || (obj._objects[0].objType == 'turnList') || (obj._objects[0].objType == 'button')) {
                 canvas.remove(obj);
             }
-        } catch(e) {}
+        } catch(e) {
+            console.error("[ERROR] Something went wrong : Failed to enter battle phase.");
+        }
     })
     showField();
     canvas.add(player1.character, player2.character);

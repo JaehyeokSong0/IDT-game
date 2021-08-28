@@ -45,6 +45,7 @@ io.on('connection', (socket) => {
   socket.on('leaveRoom', leaveRoom);
   socket.on('refreshRoom', refreshRoom);
   socket.on('startGame', startGame);
+  socket.on('enterBattlePhase', enterBattlePhase);
 
   function createId(id) {
     const index = usersId.findIndex((item) => {
@@ -146,6 +147,9 @@ io.on('connection', (socket) => {
       io.sockets.in(roomNum).emit('startGame', room);
     }
   }
+
+  // WIP
+  function enterBattlePhase(nextTurn){}
 });
 
 /**
