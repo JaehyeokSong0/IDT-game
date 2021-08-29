@@ -23,6 +23,8 @@ var server = http.createServer(app);
 /**
  * Setup Socket env
  */
+const fs = require('fs');
+const card_json = JSON.parse(fs.readFileSync('public/json/card.json', 'utf8'));
 
 var io = require('socket.io')(server, {
   cors: {
@@ -32,6 +34,9 @@ var io = require('socket.io')(server, {
 var roomNum = 1;
 var usersId = [];
 var rooms = [];
+
+var turn_host = [];
+var turn_guest = [];
 
 io.on('connection', (socket) => {
   socket.on('disconnect', () => {
@@ -148,8 +153,39 @@ io.on('connection', (socket) => {
     }
   }
 
-  // WIP
-  function enterBattlePhase(nextTurn){}
+  function enterBattlePhase(nextTurn, id) {
+    const roomNum = [...socket.rooms][1];
+    const index = rooms.findIndex((item) => {
+      return item[0] == roomNum
+    });
+    //If no room has been created, terminate the function.
+    if (index == -1) {
+      return;
+    }
+    const host = rooms[index][2];
+    const guest = rooms[index][3];
+    if (id == host) {
+      for (var i = 0; i < 3; i++) {
+        card_json.filter((data) => {
+          if (data.name == nextTurn[i].objects[1].text) {
+            turn_host.push(data);
+          }
+        })
+      }
+    } else if (id == guest) {
+      for (var i = 0; i < 3; i++) {
+        card_json.filter((data) => {
+          if (data.name == nextTurn[i].objects[1].text) {
+            turn_guest.push(data);
+          }
+        })
+      }
+    }
+    if ((turn_host.length == 3) && (turn_guest.length == 3)) {
+      io.sockets.in(roomNum).emit('battle', turn_host, turn_guest);
+    }
+  }
+
 });
 
 /**

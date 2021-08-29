@@ -1,28 +1,28 @@
 import {
-    socket
+    socket,
+    id
 } from './socket.js';
-var roomInfo = [1, "roomTitle", "host", "guest", 2];
+var roomInfo;
 
 class Player {
     constructor(nickname) {
         this.nickname = nickname;
-        this.turn = [];
     }
-    // Function to move character
-    move(testCard) {
-        if (testCard.type == "move") {
+
+    action(card) {
+        if (card.type == "move") {
             var fromField = getFieldByNum(this.location);
             // Get toField
             var toField;
-            if (testCard.up > 0) {
-                if ((this.location - 1) - testCard.up * 4 > 0) {
-                    toField = this.location - testCard.up * 4;
+            if (card.up > 0) {
+                if ((this.location - 1) - card.up * 4 > 0) {
+                    toField = this.location - card.up * 4;
                 } else {
                     toField = ((this.location - 1) % 4) + 1;
                 }
-            } else if (testCard.down > 0) {
-                if (this.location + testCard.down * 4 <= 12) {
-                    toField = this.location + testCard.down * 4;
+            } else if (card.down > 0) {
+                if (this.location + card.down * 4 <= 12) {
+                    toField = this.location + card.down * 4;
                 } else {
                     if (this.location % 4 == 0) {
                         toField = 12;
@@ -30,15 +30,15 @@ class Player {
                         toField = this.location % 4 + 8;
                     }
                 }
-            } else if (testCard.left > 0) {
-                if ((this.location - 1) % 4 >= testCard.left) {
-                    toField = this.location - testCard.left;
+            } else if (card.left > 0) {
+                if ((this.location - 1) % 4 >= card.left) {
+                    toField = this.location - card.left;
                 } else {
                     toField = Math.floor((this.location - 1) / 4) * 4 + 1;
                 }
-            } else if (testCard.right > 0) {
-                if (this.location + testCard.right <= (Math.floor((this.location - 1) / 4) + 1) * 4) {
-                    toField = this.location + testCard.right;
+            } else if (card.right > 0) {
+                if (this.location + card.right <= (Math.floor((this.location - 1) / 4) + 1) * 4) {
+                    toField = this.location + card.right;
                 } else {
                     toField = (Math.floor((this.location - 1) / 4) + 1) * 4;
                 }
@@ -68,15 +68,9 @@ class Player {
                     onChange: canvas.renderAll.bind(canvas)
                 });
             }
-        } else {
-            console.error("[ERROR] Something went wrong : Not a move card.");
-        }
-    }
-
-    attack(testCard) {
-        if (testCard.type == "attack") {
+        } else if (card.type == "attack") {
             var attackRange = [];
-            testCard.range.forEach((_field) => {
+            card.range.forEach((_field) => {
                 var chkPos = checkRange(this.location, _field);
                 if (chkPos != -1) {
                     attackRange.push(chkPos);
@@ -85,20 +79,18 @@ class Player {
             attackRange.forEach((_field) => {
                 if (this.id == 'p1') {
                     if (_field == player2.location) {
-                        player2.hp -= testCard.damage;
-                        console.log("Player2 got", testCard.damage, ", HP became ", player2.hp);
+                        player2.hp -= card.damage;
+                        console.log("Player2 got", card.damage, ", HP became ", player2.hp);
                     }
                 } else if (this.id == 'p2') {
                     if (_field == player1.location) {
-                        player1.hp -= testCard.damage;
-                        console.log("Player1 got", testCard.damage, ", HP became ", player1.hp);
+                        player1.hp -= card.damage;
+                        console.log("Player1 got", card.damage, ", HP became ", player1.hp);
                     }
                 } else {
                     console.error("[ERROR] Something went wrong : Wrong player id.");
                 }
             });
-        } else {
-            console.error("[ERROR] Something went wrong : Not a attack card.");
         }
     }
 }
@@ -107,13 +99,29 @@ var player1, player2;
 socket.on('startGame', (room) => {
     $('#roomModal').fadeOut();
     roomInfo = room;
-    
+
     resizeCanvas();
     initField(fieldWidth, fieldHeight);
     initPlayer();
 
     enterSelectPhase();
 });
+
+function sleep(delay) {
+    return new Promise((resolve) => setTimeout(resolve, delay));
+}
+
+socket.on('battle', (turn_host, turn_guest) => {
+    enterBattlePhase();
+    async function battle () {
+        for (var i = 0; i < 3; i++) {
+            player1.action(turn_host[i]);
+            player2.action(turn_guest[i]);
+            await sleep(2000);
+        }
+    }
+    battle();
+})
 
 var canvas = new fabric.Canvas('game_canvas', {
     backgroundColor: "white"
@@ -161,7 +169,7 @@ function showField() {
     canvas.getObjects('rect').forEach((obj) => {
         if (obj.objType == 'field') {
             obj.set({
-                stroke : 'Grey'
+                stroke: 'Grey'
             })
         }
     })
@@ -291,9 +299,6 @@ function checkRange(location, target) {
     return ret;
 }
 
-initField(fieldWidth, fieldHeight);
-initPlayer();
-
 function enterSelectPhase() {
     var gaugeHeight = canvas.height / 24;
     var gaugeWidth = canvas.width / 3;
@@ -307,10 +312,10 @@ function enterSelectPhase() {
                 canvas.remove(obj);
             } else if (obj.objType == 'field') {
                 obj.set({
-                    stroke : ''
+                    stroke: ''
                 });
             }
-        } catch(e) {
+        } catch (e) {
             console.error("[ERROR] Something went wrong : Failed to enter select phase.");
         }
     })
@@ -319,7 +324,7 @@ function enterSelectPhase() {
         obj.selected = 0;
     })
     nextTurn = [];
-    
+
     var continue_btn = new fabric.Group([new fabric.Rect({
             objType: 'button',
             width: gaugeWidth / 4,
@@ -346,10 +351,12 @@ function enterSelectPhase() {
         top: gaugeHeight * 13 / 4,
     });
     continue_btn.on('mousedown', (e) => {
-        if(nextTurn.length == 3) {
-            socket.emit('enterBattlePhase', nextTurn);
-            enterBattlePhase();
-        } 
+        if (nextTurn.length == 3) {
+            continue_btn._objects[0].set({
+                fill: 'Grey'
+            });
+            socket.emit('enterBattlePhase', nextTurn, id);
+        }
     })
     canvas.add(player1.hpGauge, player2.hpGauge, player1.enGauge, player2.enGauge, player1.info, player2.info, continue_btn);
     player1.hpGauge.bringToFront();
@@ -359,23 +366,18 @@ function enterSelectPhase() {
     showTurnList();
 }
 
-enterSelectPhase();
-
 function enterBattlePhase() {
     canvas.getObjects().forEach((obj) => {
         try {
-            if ((obj._objects[0].objType == 'card') || (obj._objects[0].objType == 'turnList') || (obj._objects[0].objType == 'button')) {
+            if (obj.objType == 'field') {} else if ((obj._objects[0].objType == 'card') || (obj._objects[0].objType == 'turnList') || (obj._objects[0].objType == 'button')) {
                 canvas.remove(obj);
             }
-        } catch(e) {
+        } catch (e) {
             console.error("[ERROR] Something went wrong : Failed to enter battle phase.");
         }
     })
     showField();
     canvas.add(player1.character, player2.character);
-    
-    window.setTimeout(enterSelectPhase,3000);
-
 }
 
 function initGauge(gaugeWidth, gaugeHeight) {

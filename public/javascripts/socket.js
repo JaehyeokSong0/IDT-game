@@ -1,5 +1,5 @@
 export const socket = io();
-var id;
+export var id;
 
 $('#start_btn').click(() => {
     id = $('#nickname').val();
