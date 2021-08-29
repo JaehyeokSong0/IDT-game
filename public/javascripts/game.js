@@ -68,6 +68,7 @@ class Player {
                     onChange: canvas.renderAll.bind(canvas)
                 });
             }
+            editLog(this.nickname + ' used ' + card.name);
         } else if (card.type == "attack") {
             var attackRange = [];
             card.range.forEach((_field) => {
@@ -76,16 +77,15 @@ class Player {
                     attackRange.push(chkPos);
                 }
             });
+            editLog(this.nickname + ' used ' + card.name);
             attackRange.forEach((_field) => {
                 if (this.id == 'p1') {
                     if (_field == player2.location) {
                         player2.hp -= card.damage;
-                        console.log("Player2 got", card.damage, ", HP became ", player2.hp);
                     }
                 } else if (this.id == 'p2') {
                     if (_field == player1.location) {
                         player1.hp -= card.damage;
-                        console.log("Player1 got", card.damage, ", HP became ", player1.hp);
                     }
                 } else {
                     console.error("[ERROR] Something went wrong : Wrong player id.");
@@ -95,7 +95,7 @@ class Player {
     }
 }
 var player1, player2;
-var logField, turnLogField;
+var logField;
 
 socket.on('startGame', (room) => {
     $('#roomModal').fadeOut();
@@ -118,10 +118,8 @@ socket.on('battle', (turn_host, turn_guest) => {
     async function battle() {
         for (var i = 0; i < 3; i++) {
             player1.action(turn_host[i]);
-            editTurnLog(roomInfo[2] + `'s turn.`);
             await sleep(1000);
             player2.action(turn_guest[i]);
-            editTurnLog(roomInfo[3] + `'s turn.`);
             await sleep(1000);
         }
     }
@@ -181,15 +179,6 @@ function showField() {
 }
 
 function initLogField() {
-    turnLogField = new fabric.Text('', {
-        fontFamily: 'Papyrus',
-        fontSize: fieldWidth / 4,
-        textAlign: 'center',
-        originX: 'center',
-        originY: 'center',
-        left: canvas.width / 2,
-        top: canvas.height * 4 / 5,
-    });
     logField = new fabric.Text('', {
         fontFamily: 'Papyrus',
         fontSize: fieldWidth / 3,
@@ -201,9 +190,6 @@ function initLogField() {
     });
 }
 
-function editTurnLog(text) {
-    turnLogField.set('text', text);
-}
 function editLog(text) {
     logField.set('text', text);
 }
