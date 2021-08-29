@@ -95,6 +95,7 @@ class Player {
     }
 }
 var player1, player2;
+var logField, turnLogField;
 
 socket.on('startGame', (room) => {
     $('#roomModal').fadeOut();
@@ -103,6 +104,7 @@ socket.on('startGame', (room) => {
     resizeCanvas();
     initField(fieldWidth, fieldHeight);
     initPlayer();
+    initLogField();
 
     enterSelectPhase();
 });
@@ -113,11 +115,14 @@ function sleep(delay) {
 
 socket.on('battle', (turn_host, turn_guest) => {
     enterBattlePhase();
-    async function battle () {
+    async function battle() {
         for (var i = 0; i < 3; i++) {
             player1.action(turn_host[i]);
+            editTurnLog(roomInfo[2] + `'s turn.`);
+            await sleep(1000);
             player2.action(turn_guest[i]);
-            await sleep(2000);
+            editTurnLog(roomInfo[3] + `'s turn.`);
+            await sleep(1000);
         }
     }
     battle();
@@ -173,6 +178,34 @@ function showField() {
             })
         }
     })
+}
+
+function initLogField() {
+    turnLogField = new fabric.Text('', {
+        fontFamily: 'Papyrus',
+        fontSize: fieldWidth / 4,
+        textAlign: 'center',
+        originX: 'center',
+        originY: 'center',
+        left: canvas.width / 2,
+        top: canvas.height * 4 / 5,
+    });
+    logField = new fabric.Text('', {
+        fontFamily: 'Papyrus',
+        fontSize: fieldWidth / 3,
+        textAlign: 'center',
+        originX: 'center',
+        originY: 'center',
+        left: canvas.width / 2,
+        top: canvas.height * 9 / 10,
+    });
+}
+
+function editTurnLog(text) {
+    turnLogField.set('text', text);
+}
+function editLog(text) {
+    logField.set('text', text);
 }
 
 function initPlayer() {
@@ -377,7 +410,7 @@ function enterBattlePhase() {
         }
     })
     showField();
-    canvas.add(player1.character, player2.character);
+    canvas.add(logField, player1.character, player2.character);
 }
 
 function initGauge(gaugeWidth, gaugeHeight) {
