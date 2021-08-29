@@ -68,7 +68,7 @@ class Player {
                     onChange: canvas.renderAll.bind(canvas)
                 });
             }
-            editLog(this.nickname + ' used ' + card.name);
+            editLog(String(this.nickname + ' used ' + card.name));
         } else if (card.type == "attack") {
             var attackRange = [];
             card.range.forEach((_field) => {
@@ -77,20 +77,25 @@ class Player {
                     attackRange.push(chkPos);
                 }
             });
-            editLog(this.nickname + ' used ' + card.name);
             attackRange.forEach((_field) => {
                 if (this.id == 'p1') {
                     if (_field == player2.location) {
                         player2.hp -= card.damage;
                     }
+                    editLog(String(this.nickname + ' used ' + card.name + ` / Enemy's HP became ` + player2.hp));
                 } else if (this.id == 'p2') {
                     if (_field == player1.location) {
                         player1.hp -= card.damage;
                     }
+                    editLog(String(this.nickname + ' used ' + card.name + ` / Enemy's HP became ` + player1.hp));
                 } else {
                     console.error("[ERROR] Something went wrong : Wrong player id.");
                 }
             });
+        } else if (card.type == "guard") {
+            // WIP
+        } else if (card.type == "restore") {
+            // WIP
         }
     }
 }
@@ -111,6 +116,10 @@ socket.on('startGame', (room) => {
 
 function sleep(delay) {
     return new Promise((resolve) => setTimeout(resolve, delay));
+}
+
+function calcTurnResult() {
+
 }
 
 socket.on('battle', (turn_host, turn_guest) => {
@@ -192,6 +201,7 @@ function initLogField() {
 
 function editLog(text) {
     logField.set('text', text);
+    canvas.renderAll();
 }
 
 function initPlayer() {
