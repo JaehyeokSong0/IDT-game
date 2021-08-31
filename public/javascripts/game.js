@@ -93,9 +93,13 @@ class Player {
                 }
             });
         } else if (card.type == "guard") {
-            // WIP
+            return card.damage;
         } else if (card.type == "restore") {
-            // WIP
+            if(this.en + card.energy <= 100) {
+                this.en += card.energy;
+            } else {
+                this.en = 100;
+            }
         }
     }
 }
