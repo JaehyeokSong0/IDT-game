@@ -1,7 +1,14 @@
 export const socket = io();
 export var id;
 
-$('#start_btn').click(() => {
+$('#nickname').keyup((event) => {
+    if(event.keyCode == 13) {
+        id = $('#nickname').val();
+        socket.emit('createId', id);
+    }
+});
+
+$('#submitID_btn').click(() => {
     id = $('#nickname').val();
     socket.emit('createId', id);
 });
