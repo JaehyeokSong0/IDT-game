@@ -43,14 +43,13 @@ io.on('connection', (socket) => {
     console.log('user disconnected');
   });
 
+  // In lobby
   socket.on('createId', createId);
   socket.on('createRoom', createRoom);
   socket.on('joinRoom', joinRoom);
   socket.on('getReady', getReady);
   socket.on('leaveRoom', leaveRoom);
   socket.on('refreshRoom', refreshRoom);
-  socket.on('startGame', startGame);
-  socket.on('enterBattlePhase', enterBattlePhase);
 
   function createId(id) {
     const index = usersId.findIndex((item) => {
@@ -65,6 +64,7 @@ io.on('connection', (socket) => {
     }
     io.to(socket.id).emit('checkId', isValidId);
   }
+
   async function createRoom(id, roomTitle) {
     await socket.join(roomNum);
     var clients = io.sockets.adapter.rooms.get(roomNum);
@@ -77,6 +77,7 @@ io.on('connection', (socket) => {
     io.sockets.in(roomNum).emit('createdRoom', roomInfo);
     roomNum += 1;
   }
+
   async function joinRoom(id, roomNum) {
     await socket.join(roomNum);
     var clients = io.sockets.adapter.rooms.get(roomNum);
@@ -102,14 +103,14 @@ io.on('connection', (socket) => {
     const index = rooms.findIndex((item) => {
       return item[0] == roomNum
     });
-    //If no room has been created, terminate the function.
+    // If no room has been created, terminate the function.
     if (index == -1) {
       return;
     }
     const host = rooms[index][2];
     const guest = rooms[index][3];
     if (id == host) {
-      //If there's no guest and only host exists
+      // If there's no guest and only host exists
       if (rooms[index][4] == 1) {
         deleteRoom(roomNum);
       } else {
@@ -141,7 +142,10 @@ io.on('connection', (socket) => {
     io.emit('refreshRoom', rooms);
   }
 
-  //Game
+  // In game
+  socket.on('startGame', startGame);
+  socket.on('enterBattlePhase', enterBattlePhase);
+
   function startGame() {
     const roomNum = [...socket.rooms][1];
     const index = rooms.findIndex((item) => {
@@ -185,7 +189,6 @@ io.on('connection', (socket) => {
       io.sockets.in(roomNum).emit('battle', turn_host, turn_guest);
     }
   }
-
 });
 
 /**

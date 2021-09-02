@@ -2,11 +2,29 @@ import {
     socket,
     id
 } from './socket.js';
+
 var roomInfo;
+var player1, player2;
+var logField;
+var nextTurn = [];
+var fieldWidth = canvas.width / 6;
+var fieldHeight = canvas.height / 5;
+var cardWidth = canvas.width / 12;
+var cardHeight = canvas.height / 6;
+
+var canvas = new fabric.Canvas('game_canvas', {
+    backgroundColor: 'white'
+});
+fabric.Object.prototype.selectable = false;
+window.addEventListener('resize', resizeCanvas, false);
 
 class Player {
-    constructor(nickname) {
-        this.nickname = nickname;
+    constructor(_nickname, _location, _id) {
+        this.nickname = _nickname;
+        this.location = _location;
+        this.id = _id;
+        this.hp = 100;
+        this.en = 100;
     }
 
     action(card) {
@@ -95,7 +113,7 @@ class Player {
         } else if (card.type == "guard") {
             return card.damage;
         } else if (card.type == "restore") {
-            if(this.en + card.energy <= 100) {
+            if (this.en + card.energy <= 100) {
                 this.en += card.energy;
             } else {
                 this.en = 100;
@@ -103,28 +121,19 @@ class Player {
         }
     }
 }
-var player1, player2;
-var logField;
+
+// Initialize size of the canvas
+resizeCanvas();
 
 socket.on('startGame', (room) => {
     $('#roomModal').fadeOut();
     roomInfo = room;
-
     resizeCanvas();
     initField(fieldWidth, fieldHeight);
     initPlayer();
     initLogField();
-
     enterSelectPhase();
 });
-
-function sleep(delay) {
-    return new Promise((resolve) => setTimeout(resolve, delay));
-}
-
-function calcTurnResult() {
-
-}
 
 socket.on('battle', (turn_host, turn_guest) => {
     enterBattlePhase();
@@ -137,30 +146,21 @@ socket.on('battle', (turn_host, turn_guest) => {
         }
     }
     battle();
-})
-
-var canvas = new fabric.Canvas('game_canvas', {
-    backgroundColor: "white"
 });
-fabric.Object.prototype.selectable = false;
-window.addEventListener('resize', resizeCanvas, false);
+
+function sleep(delay) {
+    return new Promise((resolve) => setTimeout(resolve, delay));
+}
+
+function calcTurnResult() {
+
+}
 
 function resizeCanvas() {
     canvas.setWidth(window.innerWidth);
     canvas.setHeight(window.innerHeight);
     console.info("canvas resized to w : ", canvas.width, ", h : ", canvas.height);
 }
-var nextTurn = [];
-
-// Initialize size of the canvas
-resizeCanvas();
-
-// Make field
-var fieldWidth = canvas.width / 6;
-var fieldHeight = canvas.height / 5;
-
-var cardWidth = canvas.width / 12;
-var cardHeight = canvas.height / 6;
 
 // Draw invincible field
 function initField(width, height) {
@@ -209,23 +209,17 @@ function editLog(text) {
 }
 
 function initPlayer() {
-    player1 = new Player(roomInfo[2]);
-    player1.id = 'p1';
-    player1.hp = 100;
-    player1.en = 100;
-    player1.location = 5;
+    player1 = new Player(roomInfo[2],5, 'p1');
     player1.character = setCharacter('magenta', 5, 'player1');
 
-    player2 = new Player(roomInfo[3]);
-    player2.id = 'p2';
-    player2.hp = 100;
-    player2.en = 100;
-    player2.location = 8;
+    player2 = new Player(roomInfo[3],8, 'p2');
     player2.character = setCharacter('cyan', 8, 'player2');
 }
 
 function setCharacter(color, location, playerNum) {
     var fieldDiv;
+    var _field = getFieldByNum(location);
+    var _radius = fieldHeight / 6;
     if (playerNum === 'player1') {
         fieldDiv = 1;
     } else if (playerNum === 'player2') {
@@ -233,8 +227,6 @@ function setCharacter(color, location, playerNum) {
     } else {
         console.error("[ERROR] Something went wrong : Wrong playerNum.");
     }
-    var _field = getFieldByNum(location);
-    var _radius = fieldHeight / 6;
     return new fabric.Circle({
         objType: 'character',
         radius: _radius,
@@ -391,10 +383,10 @@ function enterSelectPhase() {
             socket.emit('enterBattlePhase', nextTurn, id);
         }
     })
+
     canvas.add(player1.hpGauge, player2.hpGauge, player1.enGauge, player2.enGauge, player1.info, player2.info, continue_btn);
     player1.hpGauge.bringToFront();
     player2.hpGauge.bringToFront();
-
     showAllCards();
     showTurnList();
 }
@@ -606,9 +598,9 @@ function renderRange(card) {
             _arr[r - 1].set('fill', 'red');
         });
     }
-
+        
+    // Nested function
     function markRange(num, moveVal) {
-        //Nested function
         _arr[num].set('fill', 'lightgreen');
         _arr[num] = new fabric.Group([
             _arr[num],
@@ -624,28 +616,27 @@ function renderRange(card) {
     return new fabric.Group(_arr);
 }
 
-
 function showAllCards() {
     $.getJSON('json/card.json', (data) => {
         var i = 1;
         var j = 1;
         while (i <= data.length) {
-            var _card = makeCard(data[i - 1]).set({
+            var card = makeCard(data[i - 1]).set({
                 top: cardHeight * 5 / 4 * j,
                 left: cardWidth * 5 / 2 + cardWidth * ((i - 1) % 5) * 3 / 2,
                 originTop: cardHeight * 5 / 4 * j,
                 originLeft: cardWidth * 5 / 2 + cardWidth * ((i - 1) % 5) * 3 / 2,
             });
-            _card.on('mousedown', (e) => {
+            card.on('mousedown', (e) => {
                 clickCard(e);
             })
-            canvas.add(_card);
+            canvas.add(card);
             if (i % 5 == 0) {
                 j += 1;
             }
             i += 1;
         }
-    })
+    });
 }
 
 // For cards already selected, deselect card
