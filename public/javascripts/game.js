@@ -7,14 +7,15 @@ var roomInfo;
 var player1, player2;
 var logField;
 var nextTurn = [];
+var canvas = new fabric.Canvas('game_canvas', {
+    backgroundColor: 'white'
+});
+// Initialize size of the canvas
+resizeCanvas();
 var fieldWidth = canvas.width / 6;
 var fieldHeight = canvas.height / 5;
 var cardWidth = canvas.width / 12;
 var cardHeight = canvas.height / 6;
-
-var canvas = new fabric.Canvas('game_canvas', {
-    backgroundColor: 'white'
-});
 fabric.Object.prototype.selectable = false;
 window.addEventListener('resize', resizeCanvas, false);
 
@@ -28,6 +29,7 @@ class Player {
     }
 
     action(card) {
+        editLog(String(this.nickname + ' used ' + card.name));
         if (card.type == "move") {
             var fromField = getFieldByNum(this.location);
             // Get toField
@@ -86,7 +88,6 @@ class Player {
                     onChange: canvas.renderAll.bind(canvas)
                 });
             }
-            editLog(String(this.nickname + ' used ' + card.name));
         } else if (card.type == "attack") {
             var attackRange = [];
             card.range.forEach((_field) => {
@@ -100,12 +101,10 @@ class Player {
                     if (_field == player2.location) {
                         player2.hp -= card.damage;
                     }
-                    editLog(String(this.nickname + ' used ' + card.name + ` / Enemy's HP became ` + player2.hp));
                 } else if (this.id == 'p2') {
                     if (_field == player1.location) {
                         player1.hp -= card.damage;
                     }
-                    editLog(String(this.nickname + ' used ' + card.name + ` / Enemy's HP became ` + player1.hp));
                 } else {
                     console.error("[ERROR] Something went wrong : Wrong player id.");
                 }
@@ -121,9 +120,6 @@ class Player {
         }
     }
 }
-
-// Initialize size of the canvas
-resizeCanvas();
 
 socket.on('startGame', (room) => {
     $('#roomModal').fadeOut();
