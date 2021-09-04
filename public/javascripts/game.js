@@ -16,6 +16,8 @@ var fieldWidth = canvas.width / 6;
 var fieldHeight = canvas.height / 5;
 var cardWidth = canvas.width / 12;
 var cardHeight = canvas.height / 6;
+var gaugeHeight = canvas.height / 24;
+var gaugeWidth = canvas.width / 3;
 fabric.Object.prototype.selectable = false;
 window.addEventListener('resize', resizeCanvas, false);
 
@@ -117,6 +119,52 @@ class Player {
             } else {
                 this.en = 100;
             }
+        }
+    }
+
+    updateGauge(type, num) {
+        if (type == 'reduce_hp') {
+            if (this.hp >= num) {
+                this.hpGauge._objects[1].set({
+                    width: gaugeWidth * (this.hp - num) / 100
+                });
+            } else {
+                this.hpGauge._objects[1].set({
+                    width: 0
+                });
+            }
+        } else if (type == 'reduce_en') {
+            if (this.en >= num) {
+                this.enGauge._objects[1].set({
+                    width: gaugeWidth * (this.en - num) / 100
+                });
+            } else {
+                this.enGauge._objects[1].set({
+                    width: 0
+                });
+            }
+        } else if (type == 'restore_hp') {
+            if (this.hp + num <= 100) {
+                this.hpGauge._objects[1].set({
+                    width: gaugeWidth * (this.hp + num) / 100
+                });
+            } else {
+                this.hpGauge._objects[1].set({
+                    width: gaugeWidth
+                });
+            }
+        } else if (type == 'restore_en') {
+            if (this.en + num <= 100) {
+                this.enGauge._objects[1].set({
+                    width: gaugeWidth * (this.en + num) / 100
+                });
+            } else {
+                this.enGauge._objects[1].set({
+                    width: gaugeWidth
+                });
+            }
+        } else {
+            console.error("[ERROR] Something went wrong : Wrong input in updateGauge().");
         }
     }
 }
@@ -321,9 +369,6 @@ function checkRange(location, target) {
 }
 
 function enterSelectPhase() {
-    var gaugeHeight = canvas.height / 24;
-    var gaugeWidth = canvas.width / 3;
-
     initGauge(gaugeWidth, gaugeHeight);
     initPlayerInfo(gaugeWidth);
 
@@ -422,7 +467,7 @@ function initGauge(gaugeWidth, gaugeHeight) {
             strokeWidth: 4,
             rx: 10,
         }),
-        new fabric.Text(String('100'), {
+        new fabric.Text(String(player1.hp), {
             fontFamily: 'Papyrus',
             fontSize: gaugeHeight,
             textAlign: 'center',
@@ -450,7 +495,7 @@ function initGauge(gaugeWidth, gaugeHeight) {
             strokeWidth: 4,
             rx: 10,
         }),
-        new fabric.Text(String('100'), {
+        new fabric.Text(String(player2.hp), {
             fontFamily: 'Papyrus',
             fontSize: gaugeHeight,
             textAlign: 'center',
@@ -478,7 +523,7 @@ function initGauge(gaugeWidth, gaugeHeight) {
             strokeWidth: 4,
             rx: 10,
         }),
-        new fabric.Text(String('100'), {
+        new fabric.Text(String(player1.en), {
             fontFamily: 'Papyrus',
             fontSize: gaugeHeight,
             textAlign: 'center',
@@ -507,7 +552,7 @@ function initGauge(gaugeWidth, gaugeHeight) {
             strokeWidth: 4,
             rx: 10,
         }),
-        new fabric.Text(String('100'), {
+        new fabric.Text(String(player2.en), {
             fontFamily: 'Papyrus',
             fontSize: gaugeHeight,
             textAlign: 'center',
