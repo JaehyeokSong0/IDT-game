@@ -205,10 +205,10 @@ function editLog(text) {
 }
 
 function initPlayer() {
-    player1 = new Player(roomInfo[2],5, 'p1');
+    player1 = new Player(roomInfo[2], 5, 'p1');
     player1.character = setCharacter('magenta', 5, 'player1');
 
-    player2 = new Player(roomInfo[3],8, 'p2');
+    player2 = new Player(roomInfo[3], 8, 'p2');
     player2.character = setCharacter('cyan', 8, 'player2');
 }
 
@@ -408,12 +408,21 @@ function initGauge(gaugeWidth, gaugeHeight) {
             top: 0,
             width: gaugeWidth,
             height: gaugeHeight,
+            fill: 'White',
+            stroke: 'CornflowerBlue',
+            strokeWidth: 4,
+            rx: 10,
+        }), new fabric.Rect({
+            left: gaugeWidth / 2,
+            top: 0,
+            width: gaugeWidth,
+            height: gaugeHeight,
             fill: 'IndianRed',
             stroke: 'CornflowerBlue',
             strokeWidth: 4,
             rx: 10,
         }),
-        new fabric.Text(String(player1.hp), {
+        new fabric.Text(String('100'), {
             fontFamily: 'Papyrus',
             fontSize: gaugeHeight,
             textAlign: 'center',
@@ -427,12 +436,21 @@ function initGauge(gaugeWidth, gaugeHeight) {
             top: 0,
             width: gaugeWidth,
             height: gaugeHeight,
+            fill: 'White',
+            stroke: 'CornflowerBlue',
+            strokeWidth: 4,
+            rx: 10,
+        }), new fabric.Rect({
+            left: gaugeWidth * 3 / 2,
+            top: 0,
+            width: gaugeWidth,
+            height: gaugeHeight,
             fill: 'IndianRed',
             stroke: 'CornflowerBlue',
             strokeWidth: 4,
             rx: 10,
         }),
-        new fabric.Text(String(player2.hp), {
+        new fabric.Text(String('100'), {
             fontFamily: 'Papyrus',
             fontSize: gaugeHeight,
             textAlign: 'center',
@@ -446,12 +464,21 @@ function initGauge(gaugeWidth, gaugeHeight) {
             top: gaugeHeight,
             width: gaugeWidth,
             height: gaugeHeight,
+            fill: 'White',
+            stroke: 'CornflowerBlue',
+            strokeWidth: 4,
+            rx: 10,
+        }), new fabric.Rect({
+            left: gaugeWidth / 2,
+            top: gaugeHeight,
+            width: gaugeWidth,
+            height: gaugeHeight,
             fill: 'LemonChiffon',
             stroke: 'CornflowerBlue',
             strokeWidth: 4,
             rx: 10,
         }),
-        new fabric.Text(String(player1.en), {
+        new fabric.Text(String('100'), {
             fontFamily: 'Papyrus',
             fontSize: gaugeHeight,
             textAlign: 'center',
@@ -465,12 +492,22 @@ function initGauge(gaugeWidth, gaugeHeight) {
             top: gaugeHeight,
             width: gaugeWidth,
             height: gaugeHeight,
+            fill: 'White',
+            stroke: 'CornflowerBlue',
+            strokeWidth: 4,
+            rx: 10,
+        }), new fabric.Rect({
+            objType: 'gauge',
+            left: gaugeWidth * 3 / 2,
+            top: gaugeHeight,
+            width: gaugeWidth,
+            height: gaugeHeight,
             fill: 'LemonChiffon',
             stroke: 'CornflowerBlue',
             strokeWidth: 4,
             rx: 10,
         }),
-        new fabric.Text(String(player2.en), {
+        new fabric.Text(String('100'), {
             fontFamily: 'Papyrus',
             fontSize: gaugeHeight,
             textAlign: 'center',
@@ -594,7 +631,7 @@ function renderRange(card) {
             _arr[r - 1].set('fill', 'red');
         });
     }
-        
+
     // Nested function
     function markRange(num, moveVal) {
         _arr[num].set('fill', 'lightgreen');
