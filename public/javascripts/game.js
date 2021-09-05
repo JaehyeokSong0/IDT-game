@@ -172,6 +172,34 @@ socket.on('startGame', (room) => {
 
 socket.on('battle', (turn_host, turn_guest) => {
     enterBattlePhase();
+    var continue_btn = new fabric.Group([new fabric.Rect({
+            objType: 'button',
+            width: gaugeWidth / 4,
+            height: gaugeWidth / 12,
+            fill: 'DarkRed',
+            stroke: 'Black',
+            strokeWidth: 1,
+            rx: 10,
+            originX: 'center',
+            originY: 'center'
+        }),
+        new fabric.Text('CONTINUE', {
+            fontFamily: 'Papyrus',
+            fontSize: gaugeWidth / 32,
+            fill: 'White',
+            textAlign: 'center',
+            originX: 'center',
+            originY: 'center'
+        })
+    ]).set({
+        originX: 'center',
+        originY: 'center',
+        left: gaugeWidth * 3 / 2,
+        top: gaugeHeight * 13 / 4,
+    });
+    continue_btn.on('mousedown', (e) => {
+        socket.emit('enterSelectPhase');
+    })
     async function battle() {
         var result;
         for (var i = 0; i < 3; i++) {
@@ -187,7 +215,11 @@ socket.on('battle', (turn_host, turn_guest) => {
             }
         }
     }
-    battle();
+    battle().then(()=>canvas.add(continue_btn));
+});
+
+socket.on('select',() => {
+    enterSelectPhase();
 });
 
 socket.on('win', (player) => {
@@ -444,7 +476,7 @@ function checkRange(location, target) {
 function enterSelectPhase() {
     initGauge(gaugeWidth, gaugeHeight);
     initPlayerInfo(gaugeWidth);
-    
+
     // need refactor function => restoreEnergy
     if (player1.en <= 80) {
         player1.en += 20;

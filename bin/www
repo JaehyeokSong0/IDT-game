@@ -146,6 +146,7 @@ io.on('connection', (socket) => {
   socket.on('startGame', startGame);
   socket.on('getPlayer', getPlayer);
   socket.on('enterBattlePhase', enterBattlePhase);
+  socket.on('enterSelectPhase',enterSelectPhase);
   socket.on('win', win);
   socket.on('draw', draw);
 
@@ -205,6 +206,12 @@ io.on('connection', (socket) => {
     if ((turn_host.length == 3) && (turn_guest.length == 3)) {
       io.sockets.in(roomNum).emit('battle', turn_host, turn_guest);
     }
+  }
+
+  function enterSelectPhase() {
+    console.info('enterSelectPhase() executed.');
+    const roomNum = [...socket.rooms][1];
+    io.sockets.in(roomNum).emit('select');
   }
 
   function win(player) {
