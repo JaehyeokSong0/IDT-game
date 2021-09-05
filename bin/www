@@ -144,6 +144,7 @@ io.on('connection', (socket) => {
 
   // In game
   socket.on('startGame', startGame);
+  socket.on('getPlayer', getPlayer);
   socket.on('enterBattlePhase', enterBattlePhase);
   socket.on('win', win);
   socket.on('draw', draw);
@@ -157,6 +158,20 @@ io.on('connection', (socket) => {
       const room = rooms[index];
       io.sockets.in(roomNum).emit('startGame', room);
     }
+  }
+
+  function getPlayer() {
+    const roomNum = [...socket.rooms][1];
+    const index = rooms.findIndex((item) => {
+      return item[0] == roomNum
+    });
+    // If no room has been created, terminate the function.
+    if (index == -1) {
+      return;
+    }
+    const host = rooms[index][2];
+    const guest = rooms[index][3];
+    io.to(socket.id).emit('getPlayer', host, guest);
   }
 
   function enterBattlePhase(nextTurn, id) {

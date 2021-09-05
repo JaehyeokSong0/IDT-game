@@ -5,6 +5,7 @@ import {
 
 var roomInfo;
 var player1, player2;
+var client;
 var logField;
 var nextTurn = [];
 var canvas = new fabric.Canvas('game_canvas', {
@@ -32,6 +33,8 @@ class Player {
 
     action(card, val) {
         editLog(String(this.nickname + ' used ' + card.name));
+        this.en -= card.energy;
+        this.updateGauge('en', this.en);
         if (card.type == "move") {
             var fromField = getFieldByNum(this.location);
             // Get toField
@@ -160,6 +163,7 @@ socket.on('startGame', (room) => {
     $('#roomModal').fadeOut();
     roomInfo = room;
     resizeCanvas();
+    socket.emit('getPlayer');
     initField(fieldWidth, fieldHeight);
     initPlayer();
     initLogField();
@@ -177,6 +181,9 @@ socket.on('battle', (turn_host, turn_guest) => {
             if (result != -1) {
                 console.log('res: ', result);
                 break;
+            } else {
+                player1.updateGauge('en', player1.en);
+                player2.updateGauge('en', player2.en);
             }
         }
     }
@@ -189,6 +196,17 @@ socket.on('win', (player) => {
 
 socket.on('draw', () => {
     editLog("Draw!");
+});
+
+socket.on('getPlayer', (host, guest) => {
+    console.log(id, host, guest);
+    if (id == host) {
+        client = player1;
+    } else if (id == guest) {
+        client = player2;
+    } else {
+        console.error("[ERROR] Something went wrong in socket.on('getPlayer') : Wrong id.");
+    }
 });
 
 function sleep(delay) {
@@ -426,6 +444,20 @@ function checkRange(location, target) {
 function enterSelectPhase() {
     initGauge(gaugeWidth, gaugeHeight);
     initPlayerInfo(gaugeWidth);
+    
+    // need refactor function => restoreEnergy
+    if (player1.en <= 80) {
+        player1.en += 20;
+    } else {
+        player1.en = 100;
+    }
+    if (player2.en <= 80) {
+        player2.en += 20;
+    } else {
+        player2.en = 100;
+    }
+    player1.updateGauge('en', player1.en);
+    player2.updateGauge('en', player2.en);
 
     canvas.getObjects().forEach((obj) => {
         try {
@@ -693,8 +725,10 @@ function makeCard(card) {
             top: cardWidth / 2,
         })
     ]).set({
-        selected: 0
-    })
+        selected: 0,
+        damage: card.damage,
+        energy: card.energy
+    });
 }
 
 function renderRange(card) {
@@ -774,6 +808,7 @@ function showAllCards() {
 
 // For cards already selected, deselect card
 function clickCard(e) {
+    var energy = client.en;
     if (e.target.selected == 1) {
         e.target.selected = 0;
         nextTurn.splice(nextTurn.indexOf(e.target), 1);
@@ -783,10 +818,26 @@ function clickCard(e) {
         });
         e.target.setCoords(); // Function after moving objects
         refreshTurnCards(nextTurn);
+        if (energy + e.target.energy <= 100) {
+            energy += e.target.energy;
+        } else {
+            energy = 100;
+        }
     } else if (nextTurn.length < 3) {
-        e.target.selected = 1
-        nextTurn.push(e.target);
-        refreshTurnCards(nextTurn);
+        if (energy >= e.target.energy) { // If client has enough energy
+            e.target.selected = 1
+            nextTurn.push(e.target);
+            refreshTurnCards(nextTurn);
+            if (energy - e.target.energy >= 0) {
+                energy -= e.target.energy;
+            } else {
+                energy = 0;
+            }
+        } else {
+            alert("Not enough energy!");
+        }
+    } else {
+        console.error("[ERROR] Something went wrong in clickCard().");
     }
 }
 
