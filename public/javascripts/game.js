@@ -139,57 +139,19 @@ class Player {
             this.hpGauge._objects[1].set({
                 width: gaugeWidth * num / 100
             });
+            this.hpGauge._objects[2].set({
+                text: String(num)
+            });
         } else if (type = 'en') {
             this.enGauge._objects[1].set({
                 width: gaugeWidth * num / 100
-            }); 
+            });
+            this.enGauge._objects[2].set({
+                text: String(num)
+            });
         } else {
             console.error("[ERROR] Something went wrong : Wrong input in updateGauge().");
         }
-        
-        // if (type == 'reduce_hp') {
-        //     if (this.hp >= num) {
-        //         this.hpGauge._objects[1].set({
-        //             width: gaugeWidth * (this.hp - num) / 100
-        //         });
-        //     } else {
-        //         this.hpGauge._objects[1].set({
-        //             width: 0
-        //         });
-        //     }
-        // } else if (type == 'reduce_en') {
-        //     if (this.en >= num) {
-        //         this.enGauge._objects[1].set({
-        //             width: gaugeWidth * (this.en - num) / 100
-        //         });
-        //     } else {
-        //         this.enGauge._objects[1].set({
-        //             width: 0
-        //         });
-        //     }
-        // } else if (type == 'restore_hp') {
-        //     if (this.hp + num <= 100) {
-        //         this.hpGauge._objects[1].set({
-        //             width: gaugeWidth * (this.hp + num) / 100
-        //         });
-        //     } else {
-        //         this.hpGauge._objects[1].set({
-        //             width: gaugeWidth
-        //         });
-        //     }
-        // } else if (type == 'restore_en') {
-        //     if (this.en + num <= 100) {
-        //         this.enGauge._objects[1].set({
-        //             width: gaugeWidth * (this.en + num) / 100
-        //         });
-        //     } else {
-        //         this.enGauge._objects[1].set({
-        //             width: gaugeWidth
-        //         });
-        //     }
-        // } else {
-        //     console.error("[ERROR] Something went wrong : Wrong input in updateGauge().");
-        // }
         canvas.renderAll();
     }
 }
