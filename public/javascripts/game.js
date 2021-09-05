@@ -30,7 +30,7 @@ class Player {
         this.en = 100;
     }
 
-    action(card) {
+    action(card, val) {
         editLog(String(this.nickname + ' used ' + card.name));
         if (card.type == "move") {
             var fromField = getFieldByNum(this.location);
@@ -90,6 +90,7 @@ class Player {
                     onChange: canvas.renderAll.bind(canvas)
                 });
             }
+            return 0;
         } else if (card.type == "attack") {
             var attackRange = [];
             card.range.forEach((_field) => {
@@ -101,11 +102,19 @@ class Player {
             attackRange.forEach((_field) => {
                 if (this.id == 'p1') {
                     if (_field == player2.location) {
-                        player2.hp -= card.damage;
+                        if (card.damage >= val * (-1)) {
+                            player2.hp -= (card.damage + val);
+                            player2.updateGauge('hp', player2.hp);
+                        }
+                        return player2.hp;
                     }
                 } else if (this.id == 'p2') {
                     if (_field == player1.location) {
-                        player1.hp -= card.damage;
+                        if (card.damage >= val * (-1)) {
+                            player1.hp -= (card.damage + val);
+                            player1.updateGauge('hp', player1.hp);
+                        }
+                        return player1.hp;
                     }
                 } else {
                     console.error("[ERROR] Something went wrong : Wrong player id.");
@@ -119,53 +128,69 @@ class Player {
             } else {
                 this.en = 100;
             }
+            this.updateGauge('en', this.en);
+            return 0;
         }
     }
 
     updateGauge(type, num) {
-        if (type == 'reduce_hp') {
-            if (this.hp >= num) {
-                this.hpGauge._objects[1].set({
-                    width: gaugeWidth * (this.hp - num) / 100
-                });
-            } else {
-                this.hpGauge._objects[1].set({
-                    width: 0
-                });
-            }
-        } else if (type == 'reduce_en') {
-            if (this.en >= num) {
-                this.enGauge._objects[1].set({
-                    width: gaugeWidth * (this.en - num) / 100
-                });
-            } else {
-                this.enGauge._objects[1].set({
-                    width: 0
-                });
-            }
-        } else if (type == 'restore_hp') {
-            if (this.hp + num <= 100) {
-                this.hpGauge._objects[1].set({
-                    width: gaugeWidth * (this.hp + num) / 100
-                });
-            } else {
-                this.hpGauge._objects[1].set({
-                    width: gaugeWidth
-                });
-            }
-        } else if (type == 'restore_en') {
-            if (this.en + num <= 100) {
-                this.enGauge._objects[1].set({
-                    width: gaugeWidth * (this.en + num) / 100
-                });
-            } else {
-                this.enGauge._objects[1].set({
-                    width: gaugeWidth
-                });
-            }
+        console.log('updateGauge', type, num);
+        if (type == 'hp') {
+            this.hpGauge._objects[1].set({
+                width: gaugeWidth * num / 100
+            });
+        } else if (type = 'en') {
+            this.enGauge._objects[1].set({
+                width: gaugeWidth * num / 100
+            }); 
         } else {
             console.error("[ERROR] Something went wrong : Wrong input in updateGauge().");
         }
+        
+        // if (type == 'reduce_hp') {
+        //     if (this.hp >= num) {
+        //         this.hpGauge._objects[1].set({
+        //             width: gaugeWidth * (this.hp - num) / 100
+        //         });
+        //     } else {
+        //         this.hpGauge._objects[1].set({
+        //             width: 0
+        //         });
+        //     }
+        // } else if (type == 'reduce_en') {
+        //     if (this.en >= num) {
+        //         this.enGauge._objects[1].set({
+        //             width: gaugeWidth * (this.en - num) / 100
+        //         });
+        //     } else {
+        //         this.enGauge._objects[1].set({
+        //             width: 0
+        //         });
+        //     }
+        // } else if (type == 'restore_hp') {
+        //     if (this.hp + num <= 100) {
+        //         this.hpGauge._objects[1].set({
+        //             width: gaugeWidth * (this.hp + num) / 100
+        //         });
+        //     } else {
+        //         this.hpGauge._objects[1].set({
+        //             width: gaugeWidth
+        //         });
+        //     }
+        // } else if (type == 'restore_en') {
+        //     if (this.en + num <= 100) {
+        //         this.enGauge._objects[1].set({
+        //             width: gaugeWidth * (this.en + num) / 100
+        //         });
+        //     } else {
+        //         this.enGauge._objects[1].set({
+        //             width: gaugeWidth
+        //         });
+        //     }
+        // } else {
+        //     console.error("[ERROR] Something went wrong : Wrong input in updateGauge().");
+        // }
+        canvas.renderAll();
     }
 }
 
@@ -182,22 +207,90 @@ socket.on('startGame', (room) => {
 socket.on('battle', (turn_host, turn_guest) => {
     enterBattlePhase();
     async function battle() {
+        var result;
         for (var i = 0; i < 3; i++) {
-            player1.action(turn_host[i]);
+            result = await calcTurnResult(turn_host[i], turn_guest[i]);
+            console.log('in battle, ', i, result);
             await sleep(1000);
-            player2.action(turn_guest[i]);
-            await sleep(1000);
+            if (result != -1) {
+                console.log('res: ', result);
+                break;
+            }
         }
     }
     battle();
+});
+
+socket.on('win', (player) => {
+    editLog(player + "Win!");
+});
+
+socket.on('draw', () => {
+    editLog("Draw!");
 });
 
 function sleep(delay) {
     return new Promise((resolve) => setTimeout(resolve, delay));
 }
 
-function calcTurnResult() {
+function getPriority(card) {
+    if (card.type == "attack") {
+        return 0;
+    } else {
+        return 1;
+    }
+}
 
+async function calcTurnResult(p1Action, p2Action) {
+    console.log('in calcTurnResult, ', p1Action, p2Action);
+    var p1Priority = getPriority(p1Action);
+    var p2Priority = getPriority(p2Action);
+    var p1Val, p2Val;
+    if (p1Priority > p2Priority) { // Player1 action first (Player2 attack)
+        console.log('CASE 1');
+        p1Val = player1.action(p1Action);
+        await sleep(1000);
+        p2Val = player2.action(p2Action, p1Val);
+        await sleep(1000);
+        if (p2Val <= 0) {
+            socket.emit('win', 'p2');
+            return 2;
+        } else {
+            return -1;
+        }
+    } else if (p1Priority == p2Priority) {
+        console.log('CASE 2');
+        p1Val = player1.action(p1Action);
+        await sleep(1000);
+        p2Val = player2.action(p2Action);
+        await sleep(1000);
+        if ((p1Val <= 0) && (p2Val > 0)) {
+            console.log('CASE 3');
+            socket.emit('win', 'p2');
+            return 2;
+        } else if ((p1Val > 0) && (p2Val <= 0)) {
+            socket.emit('win', 'p1');
+            return 1;
+        } else if ((p1Val < 0) && (p2Val < 0)) {
+            socket.emit('draw');
+            return 0;
+        } else {
+            console.log('CASE 4');
+            return -1;
+        } // need draw when attack
+    } else {
+        console.log('CASE 5');
+        p2Val = player2.action(p2Action);
+        await sleep(1000);
+        p1Val = player1.action(p1Action, p2Val);
+        await sleep(1000);
+        if (p1Val <= 0) {
+            socket.emit('win', 'p1');
+            return 1;
+        } else {
+            return -1;
+        }
+    }
 }
 
 function resizeCanvas() {

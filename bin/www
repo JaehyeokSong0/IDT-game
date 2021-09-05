@@ -145,6 +145,8 @@ io.on('connection', (socket) => {
   // In game
   socket.on('startGame', startGame);
   socket.on('enterBattlePhase', enterBattlePhase);
+  socket.on('win', win);
+  socket.on('draw', draw);
 
   function startGame() {
     const roomNum = [...socket.rooms][1];
@@ -188,6 +190,16 @@ io.on('connection', (socket) => {
     if ((turn_host.length == 3) && (turn_guest.length == 3)) {
       io.sockets.in(roomNum).emit('battle', turn_host, turn_guest);
     }
+  }
+
+  function win(player) {
+    const roomNum = [...socket.rooms][1];
+    io.sockets.in(roomNum).emit('win', player);
+  }
+
+  function draw() {
+    const roomNum = [...socket.rooms][1];
+    io.sockets.in(roomNum).emit('draw');
   }
 });
 
