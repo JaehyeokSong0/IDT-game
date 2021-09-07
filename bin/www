@@ -176,6 +176,7 @@ io.on('connection', (socket) => {
   }
 
   function enterBattlePhase(nextTurn, id) {
+    console.info('enterBattlePhase() executed.',nextTurn,id);
     const roomNum = [...socket.rooms][1];
     const index = rooms.findIndex((item) => {
       return item[0] == roomNum

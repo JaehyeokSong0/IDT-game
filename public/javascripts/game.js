@@ -219,6 +219,16 @@ socket.on('battle', (turn_host, turn_guest) => {
 });
 
 socket.on('select',() => {
+    canvas.getObjects().forEach((obj) => {
+        console.log(obj);
+        try {
+            if (obj._objects[0].objType == 'button'){
+                canvas.remove(obj);
+            }
+        } catch (e) {
+            console.error("[ERROR] Something went wrong : Failed to enter select phase.");
+        }
+    })    
     enterSelectPhase();
 });
 
@@ -476,6 +486,7 @@ function checkRange(location, target) {
 function enterSelectPhase() {
     initGauge(gaugeWidth, gaugeHeight);
     initPlayerInfo(gaugeWidth);
+    canvas.remove(logField);
 
     // need refactor function => restoreEnergy
     if (player1.en <= 80) {
