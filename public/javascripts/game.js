@@ -126,18 +126,13 @@ class Player {
         } else if (card.type == "guard") {
             return card.damage;
         } else if (card.type == "restore") {
-            if (this.en + card.energy <= 100) {
-                this.en += card.energy;
-            } else {
-                this.en = 100;
-            }
-            this.updateGauge('en', this.en);
+            this.restoreEn(card.energy);
             return 0;
         }
     }
 
     updateGauge(type, num) {
-        console.log('updateGauge', type, num);
+        console.log('updateGauge', type, num, gaugeWidth * num / 100);
         if (type == 'hp') {
             this.hpGauge._objects[1].set({
                 width: gaugeWidth * num / 100
@@ -157,6 +152,15 @@ class Player {
         }
         canvas.renderAll();
     }
+
+    restoreEn(num) {
+        if (this.en + num <= 100) {
+            this.en += num;
+        } else {
+            this.en = 100;
+        }
+        this.updateGauge('en', this.en);
+    }
 }
 
 socket.on('startGame', (room) => {
@@ -166,6 +170,8 @@ socket.on('startGame', (room) => {
     socket.emit('getPlayer');
     initField(fieldWidth, fieldHeight);
     initPlayer();
+    initGauge(gaugeWidth, gaugeHeight);
+    initPlayerInfo(gaugeWidth);
     initLogField();
     enterSelectPhase();
 });
@@ -215,20 +221,20 @@ socket.on('battle', (turn_host, turn_guest) => {
             }
         }
     }
-    battle().then(()=>canvas.add(continue_btn));
+    battle().then(() => canvas.add(continue_btn));
 });
 
-socket.on('select',() => {
+socket.on('select', () => {
     canvas.getObjects().forEach((obj) => {
         console.log(obj);
         try {
-            if (obj._objects[0].objType == 'button'){
+            if (obj._objects[0].objType == 'button') {
                 canvas.remove(obj);
             }
         } catch (e) {
             console.error("[ERROR] Something went wrong : Failed to enter select phase.");
         }
-    })    
+    })
     enterSelectPhase();
 });
 
@@ -484,23 +490,10 @@ function checkRange(location, target) {
 }
 
 function enterSelectPhase() {
-    initGauge(gaugeWidth, gaugeHeight);
-    initPlayerInfo(gaugeWidth);
     canvas.remove(logField);
 
-    // need refactor function => restoreEnergy
-    if (player1.en <= 80) {
-        player1.en += 20;
-    } else {
-        player1.en = 100;
-    }
-    if (player2.en <= 80) {
-        player2.en += 20;
-    } else {
-        player2.en = 100;
-    }
-    player1.updateGauge('en', player1.en);
-    player2.updateGauge('en', player2.en);
+    player1.restoreEn(20);
+    player2.restoreEn(20);
 
     canvas.getObjects().forEach((obj) => {
         try {
