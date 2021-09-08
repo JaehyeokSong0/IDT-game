@@ -211,6 +211,8 @@ io.on('connection', (socket) => {
 
   function enterSelectPhase() {
     console.info('enterSelectPhase() executed.');
+    turn_host=[];
+    turn_guest=[];
     const roomNum = [...socket.rooms][1];
     io.sockets.in(roomNum).emit('select');
   }
