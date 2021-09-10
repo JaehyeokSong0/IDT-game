@@ -2,9 +2,10 @@
 
 ## <u>Currently working on...
 - Implement game
+    - Game result
     - Complete phase system
         - Connect EN system in select phase
-    - Game result
+    - Mark the range when attacking
   
 ## <u>To be worked on later...
 - Waiting Room
