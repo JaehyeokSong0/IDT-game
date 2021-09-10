@@ -32,6 +32,12 @@ class Player {
     }
 
     action(card, val) {
+        console.log("action()", this, card, val);
+        if(val == undefined) {
+            val = 0;
+        } else {
+            console.log('def')
+        }
         editLog(String(this.nickname + ' used ' + card.name));
         this.en -= card.energy;
         this.updateGauge('en', this.en);
@@ -105,16 +111,16 @@ class Player {
             attackRange.forEach((_field) => {
                 if (this.id == 'p1') {
                     if (_field == player2.location) {
-                        if (card.damage >= val * (-1)) {
-                            player2.hp -= (card.damage + val);
+                        if (card.damage >= val) {
+                            player2.hp -= (card.damage - val);
                             player2.updateGauge('hp', player2.hp);
                         }
                         return player2.hp;
                     }
                 } else if (this.id == 'p2') {
                     if (_field == player1.location) {
-                        if (card.damage >= val * (-1)) {
-                            player1.hp -= (card.damage + val);
+                        if (card.damage >= val) {
+                            player1.hp -= (card.damage - val);
                             player1.updateGauge('hp', player1.hp);
                         }
                         return player1.hp;
@@ -124,9 +130,9 @@ class Player {
                 }
             });
         } else if (card.type == "guard") {
-            return card.damage;
+            return card.guard;
         } else if (card.type == "restore") {
-            this.restoreEn(card.energy);
+            this.restoreEn(card.restore);
             return 0;
         }
     }
@@ -212,12 +218,12 @@ socket.on('battle', (turn_host, turn_guest) => {
             result = await calcTurnResult(turn_host[i], turn_guest[i]);
             console.log('in battle, ', i, result);
             await sleep(1000);
-            if (result != -1) {
-                console.log('res: ', result);
-                break;
-            } else {
+            if (result == -1) {
                 player1.updateGauge('en', player1.en);
                 player2.updateGauge('en', player2.en);
+            } else {
+                console.log('res: ', result);
+                break;
             }
         }
     }
@@ -269,6 +275,8 @@ function getPriority(card) {
     }
 }
 
+// Function return
+// (-1: continue / 0: draw / 1: 1p win / 2: 2p win)
 async function calcTurnResult(p1Action, p2Action) {
     console.log('in calcTurnResult, ', p1Action, p2Action);
     var p1Priority = getPriority(p1Action);

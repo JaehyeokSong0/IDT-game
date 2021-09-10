@@ -69,13 +69,15 @@
     {
         "name": "guard_15",
         "type": "guard",
-        "damage": -15,
-        "energy": 0
+        "damage": 0,
+        "energy": 0,
+        "guard": 15
     },
     {
         "name": "restore_15",
         "type": "restore",
         "damage": 0,
-        "energy": 15
+        "energy": 0,
+        "restore": 15
     }
 ]
