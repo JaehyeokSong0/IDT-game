@@ -31,12 +31,9 @@ class Player {
         this.en = 100;
     }
 
-    action(card, val) {
-        console.log("action()", this, card, val);
-        if(val == undefined) {
+    async action(card, val) {
+        if (val == undefined) {
             val = 0;
-        } else {
-            console.log('def')
         }
         editLog(String(this.nickname + ' used ' + card.name));
         this.en -= card.energy;
@@ -115,7 +112,6 @@ class Player {
                             player2.hp -= (card.damage - val);
                             player2.updateGauge('hp', player2.hp);
                         }
-                        return player2.hp;
                     }
                 } else if (this.id == 'p2') {
                     if (_field == player1.location) {
@@ -123,12 +119,16 @@ class Player {
                             player1.hp -= (card.damage - val);
                             player1.updateGauge('hp', player1.hp);
                         }
-                        return player1.hp;
                     }
-                } else {
-                    console.error("[ERROR] Something went wrong : Wrong player id.");
                 }
             });
+            if (this.id == 'p1') {
+                return player2.hp;
+            }  else if (this.id == 'p2') {
+                return player1.hp;
+            } else {
+                console.error("[ERROR] Something went wrong : Wrong player id.");
+            }
         } else if (card.type == "guard") {
             return card.guard;
         } else if (card.type == "restore") {
@@ -138,7 +138,6 @@ class Player {
     }
 
     updateGauge(type, num) {
-        console.log('updateGauge', type, num, gaugeWidth * num / 100);
         if (type == 'hp') {
             this.hpGauge._objects[1].set({
                 width: gaugeWidth * num / 100
@@ -216,13 +215,11 @@ socket.on('battle', (turn_host, turn_guest) => {
         var result;
         for (var i = 0; i < 3; i++) {
             result = await calcTurnResult(turn_host[i], turn_guest[i]);
-            console.log('in battle, ', i, result);
             await sleep(1000);
             if (result == -1) {
                 player1.updateGauge('en', player1.en);
                 player2.updateGauge('en', player2.en);
             } else {
-                console.log('res: ', result);
                 break;
             }
         }
@@ -232,7 +229,6 @@ socket.on('battle', (turn_host, turn_guest) => {
 
 socket.on('select', () => {
     canvas.getObjects().forEach((obj) => {
-        console.log(obj);
         try {
             if (obj._objects[0].objType == 'button') {
                 canvas.remove(obj);
@@ -253,7 +249,6 @@ socket.on('draw', () => {
 });
 
 socket.on('getPlayer', (host, guest) => {
-    console.log(id, host, guest);
     if (id == host) {
         client = player1;
     } else if (id == guest) {
@@ -278,15 +273,13 @@ function getPriority(card) {
 // Function return
 // (-1: continue / 0: draw / 1: 1p win / 2: 2p win)
 async function calcTurnResult(p1Action, p2Action) {
-    console.log('in calcTurnResult, ', p1Action, p2Action);
     var p1Priority = getPriority(p1Action);
     var p2Priority = getPriority(p2Action);
     var p1Val, p2Val;
     if (p1Priority > p2Priority) { // Player1 action first (Player2 attack)
-        console.log('CASE 1');
-        p1Val = player1.action(p1Action);
+        p1Val = await player1.action(p1Action);
         await sleep(1000);
-        p2Val = player2.action(p2Action, p1Val);
+        p2Val = await player2.action(p2Action, p1Val);
         await sleep(1000);
         if (p2Val <= 0) {
             socket.emit('win', 'p2');
@@ -294,31 +287,31 @@ async function calcTurnResult(p1Action, p2Action) {
         } else {
             return -1;
         }
-    } else if (p1Priority == p2Priority) {
-        console.log('CASE 2');
-        p1Val = player1.action(p1Action);
+    } else if (p1Priority == p2Priority) { 
+        p1Val = await player1.action(p1Action);
         await sleep(1000);
-        p2Val = player2.action(p2Action);
+        p2Val = await player2.action(p2Action);
         await sleep(1000);
-        if ((p1Val <= 0) && (p2Val > 0)) {
-            console.log('CASE 3');
-            socket.emit('win', 'p2');
-            return 2;
-        } else if ((p1Val > 0) && (p2Val <= 0)) {
-            socket.emit('win', 'p1');
-            return 1;
-        } else if ((p1Val < 0) && (p2Val < 0)) {
-            socket.emit('draw');
-            return 0;
-        } else {
-            console.log('CASE 4');
+        if (p1Priority + p2Priority == 0) { // Both players attack
+            if ((p1Val <= 0) && (p2Val > 0)) {
+                socket.emit('win', 'p2');
+                return 2;
+            } else if ((p1Val > 0) && (p2Val <= 0)) {
+                socket.emit('win', 'p1');
+                return 1;
+            } else if ((p1Val <= 0) && (p2Val <= 0)) {
+                socket.emit('draw');
+                return 0;
+            } else {
+                return -1;
+            }
+        } else { // Both players do not attack
             return -1;
-        } // need draw when attack
-    } else {
-        console.log('CASE 5');
-        p2Val = player2.action(p2Action);
+        }
+    } else { // Player2 action first (Player1 attack)
+        p2Val = await player2.action(p2Action);
         await sleep(1000);
-        p1Val = player1.action(p1Action, p2Val);
+        p1Val = await player1.action(p1Action, p2Val);
         await sleep(1000);
         if (p1Val <= 0) {
             socket.emit('win', 'p1');
