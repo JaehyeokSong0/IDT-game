@@ -3,8 +3,9 @@
 ## <u>Currently working on...
 - Implement game
     - Game result
+        - After result
     - Complete phase system
-        - Connect EN system in select phase
+        - Connect EN system in select phase : Need improve
     - Mark the range when attacking
   
 ## <u>To be worked on later...
