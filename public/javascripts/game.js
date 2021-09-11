@@ -105,6 +105,7 @@ class Player {
                     attackRange.push(chkPos);
                 }
             });
+            markAttackRange('Red', attackRange);
             attackRange.forEach((_field) => {
                 if (this.id == 'p1') {
                     if (_field == player2.location) {
@@ -122,9 +123,11 @@ class Player {
                     }
                 }
             });
+            await sleep(500);
+            markAttackRange('White', attackRange);
             if (this.id == 'p1') {
                 return player2.hp;
-            }  else if (this.id == 'p2') {
+            } else if (this.id == 'p2') {
                 return player1.hp;
             } else {
                 console.error("[ERROR] Something went wrong : Wrong player id.");
@@ -233,9 +236,7 @@ socket.on('select', () => {
             if (obj._objects[0].objType == 'button') {
                 canvas.remove(obj);
             }
-        } catch (e) {
-            console.error("[ERROR] Something went wrong : Failed to enter select phase.");
-        }
+        } catch (e) {}
     })
     enterSelectPhase();
 });
@@ -287,7 +288,7 @@ async function calcTurnResult(p1Action, p2Action) {
         } else {
             return -1;
         }
-    } else if (p1Priority == p2Priority) { 
+    } else if (p1Priority == p2Priority) {
         p1Val = await player1.action(p1Action);
         await sleep(1000);
         p2Val = await player2.action(p2Action);
@@ -914,4 +915,17 @@ function showTurnList() {
         });
         canvas.add(turn);
     }
+}
+
+function markAttackRange(color, rangeArr) {
+    rangeArr.forEach((field) => {
+        canvas.getObjects('rect').forEach((obj) => {
+            if ((obj.objType == 'field') && (obj.fieldNum == field)) {
+                obj.set({
+                    fill: color
+                })
+                canvas.renderAll();
+            }
+        })
+    })
 }
