@@ -1,14 +1,11 @@
 # To-Do List
 
 ## <u>Currently working on...
-- Implement game
-    - Game result
-        - After result
-    - Complete phase system
-        - Connect EN system in select phase : Need improve
-  
-## <u>To be worked on later...
+- Complete phase system
+    - Connect EN system in select phase : Need improve
+    - Keep the gauge bar is not out of range
 - Waiting Room
-    - Refactor
     - Disconnnect socket if player refresh or leave page
+
+## <u>To be worked on later...
 - Improve design
