@@ -1,6 +1,7 @@
 import {
     socket,
-    id
+    id,
+    refreshRoomInfo
 } from './socket.js';
 
 var roomInfo;
@@ -186,48 +187,27 @@ socket.on('startGame', (room) => {
 
 socket.on('battle', (turn_host, turn_guest) => {
     enterBattlePhase();
-    var continue_btn = new fabric.Group([new fabric.Rect({
-            objType: 'button',
-            width: gaugeWidth / 4,
-            height: gaugeWidth / 12,
-            fill: 'DarkRed',
-            stroke: 'Black',
-            strokeWidth: 1,
-            rx: 10,
-            originX: 'center',
-            originY: 'center'
-        }),
-        new fabric.Text('CONTINUE', {
-            fontFamily: 'Papyrus',
-            fontSize: gaugeWidth / 32,
-            fill: 'White',
-            textAlign: 'center',
-            originX: 'center',
-            originY: 'center'
-        })
-    ]).set({
-        originX: 'center',
-        originY: 'center',
-        left: gaugeWidth * 3 / 2,
-        top: gaugeHeight * 13 / 4,
-    });
-    continue_btn.on('mousedown', (e) => {
-        socket.emit('enterSelectPhase');
-    })
     async function battle() {
         var result;
         for (var i = 0; i < 3; i++) {
             result = await calcTurnResult(turn_host[i], turn_guest[i]);
             await sleep(1000);
-            if (result == -1) {
+            if (result == -1) { // Continue game
                 player1.updateGauge('en', player1.en);
                 player2.updateGauge('en', player2.en);
             } else {
-                break;
+                return result;
             }
         }
+        return result;
     }
-    battle().then(() => canvas.add(continue_btn));
+    battle().then((result) => {
+        if (result == -1) {
+            showContinueBtn();
+        } else {
+            showExitBtn();
+        }
+    });
 });
 
 socket.on('select', () => {
@@ -506,9 +486,7 @@ function enterSelectPhase() {
                     stroke: ''
                 });
             }
-        } catch (e) {
-            console.error("[ERROR] Something went wrong : Failed to enter select phase.");
-        }
+        } catch (e) {}
     })
 
     nextTurn.forEach((obj) => {
@@ -563,9 +541,7 @@ function enterBattlePhase() {
             if (obj.objType == 'field') {} else if ((obj._objects[0].objType == 'card') || (obj._objects[0].objType == 'turnList') || (obj._objects[0].objType == 'button')) {
                 canvas.remove(obj);
             }
-        } catch (e) {
-            console.error("[ERROR] Something went wrong : Failed to enter battle phase.");
-        }
+        } catch (e) {}
     })
     showField();
     canvas.add(logField, player1.character, player2.character);
@@ -928,4 +904,79 @@ function markAttackRange(color, rangeArr) {
             }
         })
     })
+}
+
+function exitGame() {
+    canvas.getObjects().forEach((obj) => {
+        canvas.remove(obj);
+    })
+    $('#game_lobby').show();
+    refreshRoomInfo();
+    $('#waitingRoom_guest').hide();
+    $('#waitingRoom_host').hide();
+    $('#waitingRoom_host button').attr('disabled', true);
+}
+
+function showContinueBtn() {
+    var continue_btn = new fabric.Group([new fabric.Rect({
+            objType: 'button',
+            width: gaugeWidth / 4,
+            height: gaugeWidth / 12,
+            fill: 'DarkRed',
+            stroke: 'Black',
+            strokeWidth: 1,
+            rx: 10,
+            originX: 'center',
+            originY: 'center'
+        }),
+        new fabric.Text('CONTINUE', {
+            fontFamily: 'Papyrus',
+            fontSize: gaugeWidth / 32,
+            fill: 'White',
+            textAlign: 'center',
+            originX: 'center',
+            originY: 'center'
+        })
+    ]).set({
+        originX: 'center',
+        originY: 'center',
+        left: gaugeWidth * 3 / 2,
+        top: gaugeHeight * 13 / 4,
+    });
+    continue_btn.on('mousedown', (e) => {
+        socket.emit('enterSelectPhase');
+    });
+    canvas.add(continue_btn);
+}
+
+function showExitBtn() {
+    var exit_btn = new fabric.Group([new fabric.Rect({
+            objType: 'button',
+            width: gaugeWidth / 4,
+            height: gaugeWidth / 12,
+            fill: 'DarkRed',
+            stroke: 'Black',
+            strokeWidth: 1,
+            rx: 10,
+            originX: 'center',
+            originY: 'center'
+        }),
+        new fabric.Text('EXIT', {
+            fontFamily: 'Papyrus',
+            fontSize: gaugeWidth / 32,
+            fill: 'White',
+            textAlign: 'center',
+            originX: 'center',
+            originY: 'center'
+        })
+    ]).set({
+        originX: 'center',
+        originY: 'center',
+        left: gaugeWidth * 3 / 2,
+        top: gaugeHeight * 13 / 4,
+    });
+    exit_btn.on('mousedown', (e) => {
+        exitGame();
+    })
+    canvas.add(exit_btn);
 }

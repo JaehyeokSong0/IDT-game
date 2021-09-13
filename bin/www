@@ -146,7 +146,7 @@ io.on('connection', (socket) => {
   socket.on('startGame', startGame);
   socket.on('getPlayer', getPlayer);
   socket.on('enterBattlePhase', enterBattlePhase);
-  socket.on('enterSelectPhase',enterSelectPhase);
+  socket.on('enterSelectPhase', enterSelectPhase);
   socket.on('win', win);
   socket.on('draw', draw);
 
@@ -159,6 +159,8 @@ io.on('connection', (socket) => {
       const room = rooms[index];
       io.sockets.in(roomNum).emit('startGame', room);
     }
+    turn_host = [];
+    turn_guest = [];
   }
 
   function getPlayer() {
@@ -176,7 +178,6 @@ io.on('connection', (socket) => {
   }
 
   function enterBattlePhase(nextTurn, id) {
-    console.info('enterBattlePhase() executed.',nextTurn,id);
     const roomNum = [...socket.rooms][1];
     const index = rooms.findIndex((item) => {
       return item[0] == roomNum
@@ -210,9 +211,8 @@ io.on('connection', (socket) => {
   }
 
   function enterSelectPhase() {
-    console.info('enterSelectPhase() executed.');
-    turn_host=[];
-    turn_guest=[];
+    turn_host = [];
+    turn_guest = [];
     const roomNum = [...socket.rooms][1];
     io.sockets.in(roomNum).emit('select');
   }
@@ -220,11 +220,15 @@ io.on('connection', (socket) => {
   function win(player) {
     const roomNum = [...socket.rooms][1];
     io.sockets.in(roomNum).emit('win', player);
+    deleteRoom(roomNum);
+    socket.leave(roomNum);
   }
 
   function draw() {
     const roomNum = [...socket.rooms][1];
     io.sockets.in(roomNum).emit('draw');
+    deleteRoom(roomNum);
+    socket.leave(roomNum);
   }
 });
 

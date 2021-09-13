@@ -179,7 +179,7 @@ function deleteRoomForm(roomsLen) {
     $('#lobby_table tr:eq(' + (roomsLen + 1) + ') button').attr('disabled', true);
 }
 
-function refreshRoomInfo() {
+export function refreshRoomInfo() {
     $('#roomNumInfo').html('');
     $('#roomTitleInfo').html('');
     $('#hostInfo').html('');
