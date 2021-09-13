@@ -6,7 +6,6 @@
         - After result
     - Complete phase system
         - Connect EN system in select phase : Need improve
-    - Mark the range when attacking
   
 ## <u>To be worked on later...
 - Waiting Room
