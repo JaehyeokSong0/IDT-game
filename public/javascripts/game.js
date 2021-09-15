@@ -7,6 +7,7 @@ import {
 var roomInfo;
 var player1, player2;
 var client;
+var selectPhaseEn; // Energy that can be used for the selection phase
 var logField;
 var nextTurn = [];
 var canvas = new fabric.Canvas('game_canvas', {
@@ -477,11 +478,28 @@ function checkRange(location, target) {
     return ret;
 }
 
-function enterSelectPhase() {
+function initClient() {
+    return new Promise((resolve, reject) => {
+        socket.emit('getPlayer');
+        socket.on('getPlayer', (host, guest) => {
+            if (id == host) {
+                resolve(player1);
+            } else if (id == guest) {
+                resolve(player2);
+            } else {
+                console.error("[ERROR] Something went wrong in socket.on('getPlayer') : Wrong id.");
+            }
+        })
+    }) 
+}
+
+async function enterSelectPhase() {
     canvas.remove(logField);
 
     player1.restoreEn(20);
     player2.restoreEn(20);
+    client = await initClient();
+    selectPhaseEn = client.en;
 
     canvas.getObjects().forEach((obj) => {
         try {
@@ -537,6 +555,7 @@ function enterSelectPhase() {
     canvas.add(player1.hpGauge, player2.hpGauge, player1.enGauge, player2.enGauge, player1.info, player2.info, continue_btn);
     player1.hpGauge.bringToFront();
     player2.hpGauge.bringToFront();
+
     showAllCards();
     showTurnList();
 }
@@ -747,7 +766,9 @@ function makeCard(card) {
     ]).set({
         selected: 0,
         damage: card.damage,
-        energy: card.energy
+        energy: card.energy,
+        guard: card.guard,
+        restore: card.restore
     });
 }
 
@@ -828,7 +849,6 @@ function showAllCards() {
 
 // For cards already selected, deselect card
 function clickCard(e) {
-    var energy = client.en;
     if (e.target.selected == 1) {
         e.target.selected = 0;
         nextTurn.splice(nextTurn.indexOf(e.target), 1);
@@ -838,20 +858,30 @@ function clickCard(e) {
         });
         e.target.setCoords(); // Function after moving objects
         refreshTurnCards(nextTurn);
-        if (energy + e.target.energy <= 100) {
-            energy += e.target.energy;
+        // If deselect card, increase available energy
+        if (selectPhaseEn + e.target.energy <= 100) {
+            selectPhaseEn += e.target.energy;
         } else {
-            energy = 100;
+            selectPhaseEn = 100;
         }
     } else if (nextTurn.length < 3) {
-        if (energy >= e.target.energy) { // If client has enough energy
+        // If client has enough energy to select card
+        if (selectPhaseEn >= e.target.energy) {
             e.target.selected = 1
             nextTurn.push(e.target);
             refreshTurnCards(nextTurn);
-            if (energy - e.target.energy >= 0) {
-                energy -= e.target.energy;
+            if (e.target.restore != undefined) { // If card is restore card
+                if (selectPhaseEn + e.target.restore <= 100) {
+                    selectPhaseEn += e.target.restore;
+                } else {
+                    selectPhaseEn = 100;
+                }
             } else {
-                energy = 0;
+                if (selectPhaseEn - e.target.energy >= 0) {
+                    selectPhaseEn -= e.target.energy;
+                } else {
+                    selectPhaseEn = 0;
+                }
             }
         } else {
             alert("Not enough energy!");
