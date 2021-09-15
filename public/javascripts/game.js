@@ -112,6 +112,9 @@ class Player {
                     if (_field == player2.location) {
                         if (card.damage >= val) {
                             player2.hp -= (card.damage - val);
+                            if (player2.hp < 0) { // Prevent hp from becoming negative
+                                player2.hp = 0;
+                            }
                             player2.updateGauge('hp', player2.hp);
                         }
                     }
@@ -119,6 +122,9 @@ class Player {
                     if (_field == player1.location) {
                         if (card.damage >= val) {
                             player1.hp -= (card.damage - val);
+                            if (player1.hp < 0) { // Prevent hp from becoming negative
+                                player1.hp = 0;
+                            }
                             player1.updateGauge('hp', player1.hp);
                         }
                     }
