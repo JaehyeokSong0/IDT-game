@@ -22,6 +22,7 @@ var cardHeight = canvas.height / 6;
 var gaugeHeight = canvas.height / 24;
 var gaugeWidth = canvas.width / 3;
 fabric.Object.prototype.selectable = false;
+canvas.selection = false;
 window.addEventListener('resize', resizeCanvas, false);
 
 class Player {
