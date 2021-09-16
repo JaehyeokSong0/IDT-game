@@ -230,7 +230,13 @@ socket.on('select', () => {
 });
 
 socket.on('win', (player) => {
-    editLog(player + "Win!");
+    if(player == 'p1'){
+        editLog(player1.nickname + " Win!");
+    } else if(player == 'p2'){
+        editLog(player2.nickname + " Win!");
+    } else {
+        console.error("[ERROR] Something went wrong in socket.on('win') : Wrong id.");
+    }
 });
 
 socket.on('draw', () => {
@@ -845,6 +851,7 @@ function showMinimap() {
             }));
         }
     }
+    // Color the players' locations.
     if (player1.location == player2.location) {
         _arr[player1.location - 1].set('fill', new fabric.Gradient({
             type: 'linear',
@@ -869,6 +876,7 @@ function showMinimap() {
         _arr[player1.location - 1].set('fill', 'magenta');
         _arr[player2.location - 1].set('fill', 'cyan');
     }
+    
     var miniField = new fabric.Group(_arr);
     miniField.set({
         top: cardHeight * 4,
