@@ -41,9 +41,9 @@
     {
         "name": "strike_1",
         "type": "attack",
-        "range": [2, 5, 8],
-        "damage": 30,
-        "energy": 25
+        "range": [1,2,3,4,5,6,7,8,9],
+        "damage": 15,
+        "energy": 15
     },
     {
         "name": "strike_2",
