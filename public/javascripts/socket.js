@@ -96,6 +96,7 @@ $('#waitingRoom_guest button').click(() => {
 });
 
 $('#exit_btn').click(() => {
+    $('#waitingRoom_host button').attr('disabled', true);
     $('#waitingRoom_host').hide();
     $('#waitingRoom_guest').hide();
     $('#roomModal').hide();
