@@ -491,7 +491,7 @@ function initClient() {
                 console.error("[ERROR] Something went wrong in socket.on('getPlayer') : Wrong id.");
             }
         })
-    }) 
+    })
 }
 
 async function enterSelectPhase() {
@@ -559,12 +559,13 @@ async function enterSelectPhase() {
 
     showAllCards();
     showTurnList();
+    showMinimap();
 }
 
 function enterBattlePhase() {
     canvas.getObjects().forEach((obj) => {
         try {
-            if (obj.objType == 'field') {} else if ((obj._objects[0].objType == 'card') || (obj._objects[0].objType == 'turnList') || (obj._objects[0].objType == 'button')) {
+            if (obj.objType == 'field') {} else if ((obj._objects[0].objType == 'card') || (obj._objects[0].objType == 'turnList') || (obj._objects[0].objType == 'button') || (obj._objects[0].objType == 'minimap')) {
                 canvas.remove(obj);
             }
         } catch (e) {}
@@ -823,6 +824,57 @@ function renderRange(card) {
         ]);
     }
     return new fabric.Group(_arr);
+}
+
+function showMinimap() {
+    var _width = cardWidth * 5 / 8;
+    var _height = cardHeight * 1 / 2;
+    var _arr = [];
+
+    for (var i = 0; i < 3; i++) {
+        for (var j = 0; j < 4; j++) {
+            _arr.push(new fabric.Rect({
+                objType: 'minimap',
+                left: j * _width,
+                top: i * _height,
+                width: _width,
+                height: _height,
+                fill: 'White',
+                strokeWidth: 3,
+                stroke: 'SlateGrey'
+            }));
+        }
+    }
+    if (player1.location == player2.location) {
+        _arr[player1.location - 1].set('fill', new fabric.Gradient({
+            type: 'linear',
+            gradientUnits: 'percentage',
+            coords: {
+                x1: 0,
+                y1: 0,
+                x2: 1,
+                y2: 0
+            },
+            colorStops: [{
+                    offset: 0,
+                    color: 'magenta'
+                },
+                {
+                    offset: 1,
+                    color: 'cyan'
+                }
+            ]
+        }));
+    } else {
+        _arr[player1.location - 1].set('fill', 'magenta');
+        _arr[player2.location - 1].set('fill', 'cyan');
+    }
+    var miniField = new fabric.Group(_arr);
+    miniField.set({
+        top: cardHeight * 4,
+        left: cardWidth * 9
+    })
+    canvas.add(miniField);
 }
 
 function showAllCards() {
