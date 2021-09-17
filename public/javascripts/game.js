@@ -195,19 +195,45 @@ socket.on('startGame', (room) => {
 
 socket.on('battle', (turn_host, turn_guest) => {
     enterBattlePhase();
+    var host_turn_card = [];
+    var guest_turn_card = [];
     async function battle() {
         var result;
         for (var i = 0; i < 3; i++) {
+            showTurnCard(i);
             result = await calcTurnResult(turn_host[i], turn_guest[i]);
             await sleep(1000);
             if (result == -1) { // Continue game
                 player1.updateGauge('en', player1.en);
                 player2.updateGauge('en', player2.en);
+                fillCardGrey(host_turn_card[i]);
+                fillCardGrey(guest_turn_card[i]);
             } else {
                 return result;
             }
         }
         return result;
+
+        // Nested function
+        function showTurnCard(num) {
+            host_turn_card.push(makeCard(turn_host[num]).set({
+                top: fieldHeight * (num + 1),
+                left: gaugeWidth / 16
+            }));
+            guest_turn_card.push(makeCard(turn_guest[num]).set({
+                top: fieldHeight * (num + 1),
+                left: gaugeWidth * 43 / 16
+            }));
+            canvas.add(host_turn_card[num], guest_turn_card[num]);
+        }
+        // Nested function
+        function fillCardGrey(card) {
+            try {
+                card._objects[0].set({
+                    fill: 'Grey'
+                })
+            } catch (e) {}
+        }
     }
     battle().then((result) => {
         if (result == -1) {
@@ -230,9 +256,9 @@ socket.on('select', () => {
 });
 
 socket.on('win', (player) => {
-    if(player == 'p1'){
+    if (player == 'p1') {
         editLog(player1.nickname + " Win!");
-    } else if(player == 'p2'){
+    } else if (player == 'p2') {
         editLog(player2.nickname + " Win!");
     } else {
         console.error("[ERROR] Something went wrong in socket.on('win') : Wrong id.");
@@ -507,16 +533,16 @@ async function enterSelectPhase() {
     player2.restoreEn(20);
     client = await initClient();
     selectPhaseEn = client.en;
-
+    
     canvas.getObjects().forEach((obj) => {
         try {
-            if (obj.objType == 'character') {
-                canvas.remove(obj);
-            } else if (obj.objType == 'field') {
+            if (obj.objType == 'field') {
                 obj.set({
                     stroke: ''
                 });
-            }
+            } else if ((obj.objType == 'character') || (obj._objects[0].objType == 'card')) {
+                canvas.remove(obj);
+            } 
         } catch (e) {}
     })
 
@@ -876,7 +902,7 @@ function showMinimap() {
         _arr[player1.location - 1].set('fill', 'magenta');
         _arr[player2.location - 1].set('fill', 'cyan');
     }
-    
+
     var miniField = new fabric.Group(_arr);
     miniField.set({
         top: cardHeight * 4,
