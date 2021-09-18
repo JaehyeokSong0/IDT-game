@@ -14,6 +14,7 @@ var canvas = new fabric.Canvas('game_canvas', {
     backgroundColor: 'white'
 });
 // Initialize size of the canvas
+const { width: initialWidth } = getSize();
 resizeCanvas();
 var fieldWidth = canvas.width / 6;
 var fieldHeight = canvas.height / 5;
@@ -343,10 +344,40 @@ async function calcTurnResult(p1Action, p2Action) {
     }
 }
 
+/**
+ * @typedef {Object} Size
+ * @property {number} width
+ * @property {number} height
+ */
+
+/**
+ * 화면에 알맞은 16:9 width, height를 반환해주는 함수
+ * @returns {Size} 
+ */
+function getSize() {
+    const { innerWidth, innerHeight } = window;
+    const height = innerWidth * 9 / 16;
+
+    if(innerHeight < height) {
+        return {
+            width: innerHeight * 16 / 9,
+            height: innerHeight
+        };
+    } else {
+        return {
+            width: innerWidth,
+            height
+        };
+    }
+}
+
 function resizeCanvas() {
-    canvas.setWidth(window.innerWidth);
-    canvas.setHeight(window.innerHeight);
-    console.info("canvas resized to w : ", canvas.width, ", h : ", canvas.height);
+    const { width, height } = getSize();
+    const zoom = width / initialWidth
+    canvas.setWidth(width);
+    canvas.setHeight(height);
+    canvas.setZoom(zoom)
+    console.info("canvas resized to w : ", width, ", h : ", height, ", zoom : " , zoom);
 }
 
 // Draw invincible field
