@@ -7,8 +7,8 @@
 https://idt-game.herokuapp.com/
 
 ## Update
-- 최근 업데이트 : 2021-09-18
-    - v0.1.0 release
+- 최근 업데이트 : 2021-09-20
+    - v0.1.1 release
 - 향후 업데이트 예정사항은 [TODO.md](https://github.com/JaehyeokSong0/ProjectSocket/blob/main/TODO.md)에서 확인할 수 있습니다.
 
 ## Getting Started
@@ -22,5 +22,5 @@ npm start
 ```
 
 ## Contact
-- JaehyoekSong0
+- JaehyeokSong0
     - jaehyeok.song0@gmail.com
