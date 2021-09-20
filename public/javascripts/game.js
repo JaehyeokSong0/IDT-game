@@ -377,7 +377,7 @@ function resizeCanvas() {
     canvas.setWidth(width);
     canvas.setHeight(height);
     canvas.setZoom(zoom)
-    console.info("canvas resized to w : ", width, ", h : ", height, ", zoom : " , zoom);
+    // console.info("canvas resized to w : ", width, ", h : ", height, ", zoom : " , zoom);
 }
 
 // Draw invincible field
