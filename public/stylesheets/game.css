@@ -11,10 +11,21 @@
     top: 20%;
     left: 50%;
     transform: translateY(-50%) translateX(-50%);
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
 }
 
 #game_title p {
+    margin: 0 0;
     font-size: 6rem;
+}
+
+#game_title div {
+    display: flex;
+    justify-content: space-between;
+}
+
+#version_info {
+    font-size: 32px;
 }
 
 #game_index {
