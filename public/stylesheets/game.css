@@ -48,17 +48,26 @@
 }
 
 #nickname {
-    border: 2px solid skyblue;
+    border: 2px solid white;
     border-radius: 5px;
     margin: 10px 0;
     font-size: 1.5rem;
+    text-align: center;
 }
 
 #submitID_btn {
-    background-color: antiquewhite;
+    background-color: white;
+    color: black;
     display: inline-block;
-    border: none;
+    border: 2px solid black;
     padding: 0.5rem 1rem;
     font-size: 2rem;
     margin: 10px 0;
+    width: 10rem;
+    transition: all 0.4s;
+}
+
+#submitID_btn:hover {
+    background-color: black;
+    color: white;
 }
