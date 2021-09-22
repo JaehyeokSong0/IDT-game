@@ -7,7 +7,7 @@ socket.on('checkId', (isValidId) => {
     if (isValidId) {
         alert("Successfully created ID!");
         $('#game_index').hide();
-        $('body').css('backgroundColor', 'white');
+        $('#game_title').fadeOut();
         $('#game_lobby').show();
         socket.emit('refreshRoom');
     } else {
