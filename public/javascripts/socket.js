@@ -151,7 +151,7 @@ function refreshRoom(rooms) {
         <td class = "roomTitle"></td>
         <td class = "roomPlayers"></td>
         <td class = "roomStatus"></td>
-        <td><button disabled>JoinRoom</button></td>
+        <td><button disabled>Join</button></td>
       </tr>`);
                 roomFormNum += 1;
             }
