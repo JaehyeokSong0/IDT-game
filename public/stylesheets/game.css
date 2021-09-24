@@ -65,6 +65,7 @@
     margin: 10px 0;
     width: 10rem;
     transition: all 0.4s;
+    box-shadow: 0.2rem 0.2rem black;
 }
 
 #submitID_btn:hover {
