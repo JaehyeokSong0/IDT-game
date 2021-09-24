@@ -158,7 +158,7 @@ function refreshRoom(rooms) {
             $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(0)').html(rooms[trNum][0]);
             $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(1)').html(rooms[trNum][1]);
             $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(2)').html(rooms[trNum][4] + '/2');
-            $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(3)').html('Waiting');
+            $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(3)').html(rooms[trNum][5]);
             $('#lobby_table tr:eq(' + (trNum + 1) + ') button').attr('disabled', false);
         }
         if (roomFormNum > 5) {
