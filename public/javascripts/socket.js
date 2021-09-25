@@ -5,7 +5,7 @@ var roomFormNum = 5; // Number of room forms created
 
 socket.on('checkId', (isValidId) => {
     if (isValidId) {
-        alert("Successfully created ID!");
+        //alert("Successfully created ID!");
         $('#game_index').hide();
         $('#game_title').fadeOut();
         $('#game_lobby').show();
@@ -92,6 +92,8 @@ $('#waitingRoom_host button').click(() => {
 });
 
 $('#waitingRoom_guest button').click(() => {
+    $('#waitingRoom_guest button').css('background','grey');
+    $('#waitingRoom_guest button').css('color','white');
     socket.emit('getReady');
 });
 
@@ -99,6 +101,8 @@ $('#exit_btn').click(() => {
     $('#waitingRoom_host button').attr('disabled', true);
     $('#waitingRoom_host').hide();
     $('#waitingRoom_guest').hide();
+    $('#waitingRoom_guest button').css('background','white');
+    $('#waitingRoom_guest button').css('color','grey');
     $('#roomModal').hide();
     $('#game_lobby').show();
     socket.emit('leaveRoom', id);
