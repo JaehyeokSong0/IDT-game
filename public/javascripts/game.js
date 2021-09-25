@@ -1069,6 +1069,8 @@ function exitGame() {
     $('#waitingRoom_guest').hide();
     $('#waitingRoom_host').hide();
     $('#waitingRoom_host button').attr('disabled', true);
+    $('#waitingRoom_guest button').css('background','white');
+    $('#waitingRoom_guest button').css('color','grey');
 }
 
 function showContinueBtn() {
