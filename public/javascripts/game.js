@@ -1,7 +1,7 @@
 import {
     socket,
     id,
-    refreshRoomInfo
+    clearRoomInfo
 } from './socket.js';
 
 var roomInfo;
@@ -1065,7 +1065,7 @@ function exitGame() {
         canvas.remove(obj);
     })
     $('#game_lobby').show();
-    refreshRoomInfo();
+    clearRoomInfo();
     $('#waitingRoom_guest').hide();
     $('#waitingRoom_host').hide();
     $('#waitingRoom_host button').attr('disabled', true);

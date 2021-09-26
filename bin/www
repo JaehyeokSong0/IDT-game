@@ -110,6 +110,7 @@ io.on('connection', (socket) => {
     }
     const host = rooms[index][2];
     const guest = rooms[index][3];
+    var roomInfo;
     if (id == host) {
       // If there's no guest and only host exists
       if (rooms[index][4] == 1) {
@@ -118,12 +119,14 @@ io.on('connection', (socket) => {
         rooms[index][2] = guest;
         rooms[index][3] = "";
         rooms[index][4] = 1;
-        socket.broadcast.to(roomNum).emit('changeHost');
+        roomInfo = rooms[index];
+        socket.broadcast.to(roomNum).emit('changeHost',roomInfo);
       }
     } else {
-      socket.broadcast.to(roomNum).emit('guestExit');
       rooms[index][3] = "";
       rooms[index][4] = 1;
+      roomInfo = rooms[index];
+      socket.broadcast.to(roomNum).emit('guestExit',roomInfo);
     }
     io.emit('refreshRoom', rooms);
     socket.leave(roomNum);
