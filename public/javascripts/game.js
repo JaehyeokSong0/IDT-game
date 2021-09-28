@@ -28,6 +28,13 @@ fabric.Object.prototype.selectable = false;
 canvas.selection = false;
 window.addEventListener('resize', resizeCanvas, false);
 
+fabric.Image.fromURL('images/background-6008188.png', function (img) {    
+    canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
+        scaleX: canvas.width / img.width,
+        scaleY: canvas.height / img.height
+    });
+});
+
 class Player {
     constructor(_nickname, _location, _id) {
         this.nickname = _nickname;
@@ -151,7 +158,7 @@ class Player {
                 }
             });
             await sleep(500);
-            markAttackRange('White', attackRange);
+            markAttackRange('Transparent', attackRange);
             if (this.id == 'p1') {
                 return player2.hp;
             } else if (this.id == 'p2') {
@@ -413,7 +420,7 @@ function initField(width, height) {
                 top: i * height,
                 width: width,
                 height: height,
-                fill: '',
+                fill: 'Transparent',
                 strokeWidth: 8,
                 stroke: '',
                 fieldNum: (i - 1) * 4 + j
@@ -667,7 +674,7 @@ function initGauge(gaugeWidth, gaugeHeight) {
             top: 0,
             width: gaugeWidth,
             height: gaugeHeight,
-            fill: 'White',
+            fill: 'Transparent',
             stroke: 'CornflowerBlue',
             strokeWidth: 4,
             rx: 10,
@@ -695,7 +702,7 @@ function initGauge(gaugeWidth, gaugeHeight) {
             top: 0,
             width: gaugeWidth,
             height: gaugeHeight,
-            fill: 'White',
+            fill: 'Transparent',
             stroke: 'CornflowerBlue',
             strokeWidth: 4,
             rx: 10,
@@ -723,7 +730,7 @@ function initGauge(gaugeWidth, gaugeHeight) {
             top: gaugeHeight,
             width: gaugeWidth,
             height: gaugeHeight,
-            fill: 'White',
+            fill: 'Transparent',
             stroke: 'CornflowerBlue',
             strokeWidth: 4,
             rx: 10,
@@ -751,7 +758,7 @@ function initGauge(gaugeWidth, gaugeHeight) {
             top: gaugeHeight,
             width: gaugeWidth,
             height: gaugeHeight,
-            fill: 'White',
+            fill: 'Transparent',
             stroke: 'CornflowerBlue',
             strokeWidth: 4,
             rx: 10,
