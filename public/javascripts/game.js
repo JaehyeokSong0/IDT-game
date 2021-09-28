@@ -112,6 +112,21 @@ class Player {
                 }
             });
             markAttackRange('Red', attackRange);
+            // Attack animation
+            if (this.id == 'p1') {
+                if ((this.location - 1) % 4 <= (player2.location - 1) % 4) {
+                    anim_bounce(this.character, 'right');
+                } else {
+                    anim_bounce(this.character, 'left');
+                }
+            } else if (this.id == 'p2') {
+                if ((this.location - 1) % 4 < (player1.location - 1) % 4) {
+                    anim_bounce(this.character, 'right');
+                } else {
+                    anim_bounce(this.character, 'left');
+                }
+            }
+
             attackRange.forEach((_field) => {
                 if (this.id == 'p1') {
                     if (_field == player2.location) {
@@ -1161,4 +1176,34 @@ function showExitBtn() {
         exitGame();
     })
     canvas.add(exit_btn);
+}
+
+async function anim_bounce(char, direction) {
+    const _lib = [
+        ['top', '-=25', '+=25'], // Up
+        ['top', '+=25', '-=25'], // Down
+        ['left', '-=25', '+=25'], // Left
+        ['left', '+=25', '-=25'] // Right
+    ];
+    var _val;
+    if (direction == 'up') {
+        _val = _lib[0];
+    } else if (direction == 'down') {
+        _val = _lib[1];
+    } else if (direction == 'left') {
+        _val = _lib[2];
+    } else if (direction == 'right') {
+        _val = _lib[3];
+    } else {
+        console.error("[ERROR] Something went wrong in anim_bounce().");
+    }
+    char.animate(_val[0], _val[1], {
+        duration: 100,
+        onChange: canvas.renderAll.bind(canvas),
+    });
+    await sleep(100);
+    char.animate(_val[0], _val[2], {
+        duration: 100,
+        onChange: canvas.renderAll.bind(canvas),
+    });
 }
