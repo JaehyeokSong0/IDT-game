@@ -318,10 +318,10 @@ async function calcTurnResult(p1Action, p2Action) {
         await sleep(1000);
         if (p1Priority + p2Priority == 0) { // Both players attack
             if ((p1Val <= 0) && (p2Val > 0)) {
-                socket.emit('win', 'p2');
+                socket.emit('win', 'p1');
                 return 2;
             } else if ((p1Val > 0) && (p2Val <= 0)) {
-                socket.emit('win', 'p1');
+                socket.emit('win', 'p2');
                 return 1;
             } else if ((p1Val <= 0) && (p2Val <= 0)) {
                 socket.emit('draw');
