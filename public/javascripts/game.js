@@ -14,7 +14,9 @@ var canvas = new fabric.Canvas('game_canvas', {
     backgroundColor: 'white'
 });
 // Initialize size of the canvas
-const { width: initialWidth } = getSize();
+const {
+    width: initialWidth
+} = getSize();
 resizeCanvas();
 var fieldWidth = canvas.width / 6;
 var fieldHeight = canvas.height / 5;
@@ -355,10 +357,13 @@ async function calcTurnResult(p1Action, p2Action) {
  * @returns {Size} 
  */
 function getSize() {
-    const { innerWidth, innerHeight } = window;
+    const {
+        innerWidth,
+        innerHeight
+    } = window;
     const height = innerWidth * 9 / 16;
 
-    if(innerHeight < height) {
+    if (innerHeight < height) {
         return {
             width: innerHeight * 16 / 9,
             height: innerHeight
@@ -372,7 +377,10 @@ function getSize() {
 }
 
 function resizeCanvas() {
-    const { width, height } = getSize();
+    const {
+        width,
+        height
+    } = getSize();
     const zoom = width / initialWidth
     canvas.setWidth(width);
     canvas.setHeight(height);
@@ -564,7 +572,7 @@ async function enterSelectPhase() {
     player2.restoreEn(20);
     client = await initClient();
     selectPhaseEn = client.en;
-    
+
     canvas.getObjects().forEach((obj) => {
         try {
             if (obj.objType == 'field') {
@@ -573,7 +581,7 @@ async function enterSelectPhase() {
                 });
             } else if ((obj.objType == 'character') || (obj._objects[0].objType == 'card')) {
                 canvas.remove(obj);
-            } 
+            }
         } catch (e) {}
     })
 
@@ -754,6 +762,8 @@ function initGauge(gaugeWidth, gaugeHeight) {
 }
 
 function initPlayerInfo(_width) {
+    var player1_color = 'magenta';
+    var player2_color = 'cyan';
     player1.info = new fabric.Group([
         new fabric.Rect({
             objType: 'info',
@@ -773,8 +783,16 @@ function initPlayerInfo(_width) {
             originX: 'center',
             originY: 'center',
             left: _width / 16 * 3,
-            top: _width / 8,
+            top: _width / 16,
         }),
+        new fabric.Circle({
+            originX: 'center',
+            originY: 'center',
+            radius: _width / 32,
+            top: _width / 16 * 3,
+            left: _width / 16 * 3,
+            fill: player1_color
+        })
     ]);
     player2.info = new fabric.Group([
         new fabric.Rect({
@@ -795,7 +813,15 @@ function initPlayerInfo(_width) {
             originX: 'center',
             originY: 'center',
             left: _width / 16 * 45,
-            top: _width / 8,
+            top: _width / 16,
+        }),
+        new fabric.Circle({
+            originX: 'center',
+            originY: 'center',
+            radius: _width / 32,
+            top: _width / 16 * 3,
+            left: _width / 16 * 45,
+            fill: player2_color
         })
     ]);
 }
@@ -1069,8 +1095,8 @@ function exitGame() {
     $('#waitingRoom_guest').hide();
     $('#waitingRoom_host').hide();
     $('#waitingRoom_host button').attr('disabled', true);
-    $('#waitingRoom_guest button').css('background','white');
-    $('#waitingRoom_guest button').css('color','grey');
+    $('#waitingRoom_guest button').css('background', 'white');
+    $('#waitingRoom_guest button').css('color', 'grey');
 }
 
 function showContinueBtn() {
