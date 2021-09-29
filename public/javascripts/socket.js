@@ -108,6 +108,7 @@ $('#exit_btn').click(() => {
 $('#lobby_table button').click((e) => {
     var roomNum = Number($(e.target).parent().siblings('.roomNum').text());
     var playersCnt = $(e.target).parent().siblings('.roomPlayers').text().split('/')[0];
+    var roomStatus = $(e.target).parent().siblings('.roomStatus').text();
     if (playersCnt == '1') {
         socket.emit('joinRoom', id, roomNum);
         $('#roomModal').fadeIn();
@@ -115,7 +116,11 @@ $('#lobby_table button').click((e) => {
         $('#waitingRoom_guest').show();
         $('#game_lobby').hide();
     } else if (playersCnt == '2') {
-        alert("The room already has been full!!");
+        if (roomStatus == 'Gaming') {
+            alert("This room is already playing a game.");
+        } else {
+            alert("The room already has been full!!");
+        }
     }
 });
 
