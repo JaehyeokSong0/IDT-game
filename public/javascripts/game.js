@@ -26,6 +26,7 @@ var gaugeHeight = canvas.height / 24;
 var gaugeWidth = canvas.width / 3;
 fabric.Object.prototype.selectable = false;
 canvas.selection = false;
+canvas.hoverCursor = 'default';
 window.addEventListener('resize', resizeCanvas, false);
 
 fabric.Image.fromURL('images/background-6008188.png', function (img) {    
@@ -636,6 +637,7 @@ async function enterSelectPhase() {
         originY: 'center',
         left: gaugeWidth * 3 / 2,
         top: gaugeHeight * 13 / 4,
+        hoverCursor: 'pointer'
     });
     continue_btn.on('mousedown', (e) => {
         if (nextTurn.length == 3) {
@@ -881,7 +883,8 @@ function makeCard(card) {
         damage: card.damage,
         energy: card.energy,
         guard: card.guard,
-        restore: card.restore
+        restore: card.restore,
+        hoverCursor: "pointer"
     });
 }
 
@@ -1146,6 +1149,7 @@ function showContinueBtn() {
         originY: 'center',
         left: gaugeWidth * 3 / 2,
         top: gaugeHeight * 13 / 4,
+        hoverCursor: 'pointer'
     });
     continue_btn.on('mousedown', (e) => {
         socket.emit('enterSelectPhase');
@@ -1178,6 +1182,7 @@ function showExitBtn() {
         originY: 'center',
         left: gaugeWidth * 3 / 2,
         top: gaugeHeight * 13 / 4,
+        hoverCursor: 'pointer'
     });
     exit_btn.on('mousedown', (e) => {
         exitGame();
