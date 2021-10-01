@@ -120,13 +120,13 @@ io.on('connection', (socket) => {
         rooms[index][3] = "";
         rooms[index][4] = 1;
         roomInfo = rooms[index];
-        socket.broadcast.to(roomNum).emit('changeHost',roomInfo);
+        socket.broadcast.to(roomNum).emit('changeHost', roomInfo);
       }
     } else {
       rooms[index][3] = "";
       rooms[index][4] = 1;
       roomInfo = rooms[index];
-      socket.broadcast.to(roomNum).emit('guestExit',roomInfo);
+      socket.broadcast.to(roomNum).emit('guestExit', roomInfo);
     }
     io.emit('refreshRoom', rooms);
     socket.leave(roomNum);
@@ -163,7 +163,7 @@ io.on('connection', (socket) => {
       rooms[index][5] = "Gaming";
       const room = rooms[index];
       io.sockets.in(roomNum).emit('startGame', room);
-      io.emit('refreshRoom',rooms);
+      io.emit('refreshRoom', rooms);
     }
     turn_host = [];
     turn_guest = [];
@@ -188,7 +188,7 @@ io.on('connection', (socket) => {
     const index = rooms.findIndex((item) => {
       return item[0] == roomNum
     });
-    //If no room has been created, terminate the function.
+    // If no room has been created, terminate the function.
     if (index == -1) {
       return;
     }
@@ -202,6 +202,9 @@ io.on('connection', (socket) => {
           }
         })
       }
+      if (turn_guest.length != 3) {
+        io.sockets.in(roomNum).emit('selected', "host");
+      }
     } else if (id == guest) {
       for (var i = 0; i < 3; i++) {
         card_json.filter((data) => {
@@ -209,6 +212,9 @@ io.on('connection', (socket) => {
             turn_guest.push(data);
           }
         })
+      }
+      if (turn_host.length != 3) {
+        io.sockets.in(roomNum).emit('selected', "guest");
       }
     }
     if ((turn_host.length == 3) && (turn_guest.length == 3)) {

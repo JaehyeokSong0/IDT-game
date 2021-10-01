@@ -9,6 +9,7 @@ var player1, player2;
 var client;
 var selectPhaseEn; // Energy that can be used for the selection phase
 var logField;
+var p1ReadySign, p2ReadySign;
 var nextTurn = [];
 var canvas = new fabric.Canvas('game_canvas', {
     backgroundColor: 'white'
@@ -230,11 +231,18 @@ socket.on('startGame', (room) => {
     initGauge(gaugeWidth, gaugeHeight);
     initPlayerInfo(gaugeWidth);
     initLogField();
+    initReadySign();
     enterSelectPhase();
 });
 
 socket.on('battle', (turn_host, turn_guest) => {
     enterBattlePhase();
+    p1ReadySign.set({
+        'fill': 'DarkGrey'
+    });
+    p2ReadySign.set({
+        'fill': 'DarkGrey'
+    });
     var host_turn_card = [];
     var guest_turn_card = [];
     async function battle() {
@@ -315,8 +323,23 @@ socket.on('getPlayer', (host, guest) => {
     } else if (id == guest) {
         client = player2;
     } else {
-        console.error("[ERROR] Something went wrong in socket.on('getPlayer') : Wrong id.");
+        console.error("[ERROR] Something went wrong in socket.on('getPlayer')");
     }
+});
+
+socket.on('selected', (player) => {
+    if (player == "host") {
+        p1ReadySign.set({
+            fill: 'DarkRed'
+        });
+    } else if (player == "guest") {
+        p2ReadySign.set({
+            fill: 'DarkRed'
+        });
+    } else {
+        console.error("[ERROR] Something went wrong in socket.on('selected')");
+    }
+    canvas.renderAll();
 });
 
 function sleep(delay) {
@@ -662,7 +685,7 @@ async function enterSelectPhase() {
         }
     })
 
-    canvas.add(player1.hpGauge, player2.hpGauge, player1.enGauge, player2.enGauge, player1.info, player2.info, continue_btn);
+    canvas.add(player1.hpGauge, player2.hpGauge, player1.enGauge, player2.enGauge, player1.info, player2.info, continue_btn, p1ReadySign, p2ReadySign);
     player1.hpGauge.bringToFront();
     player2.hpGauge.bringToFront();
 
@@ -681,6 +704,7 @@ function enterBattlePhase() {
     })
     showField();
     canvas.add(logField, player1.character, player2.character);
+    canvas.remove(p1ReadySign, p2ReadySign);
 }
 
 function initGauge(gaugeWidth, gaugeHeight) {
@@ -862,6 +886,29 @@ function initPlayerInfo(_width) {
             fill: player2_color
         })
     ]);
+}
+
+function initReadySign() {
+    p1ReadySign = new fabric.Text('READY', {
+        objType: 'readySign',
+        fontFamily: 'Papyrus',
+        fontSize: gaugeWidth / 32,
+        fill: 'DarkGrey',
+        left: gaugeWidth * 3 / 16,
+        top: gaugeWidth * 5 / 16,
+        originX: 'center',
+        originY: 'center'
+    });
+    p2ReadySign = new fabric.Text('READY', {
+        objType: 'readySign',
+        fontFamily: 'Papyrus',
+        fontSize: gaugeWidth / 32,
+        fill: 'DarkGrey',
+        left: gaugeWidth * 45 / 16,
+        top: gaugeWidth * 5 / 16,
+        originX: 'center',
+        originY: 'center'
+    });
 }
 
 function makeCard(card) {
