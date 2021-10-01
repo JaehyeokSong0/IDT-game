@@ -180,6 +180,7 @@ class Player {
                 console.error("[ERROR] Something went wrong : Wrong player id.");
             }
         } else if (card.type == "guard") {
+            anim_guard(this.character);
             return card.guard;
         } else if (card.type == "restore") {
             this.restoreEn(card.restore);
@@ -1243,4 +1244,23 @@ async function anim_attacked(char, direction) {
         duration: 300,
         onChange: canvas.renderAll.bind(canvas),
     });
+}
+
+async function anim_guard(char) {
+    var _guardEffect = new fabric.Circle({
+        originX: 'center',
+        originY: 'center',
+        radius: char.radius,
+        left: char.left + char.radius,
+        top: char.top + char.radius,
+        fill: 'Grey',
+        opacity: 0.6
+    })
+    canvas.add(_guardEffect);
+    _guardEffect.animate('radius', '+=' + char.radius, {
+        duration: 600,
+        onChange: canvas.renderAll.bind(canvas),
+    });
+    await sleep(600);
+    canvas.remove(_guardEffect);
 }
