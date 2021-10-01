@@ -29,7 +29,7 @@ canvas.selection = false;
 canvas.hoverCursor = 'default';
 window.addEventListener('resize', resizeCanvas, false);
 
-fabric.Image.fromURL('images/background-6008188.png', function (img) {    
+fabric.Image.fromURL('images/background-6008188.png', function (img) {
     canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
         scaleX: canvas.width / img.width,
         scaleY: canvas.height / img.height
@@ -123,15 +123,15 @@ class Player {
             // Attack animation
             if (this.id == 'p1') {
                 if ((this.location - 1) % 4 <= (player2.location - 1) % 4) {
-                    anim_bounce(this.character, 'right');
+                    anim_bounce(this.character, 'right', 100);
                 } else {
-                    anim_bounce(this.character, 'left');
+                    anim_bounce(this.character, 'left', 100);
                 }
             } else if (this.id == 'p2') {
                 if ((this.location - 1) % 4 < (player1.location - 1) % 4) {
-                    anim_bounce(this.character, 'right');
+                    anim_bounce(this.character, 'right', 100);
                 } else {
-                    anim_bounce(this.character, 'left');
+                    anim_bounce(this.character, 'left', 100);
                 }
             }
 
@@ -1190,7 +1190,7 @@ function showExitBtn() {
     canvas.add(exit_btn);
 }
 
-async function anim_bounce(char, direction) {
+async function anim_bounce(char, direction, delay) {
     const _lib = [
         ['top', '-=25', '+=25'], // Up
         ['top', '+=25', '-=25'], // Down
@@ -1210,12 +1210,12 @@ async function anim_bounce(char, direction) {
         console.error("[ERROR] Something went wrong in anim_bounce().");
     }
     char.animate(_val[0], _val[1], {
-        duration: 100,
+        duration: delay,
         onChange: canvas.renderAll.bind(canvas),
     });
-    await sleep(100);
+    await sleep(delay);
     char.animate(_val[0], _val[2], {
-        duration: 100,
+        duration: delay,
         onChange: canvas.renderAll.bind(canvas),
     });
 }
