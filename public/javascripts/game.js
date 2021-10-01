@@ -138,6 +138,12 @@ class Player {
             attackRange.forEach((_field) => {
                 if (this.id == 'p1') {
                     if (_field == player2.location) {
+                        // Attacked animation
+                        if ((this.location - 1) % 4 <= (player2.location - 1) % 4) {
+                            anim_attacked(player2.character, 'right');
+                        } else {
+                            anim_attacked(player2.character, 'left');
+                        }
                         if (card.damage >= val) {
                             player2.hp -= (card.damage - val);
                             if (player2.hp < 0) { // Prevent hp from becoming negative
@@ -148,6 +154,12 @@ class Player {
                     }
                 } else if (this.id == 'p2') {
                     if (_field == player1.location) {
+                        // Attacked animation
+                        if ((this.location - 1) % 4 < (player1.location - 1) % 4) {
+                            anim_attacked(player1.character, 'right');
+                        } else {
+                            anim_attacked(player1.character, 'left');
+                        }
                         if (card.damage >= val) {
                             player1.hp -= (card.damage - val);
                             if (player1.hp < 0) { // Prevent hp from becoming negative
@@ -1216,6 +1228,19 @@ async function anim_bounce(char, direction, delay) {
     await sleep(delay);
     char.animate(_val[0], _val[2], {
         duration: delay,
+        onChange: canvas.renderAll.bind(canvas),
+    });
+}
+
+async function anim_attacked(char, direction) {
+    anim_bounce(char, direction, 300);
+    char.animate('opacity', 0.1, {
+        duration: 300,
+        onChange: canvas.renderAll.bind(canvas),
+    });
+    await sleep(400);
+    char.animate('opacity', 1, {
+        duration: 300,
         onChange: canvas.renderAll.bind(canvas),
     });
 }
