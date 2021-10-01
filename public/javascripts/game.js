@@ -183,6 +183,7 @@ class Player {
             anim_guard(this.character);
             return card.guard;
         } else if (card.type == "restore") {
+            anim_restore(this.character);
             this.restoreEn(card.restore);
             return 0;
         }
@@ -1263,4 +1264,24 @@ async function anim_guard(char) {
     });
     await sleep(600);
     canvas.remove(_guardEffect);
+}
+
+async function anim_restore(char) {
+    var _restoreEffect = new fabric.Rect({
+        originX: 'center',
+        originY: 'center',
+        left: char.left + char.radius,
+        top: char.top + char.radius * 2,
+        width: char.radius * 4,
+        height: char.radius * 2,
+        fill: 'LightCyan',
+        opacity: 0.6
+    })
+    canvas.add(_restoreEffect);
+    _restoreEffect.animate('top', '-=' + char.radius * 2, {
+        duration: 600,
+        onChange: canvas.renderAll.bind(canvas),
+    });
+    await sleep(800);
+    canvas.remove(_restoreEffect);
 }
