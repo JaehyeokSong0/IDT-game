@@ -674,10 +674,12 @@ async function enterSelectPhase() {
         originY: 'center',
         left: gaugeWidth * 3 / 2,
         top: gaugeHeight * 13 / 4,
-        hoverCursor: 'pointer'
+        hoverCursor: 'pointer',
+        selected: 0
     });
     continue_btn.on('mousedown', (e) => {
-        if (nextTurn.length == 3) {
+        if ((nextTurn.length == 3) && (continue_btn.selected == 0)) {
+            continue_btn.selected = 1;
             continue_btn._objects[0].set({
                 fill: 'Grey'
             });
