@@ -22,7 +22,7 @@ resizeCanvas();
 var fieldWidth = canvas.width / 6;
 var fieldHeight = canvas.height / 5;
 var cardWidth = canvas.width / 12;
-var cardHeight = canvas.height / 6;
+var cardHeight = canvas.height / 7;
 var gaugeHeight = canvas.height / 24;
 var gaugeWidth = canvas.width / 3;
 fabric.Object.prototype.selectable = false;
@@ -265,11 +265,11 @@ socket.on('battle', (turn_host, turn_guest) => {
         // Nested function
         function showTurnCard(num) {
             host_turn_card.push(makeCard(turn_host[num]).set({
-                top: fieldHeight * (num + 1),
+                top: fieldHeight + cardHeight * num * (1.2),
                 left: gaugeWidth / 16
             }));
             guest_turn_card.push(makeCard(turn_guest[num]).set({
-                top: fieldHeight * (num + 1),
+                top: fieldHeight + cardHeight * num * (1.2),
                 left: gaugeWidth * 43 / 16
             }));
             canvas.add(host_turn_card[num], guest_turn_card[num]);
@@ -724,7 +724,7 @@ function initGauge(gaugeWidth, gaugeHeight) {
             width: gaugeWidth,
             height: gaugeHeight,
             fill: 'Transparent',
-            stroke: 'CornflowerBlue',
+            stroke: 'SlateGrey',
             strokeWidth: 4,
             rx: 10,
         }), new fabric.Rect({
@@ -733,7 +733,7 @@ function initGauge(gaugeWidth, gaugeHeight) {
             width: gaugeWidth,
             height: gaugeHeight,
             fill: 'IndianRed',
-            stroke: 'CornflowerBlue',
+            stroke: 'SlateGrey',
             strokeWidth: 4,
             rx: 10,
         }),
@@ -752,7 +752,7 @@ function initGauge(gaugeWidth, gaugeHeight) {
             width: gaugeWidth,
             height: gaugeHeight,
             fill: 'Transparent',
-            stroke: 'CornflowerBlue',
+            stroke: 'SlateGrey',
             strokeWidth: 4,
             rx: 10,
         }), new fabric.Rect({
@@ -761,7 +761,7 @@ function initGauge(gaugeWidth, gaugeHeight) {
             width: gaugeWidth,
             height: gaugeHeight,
             fill: 'IndianRed',
-            stroke: 'CornflowerBlue',
+            stroke: 'SlateGrey',
             strokeWidth: 4,
             rx: 10,
         }),
@@ -780,7 +780,7 @@ function initGauge(gaugeWidth, gaugeHeight) {
             width: gaugeWidth,
             height: gaugeHeight,
             fill: 'Transparent',
-            stroke: 'CornflowerBlue',
+            stroke: 'SlateGrey',
             strokeWidth: 4,
             rx: 10,
         }), new fabric.Rect({
@@ -789,7 +789,7 @@ function initGauge(gaugeWidth, gaugeHeight) {
             width: gaugeWidth,
             height: gaugeHeight,
             fill: 'LemonChiffon',
-            stroke: 'CornflowerBlue',
+            stroke: 'SlateGrey',
             strokeWidth: 4,
             rx: 10,
         }),
@@ -808,7 +808,7 @@ function initGauge(gaugeWidth, gaugeHeight) {
             width: gaugeWidth,
             height: gaugeHeight,
             fill: 'Transparent',
-            stroke: 'CornflowerBlue',
+            stroke: 'SlateGrey',
             strokeWidth: 4,
             rx: 10,
         }), new fabric.Rect({
@@ -818,7 +818,7 @@ function initGauge(gaugeWidth, gaugeHeight) {
             width: gaugeWidth,
             height: gaugeHeight,
             fill: 'LemonChiffon',
-            stroke: 'CornflowerBlue',
+            stroke: 'SlateGrey',
             strokeWidth: 4,
             rx: 10,
         }),
@@ -842,9 +842,9 @@ function initPlayerInfo(_width) {
             top: 0,
             width: _width / 4,
             height: _width / 4,
-            fill: 'AliceBlue',
-            stroke: 'LightSkyBlue',
-            strokeWidth: 4,
+            fill: 'WhiteSmoke',
+            stroke: 'Black',
+            strokeWidth: 5,
             rx: 10,
         }),
         new fabric.Text(player1.nickname, {
@@ -872,9 +872,9 @@ function initPlayerInfo(_width) {
             top: 0,
             width: _width / 4,
             height: _width / 4,
-            fill: 'AliceBlue',
-            stroke: 'LightSkyBlue',
-            strokeWidth: 4,
+            fill: 'WhiteSmoke',
+            stroke: 'Black',
+            strokeWidth: 5,
             rx: 10,
         }),
         new fabric.Text(player2.nickname, {
@@ -934,19 +934,21 @@ function makeCard(card) {
             selected: 0
         }),
         new fabric.Text(card.name, {
-            fontSize: cardWidth / 7,
+            fontSize: cardWidth / 6,
+            top: cardHeight / 12,
             originX: 'center',
-            fontFamily: 'Lucida Console'
+            fontFamily: 'Trebuchet MS',
         }),
-        new fabric.Text(String('[DM]' + card.damage + ' [EN]' + card.energy), {
-            fontSize: cardWidth / 9,
-            top: cardWidth / 4,
+        new fabric.Text(String('[DM]' + card.damage + '\n[EN]' + card.energy), {
+            fontSize: cardWidth / 8,
+            top: cardHeight / 2,
+            left: (-1) * cardWidth / 2.1,
             fontFamily: 'Lucida Console',
-            originX: 'center'
         }),
         renderRange(card).set({
             originX: 'center',
-            top: cardWidth / 2,
+            top: cardHeight / 2,
+            left: cardWidth / 4
         })
     ]).set({
         selected: 0,
@@ -1057,7 +1059,7 @@ function showMinimap() {
 
     var miniField = new fabric.Group(_arr);
     miniField.set({
-        top: cardHeight * 4,
+        top: cardHeight * 5,
         left: cardWidth * 9
     })
     canvas.add(miniField);
@@ -1133,7 +1135,7 @@ function clickCard(e) {
 function refreshTurnCards(turn) {
     for (var i = 0; i < turn.length; i++) {
         turn[i].set({
-            top: cardHeight * 9 / 2,
+            top: cardHeight * 11 / 2,
             left: cardWidth * 4 + cardWidth * i * 3 / 2
         });
         turn[i].setCoords(); // Function after moving objects
@@ -1161,7 +1163,7 @@ function showTurnList() {
                 top: cardHeight / 3
             }),
         ]).set({
-            top: cardHeight * 9 / 2,
+            top: cardHeight * 11 / 2,
             left: cardWidth * 4 + cardWidth * ((i - 1) % 5) * 3 / 2
         });
         canvas.add(turn);
