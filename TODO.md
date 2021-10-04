@@ -1,10 +1,11 @@
 # To-Do List
 
 ## <u>Currently working on...
-- Improve design
+- Make better game
+    - Implement character
+    - Implement additional action card
+    - Time limit (Selection phase)
 - Maintanance
 ## <u>To be worked on later...
 - Waiting Room
     - Action when socket disconnnect
-- Implement character
-- Implement additional card

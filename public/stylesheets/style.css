@@ -4,6 +4,6 @@ body {
   padding: 0;
   width: 100%;
   height: 100%;
-  background-color: white;
-  font: 14px "Lucida Console", monospace;
+  background-color: black;
+  font: 14px "Roboto Mono", "Lucida Console", monospace;
 }

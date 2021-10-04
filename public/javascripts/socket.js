@@ -5,9 +5,9 @@ var roomFormNum = 5; // Number of room forms created
 
 socket.on('checkId', (isValidId) => {
     if (isValidId) {
-        alert("Successfully created ID!");
+        //alert("Successfully created ID!");
         $('#game_index').hide();
-        $('body').css('backgroundColor', 'white');
+        $('#game_title').fadeOut();
         $('#game_lobby').show();
         socket.emit('refreshRoom');
     } else {
@@ -20,10 +20,7 @@ socket.on('createRoom', (rooms) => {
 });
 
 socket.on('createdRoom', (roomInfo) => {
-    $('#roomNumInfo').html(roomInfo[0]);
-    $('#roomTitleInfo').html(roomInfo[1]);
-    $('#hostInfo').html(roomInfo[2]);
-    $('#guestInfo').html(roomInfo[3]);
+    refreshRoomInfo(roomInfo);
 });
 
 socket.on('joinRoom', (roomNum, clientsNum) => {
@@ -36,10 +33,7 @@ socket.on('joinRoom', (roomNum, clientsNum) => {
 });
 
 socket.on('joinedRoom', (roomInfo) => {
-    $('#roomNumInfo').html(roomInfo[0]);
-    $('#roomTitleInfo').html(roomInfo[1]);
-    $('#hostInfo').html(roomInfo[2]);
-    $('#guestInfo').html(roomInfo[3]);
+    refreshRoomInfo(roomInfo);
 });
 
 socket.on('refreshRoom', (rooms) => {
@@ -50,18 +44,20 @@ socket.on('getReady', () => {
     $('#waitingRoom_host button').attr('disabled', false);
 });
 
-socket.on('guestExit', () => {
+socket.on('guestExit', (roomInfo) => {
     $('#waitingRoom_host button').attr('disabled', true);
+    refreshRoomInfo(roomInfo);
 });
 
-socket.on('changeHost', () => {
+socket.on('changeHost', (roomInfo) => {
     $('#waitingRoom_guest').hide();
     $('#waitingRoom_host').show();
     $('#waitingRoom_host button').attr('disabled', true);
+    refreshRoomInfo(roomInfo);
 });
 
 $('#nickname').keyup((event) => {
-    if(event.keyCode == 13) {
+    if (event.keyCode == 13) {
         id = $('#nickname').val();
         socket.emit('createId', id);
     }
@@ -92,6 +88,8 @@ $('#waitingRoom_host button').click(() => {
 });
 
 $('#waitingRoom_guest button').click(() => {
+    $('#waitingRoom_guest button').css('background', 'grey');
+    $('#waitingRoom_guest button').css('color', 'white');
     socket.emit('getReady');
 });
 
@@ -99,15 +97,18 @@ $('#exit_btn').click(() => {
     $('#waitingRoom_host button').attr('disabled', true);
     $('#waitingRoom_host').hide();
     $('#waitingRoom_guest').hide();
+    $('#waitingRoom_guest button').css('background', 'white');
+    $('#waitingRoom_guest button').css('color', 'grey');
     $('#roomModal').hide();
     $('#game_lobby').show();
     socket.emit('leaveRoom', id);
-    refreshRoomInfo();
+    clearRoomInfo();
 });
 
 $('#lobby_table button').click((e) => {
     var roomNum = Number($(e.target).parent().siblings('.roomNum').text());
     var playersCnt = $(e.target).parent().siblings('.roomPlayers').text().split('/')[0];
+    var roomStatus = $(e.target).parent().siblings('.roomStatus').text();
     if (playersCnt == '1') {
         socket.emit('joinRoom', id, roomNum);
         $('#roomModal').fadeIn();
@@ -115,7 +116,11 @@ $('#lobby_table button').click((e) => {
         $('#waitingRoom_guest').show();
         $('#game_lobby').hide();
     } else if (playersCnt == '2') {
-        alert("The room already has been full!!");
+        if (roomStatus == 'Gaming') {
+            alert("This room is already playing a game.");
+        } else {
+            alert("The room already has been full!!");
+        }
     }
 });
 
@@ -151,14 +156,14 @@ function refreshRoom(rooms) {
         <td class = "roomTitle"></td>
         <td class = "roomPlayers"></td>
         <td class = "roomStatus"></td>
-        <td><button disabled>JoinRoom</button></td>
+        <td><button disabled>Join</button></td>
       </tr>`);
                 roomFormNum += 1;
             }
             $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(0)').html(rooms[trNum][0]);
             $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(1)').html(rooms[trNum][1]);
             $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(2)').html(rooms[trNum][4] + '/2');
-            $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(3)').html('Waiting');
+            $('#lobby_table tr:eq(' + (trNum + 1) + ')>' + 'td:eq(3)').html(rooms[trNum][5]);
             $('#lobby_table tr:eq(' + (trNum + 1) + ') button').attr('disabled', false);
         }
         if (roomFormNum > 5) {
@@ -180,10 +185,17 @@ function deleteRoomForm(roomsLen) {
     $('#lobby_table tr:eq(' + (roomsLen + 1) + ') button').attr('disabled', true);
 }
 
-export function refreshRoomInfo() {
+export function clearRoomInfo() {
     $('#roomNumInfo').html('');
     $('#roomTitleInfo').html('');
     $('#hostInfo').html('');
     $('#guestInfo').html('');
     $('#createRoomInfo input').val('');
+}
+
+function refreshRoomInfo(roomInfo) {
+    $('#roomNumInfo').html(roomInfo[0]);
+    $('#roomTitleInfo').html(roomInfo[1]);
+    $('#hostInfo').html(roomInfo[2]);
+    $('#guestInfo').html(roomInfo[3]);
 }

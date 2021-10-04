@@ -5,11 +5,23 @@
   <title><%= title %></title>
   <link rel='stylesheet' href='/stylesheets/style.css' />
   <link rel='stylesheet' href='/stylesheets/game.css' />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&display=swap" rel="stylesheet">  
 </head>
 
 <body>
   <div id="canvas_wrapper">
     <canvas id="game_canvas"></canvas>
+  </div>
+  <div id="game_title">
+    <p style=>IDT-GAME</p>
+    <div>
+      <span id="version_info">v0.1.1</span>
+      <a href="https://github.com/JaehyeokSong0/IDT-game">
+        <img src="images/GitHub-Mark-32px.png" alt="link_github_repo">
+      </a>
+    </div>
   </div>
   <div id="game_index">
     <p> Input your nickname </p>

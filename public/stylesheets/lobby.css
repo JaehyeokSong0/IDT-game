@@ -34,3 +34,36 @@
     height: 25vh;
     overflow-y: auto;
 }
+
+#lobby_table button {
+    width: 6rem;
+}
+
+#lobby_table button:enabled {
+    border: 2px solid grey;
+    color: grey;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.8s ease;
+    background: white;
+}
+
+#lobby_table button:enabled:hover {
+    color: #fff;
+    box-shadow: 6rem 0 0 0 grey inset;
+}
+
+#createRoom_btn {
+    width: 8rem;
+    border: 2px solid grey;
+    color: grey;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.8s ease;
+    background: white;
+}
+
+#createRoom_btn:hover {
+    color: #fff;
+    box-shadow: 8rem 0 0 0 grey inset, -8rem 0 0 0 grey inset;
+}

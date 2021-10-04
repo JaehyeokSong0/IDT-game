@@ -71,7 +71,8 @@ io.on('connection', (socket) => {
     var clientsNum = clients.size;
     var host = id;
     var guest = "";
-    var roomInfo = [roomNum, roomTitle, host, guest, clientsNum];
+    var roomStatus = "Waiting";
+    var roomInfo = [roomNum, roomTitle, host, guest, clientsNum, roomStatus];
     rooms.push(roomInfo);
     io.emit('createRoom', rooms);
     io.sockets.in(roomNum).emit('createdRoom', roomInfo);
@@ -109,6 +110,7 @@ io.on('connection', (socket) => {
     }
     const host = rooms[index][2];
     const guest = rooms[index][3];
+    var roomInfo;
     if (id == host) {
       // If there's no guest and only host exists
       if (rooms[index][4] == 1) {
@@ -117,12 +119,14 @@ io.on('connection', (socket) => {
         rooms[index][2] = guest;
         rooms[index][3] = "";
         rooms[index][4] = 1;
-        socket.broadcast.to(roomNum).emit('changeHost');
+        roomInfo = rooms[index];
+        socket.broadcast.to(roomNum).emit('changeHost', roomInfo);
       }
     } else {
-      socket.broadcast.to(roomNum).emit('guestExit');
       rooms[index][3] = "";
       rooms[index][4] = 1;
+      roomInfo = rooms[index];
+      socket.broadcast.to(roomNum).emit('guestExit', roomInfo);
     }
     io.emit('refreshRoom', rooms);
     socket.leave(roomNum);
@@ -156,8 +160,10 @@ io.on('connection', (socket) => {
       return item[0] == roomNum
     });
     if (index > -1) {
+      rooms[index][5] = "Gaming";
       const room = rooms[index];
       io.sockets.in(roomNum).emit('startGame', room);
+      io.emit('refreshRoom', rooms);
     }
     turn_host = [];
     turn_guest = [];
@@ -182,7 +188,7 @@ io.on('connection', (socket) => {
     const index = rooms.findIndex((item) => {
       return item[0] == roomNum
     });
-    //If no room has been created, terminate the function.
+    // If no room has been created, terminate the function.
     if (index == -1) {
       return;
     }
@@ -196,6 +202,9 @@ io.on('connection', (socket) => {
           }
         })
       }
+      if (turn_guest.length != 3) {
+        io.sockets.in(roomNum).emit('selected', "host");
+      }
     } else if (id == guest) {
       for (var i = 0; i < 3; i++) {
         card_json.filter((data) => {
@@ -203,6 +212,9 @@ io.on('connection', (socket) => {
             turn_guest.push(data);
           }
         })
+      }
+      if (turn_host.length != 3) {
+        io.sockets.in(roomNum).emit('selected', "guest");
       }
     }
     if ((turn_host.length == 3) && (turn_guest.length == 3)) {

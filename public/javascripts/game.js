@@ -1,7 +1,7 @@
 import {
     socket,
     id,
-    refreshRoomInfo
+    clearRoomInfo
 } from './socket.js';
 
 var roomInfo;
@@ -9,22 +9,33 @@ var player1, player2;
 var client;
 var selectPhaseEn; // Energy that can be used for the selection phase
 var logField;
+var p1ReadySign, p2ReadySign;
 var nextTurn = [];
 var canvas = new fabric.Canvas('game_canvas', {
     backgroundColor: 'white'
 });
 // Initialize size of the canvas
-const { width: initialWidth } = getSize();
+const {
+    width: initialWidth
+} = getSize();
 resizeCanvas();
 var fieldWidth = canvas.width / 6;
 var fieldHeight = canvas.height / 5;
 var cardWidth = canvas.width / 12;
-var cardHeight = canvas.height / 6;
+var cardHeight = canvas.height / 7;
 var gaugeHeight = canvas.height / 24;
 var gaugeWidth = canvas.width / 3;
 fabric.Object.prototype.selectable = false;
 canvas.selection = false;
+canvas.hoverCursor = 'default';
 window.addEventListener('resize', resizeCanvas, false);
+
+fabric.Image.fromURL('images/background-6008188.png', function (img) {
+    canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
+        scaleX: canvas.width / img.width,
+        scaleY: canvas.height / img.height
+    });
+});
 
 class Player {
     constructor(_nickname, _location, _id) {
@@ -110,9 +121,30 @@ class Player {
                 }
             });
             markAttackRange('Red', attackRange);
+            // Attack animation
+            if (this.id == 'p1') {
+                if ((this.location - 1) % 4 <= (player2.location - 1) % 4) {
+                    anim_bounce(this.character, 'right', 100);
+                } else {
+                    anim_bounce(this.character, 'left', 100);
+                }
+            } else if (this.id == 'p2') {
+                if ((this.location - 1) % 4 < (player1.location - 1) % 4) {
+                    anim_bounce(this.character, 'right', 100);
+                } else {
+                    anim_bounce(this.character, 'left', 100);
+                }
+            }
+
             attackRange.forEach((_field) => {
                 if (this.id == 'p1') {
                     if (_field == player2.location) {
+                        // Attacked animation
+                        if ((this.location - 1) % 4 <= (player2.location - 1) % 4) {
+                            anim_attacked(player2.character, 'right');
+                        } else {
+                            anim_attacked(player2.character, 'left');
+                        }
                         if (card.damage >= val) {
                             player2.hp -= (card.damage - val);
                             if (player2.hp < 0) { // Prevent hp from becoming negative
@@ -123,6 +155,12 @@ class Player {
                     }
                 } else if (this.id == 'p2') {
                     if (_field == player1.location) {
+                        // Attacked animation
+                        if ((this.location - 1) % 4 < (player1.location - 1) % 4) {
+                            anim_attacked(player1.character, 'right');
+                        } else {
+                            anim_attacked(player1.character, 'left');
+                        }
                         if (card.damage >= val) {
                             player1.hp -= (card.damage - val);
                             if (player1.hp < 0) { // Prevent hp from becoming negative
@@ -134,7 +172,7 @@ class Player {
                 }
             });
             await sleep(500);
-            markAttackRange('White', attackRange);
+            markAttackRange('Transparent', attackRange);
             if (this.id == 'p1') {
                 return player2.hp;
             } else if (this.id == 'p2') {
@@ -143,8 +181,10 @@ class Player {
                 console.error("[ERROR] Something went wrong : Wrong player id.");
             }
         } else if (card.type == "guard") {
+            anim_guard(this.character);
             return card.guard;
         } else if (card.type == "restore") {
+            anim_restore(this.character);
             this.restoreEn(card.restore);
             return 0;
         }
@@ -191,11 +231,18 @@ socket.on('startGame', (room) => {
     initGauge(gaugeWidth, gaugeHeight);
     initPlayerInfo(gaugeWidth);
     initLogField();
+    initReadySign();
     enterSelectPhase();
 });
 
 socket.on('battle', (turn_host, turn_guest) => {
     enterBattlePhase();
+    p1ReadySign.set({
+        'fill': 'DarkGrey'
+    });
+    p2ReadySign.set({
+        'fill': 'DarkGrey'
+    });
     var host_turn_card = [];
     var guest_turn_card = [];
     async function battle() {
@@ -218,11 +265,11 @@ socket.on('battle', (turn_host, turn_guest) => {
         // Nested function
         function showTurnCard(num) {
             host_turn_card.push(makeCard(turn_host[num]).set({
-                top: fieldHeight * (num + 1),
+                top: fieldHeight + cardHeight * num * (1.2),
                 left: gaugeWidth / 16
             }));
             guest_turn_card.push(makeCard(turn_guest[num]).set({
-                top: fieldHeight * (num + 1),
+                top: fieldHeight + cardHeight * num * (1.2),
                 left: gaugeWidth * 43 / 16
             }));
             canvas.add(host_turn_card[num], guest_turn_card[num]);
@@ -276,8 +323,23 @@ socket.on('getPlayer', (host, guest) => {
     } else if (id == guest) {
         client = player2;
     } else {
-        console.error("[ERROR] Something went wrong in socket.on('getPlayer') : Wrong id.");
+        console.error("[ERROR] Something went wrong in socket.on('getPlayer')");
     }
+});
+
+socket.on('selected', (player) => {
+    if (player == "host") {
+        p1ReadySign.set({
+            fill: 'DarkRed'
+        });
+    } else if (player == "guest") {
+        p2ReadySign.set({
+            fill: 'DarkRed'
+        });
+    } else {
+        console.error("[ERROR] Something went wrong in socket.on('selected')");
+    }
+    canvas.renderAll();
 });
 
 function sleep(delay) {
@@ -316,10 +378,10 @@ async function calcTurnResult(p1Action, p2Action) {
         await sleep(1000);
         if (p1Priority + p2Priority == 0) { // Both players attack
             if ((p1Val <= 0) && (p2Val > 0)) {
-                socket.emit('win', 'p2');
+                socket.emit('win', 'p1');
                 return 2;
             } else if ((p1Val > 0) && (p2Val <= 0)) {
-                socket.emit('win', 'p1');
+                socket.emit('win', 'p2');
                 return 1;
             } else if ((p1Val <= 0) && (p2Val <= 0)) {
                 socket.emit('draw');
@@ -355,10 +417,13 @@ async function calcTurnResult(p1Action, p2Action) {
  * @returns {Size} 
  */
 function getSize() {
-    const { innerWidth, innerHeight } = window;
+    const {
+        innerWidth,
+        innerHeight
+    } = window;
     const height = innerWidth * 9 / 16;
 
-    if(innerHeight < height) {
+    if (innerHeight < height) {
         return {
             width: innerHeight * 16 / 9,
             height: innerHeight
@@ -372,7 +437,10 @@ function getSize() {
 }
 
 function resizeCanvas() {
-    const { width, height } = getSize();
+    const {
+        width,
+        height
+    } = getSize();
     const zoom = width / initialWidth
     canvas.setWidth(width);
     canvas.setHeight(height);
@@ -390,7 +458,7 @@ function initField(width, height) {
                 top: i * height,
                 width: width,
                 height: height,
-                fill: '',
+                fill: 'Transparent',
                 strokeWidth: 8,
                 stroke: '',
                 fieldNum: (i - 1) * 4 + j
@@ -564,7 +632,7 @@ async function enterSelectPhase() {
     player2.restoreEn(20);
     client = await initClient();
     selectPhaseEn = client.en;
-    
+
     canvas.getObjects().forEach((obj) => {
         try {
             if (obj.objType == 'field') {
@@ -573,7 +641,7 @@ async function enterSelectPhase() {
                 });
             } else if ((obj.objType == 'character') || (obj._objects[0].objType == 'card')) {
                 canvas.remove(obj);
-            } 
+            }
         } catch (e) {}
     })
 
@@ -606,17 +674,27 @@ async function enterSelectPhase() {
         originY: 'center',
         left: gaugeWidth * 3 / 2,
         top: gaugeHeight * 13 / 4,
+        hoverCursor: 'pointer',
+        selected: 0
     });
     continue_btn.on('mousedown', (e) => {
-        if (nextTurn.length == 3) {
+        if ((nextTurn.length == 3) && (continue_btn.selected == 0)) {
+            continue_btn.selected = 1;
             continue_btn._objects[0].set({
                 fill: 'Grey'
             });
+            canvas.getObjects().forEach((obj) => {
+                try {
+                    if (obj._objects[0].objType == 'card') {
+                        obj.off('mousedown');
+                    }
+                } catch (e) {}
+            })
             socket.emit('enterBattlePhase', nextTurn, id);
         }
     })
 
-    canvas.add(player1.hpGauge, player2.hpGauge, player1.enGauge, player2.enGauge, player1.info, player2.info, continue_btn);
+    canvas.add(player1.hpGauge, player2.hpGauge, player1.enGauge, player2.enGauge, player1.info, player2.info, continue_btn, p1ReadySign, p2ReadySign);
     player1.hpGauge.bringToFront();
     player2.hpGauge.bringToFront();
 
@@ -635,6 +713,7 @@ function enterBattlePhase() {
     })
     showField();
     canvas.add(logField, player1.character, player2.character);
+    canvas.remove(p1ReadySign, p2ReadySign);
 }
 
 function initGauge(gaugeWidth, gaugeHeight) {
@@ -644,8 +723,8 @@ function initGauge(gaugeWidth, gaugeHeight) {
             top: 0,
             width: gaugeWidth,
             height: gaugeHeight,
-            fill: 'White',
-            stroke: 'CornflowerBlue',
+            fill: 'Transparent',
+            stroke: 'SlateGrey',
             strokeWidth: 4,
             rx: 10,
         }), new fabric.Rect({
@@ -654,7 +733,7 @@ function initGauge(gaugeWidth, gaugeHeight) {
             width: gaugeWidth,
             height: gaugeHeight,
             fill: 'IndianRed',
-            stroke: 'CornflowerBlue',
+            stroke: 'SlateGrey',
             strokeWidth: 4,
             rx: 10,
         }),
@@ -672,8 +751,8 @@ function initGauge(gaugeWidth, gaugeHeight) {
             top: 0,
             width: gaugeWidth,
             height: gaugeHeight,
-            fill: 'White',
-            stroke: 'CornflowerBlue',
+            fill: 'Transparent',
+            stroke: 'SlateGrey',
             strokeWidth: 4,
             rx: 10,
         }), new fabric.Rect({
@@ -682,7 +761,7 @@ function initGauge(gaugeWidth, gaugeHeight) {
             width: gaugeWidth,
             height: gaugeHeight,
             fill: 'IndianRed',
-            stroke: 'CornflowerBlue',
+            stroke: 'SlateGrey',
             strokeWidth: 4,
             rx: 10,
         }),
@@ -700,8 +779,8 @@ function initGauge(gaugeWidth, gaugeHeight) {
             top: gaugeHeight,
             width: gaugeWidth,
             height: gaugeHeight,
-            fill: 'White',
-            stroke: 'CornflowerBlue',
+            fill: 'Transparent',
+            stroke: 'SlateGrey',
             strokeWidth: 4,
             rx: 10,
         }), new fabric.Rect({
@@ -710,7 +789,7 @@ function initGauge(gaugeWidth, gaugeHeight) {
             width: gaugeWidth,
             height: gaugeHeight,
             fill: 'LemonChiffon',
-            stroke: 'CornflowerBlue',
+            stroke: 'SlateGrey',
             strokeWidth: 4,
             rx: 10,
         }),
@@ -728,8 +807,8 @@ function initGauge(gaugeWidth, gaugeHeight) {
             top: gaugeHeight,
             width: gaugeWidth,
             height: gaugeHeight,
-            fill: 'White',
-            stroke: 'CornflowerBlue',
+            fill: 'Transparent',
+            stroke: 'SlateGrey',
             strokeWidth: 4,
             rx: 10,
         }), new fabric.Rect({
@@ -739,7 +818,7 @@ function initGauge(gaugeWidth, gaugeHeight) {
             width: gaugeWidth,
             height: gaugeHeight,
             fill: 'LemonChiffon',
-            stroke: 'CornflowerBlue',
+            stroke: 'SlateGrey',
             strokeWidth: 4,
             rx: 10,
         }),
@@ -754,6 +833,8 @@ function initGauge(gaugeWidth, gaugeHeight) {
 }
 
 function initPlayerInfo(_width) {
+    var player1_color = 'magenta';
+    var player2_color = 'cyan';
     player1.info = new fabric.Group([
         new fabric.Rect({
             objType: 'info',
@@ -761,9 +842,9 @@ function initPlayerInfo(_width) {
             top: 0,
             width: _width / 4,
             height: _width / 4,
-            fill: 'AliceBlue',
-            stroke: 'LightSkyBlue',
-            strokeWidth: 4,
+            fill: 'WhiteSmoke',
+            stroke: 'Black',
+            strokeWidth: 5,
             rx: 10,
         }),
         new fabric.Text(player1.nickname, {
@@ -773,8 +854,16 @@ function initPlayerInfo(_width) {
             originX: 'center',
             originY: 'center',
             left: _width / 16 * 3,
-            top: _width / 8,
+            top: _width / 16,
         }),
+        new fabric.Circle({
+            originX: 'center',
+            originY: 'center',
+            radius: _width / 32,
+            top: _width / 16 * 3,
+            left: _width / 16 * 3,
+            fill: player1_color
+        })
     ]);
     player2.info = new fabric.Group([
         new fabric.Rect({
@@ -783,9 +872,9 @@ function initPlayerInfo(_width) {
             top: 0,
             width: _width / 4,
             height: _width / 4,
-            fill: 'AliceBlue',
-            stroke: 'LightSkyBlue',
-            strokeWidth: 4,
+            fill: 'WhiteSmoke',
+            stroke: 'Black',
+            strokeWidth: 5,
             rx: 10,
         }),
         new fabric.Text(player2.nickname, {
@@ -795,9 +884,40 @@ function initPlayerInfo(_width) {
             originX: 'center',
             originY: 'center',
             left: _width / 16 * 45,
-            top: _width / 8,
+            top: _width / 16,
+        }),
+        new fabric.Circle({
+            originX: 'center',
+            originY: 'center',
+            radius: _width / 32,
+            top: _width / 16 * 3,
+            left: _width / 16 * 45,
+            fill: player2_color
         })
     ]);
+}
+
+function initReadySign() {
+    p1ReadySign = new fabric.Text('READY', {
+        objType: 'readySign',
+        fontFamily: 'Papyrus',
+        fontSize: gaugeWidth / 32,
+        fill: 'DarkGrey',
+        left: gaugeWidth * 3 / 16,
+        top: gaugeWidth * 5 / 16,
+        originX: 'center',
+        originY: 'center'
+    });
+    p2ReadySign = new fabric.Text('READY', {
+        objType: 'readySign',
+        fontFamily: 'Papyrus',
+        fontSize: gaugeWidth / 32,
+        fill: 'DarkGrey',
+        left: gaugeWidth * 45 / 16,
+        top: gaugeWidth * 5 / 16,
+        originX: 'center',
+        originY: 'center'
+    });
 }
 
 function makeCard(card) {
@@ -814,26 +934,29 @@ function makeCard(card) {
             selected: 0
         }),
         new fabric.Text(card.name, {
-            fontSize: cardWidth / 7,
+            fontSize: cardWidth / 6,
+            top: cardHeight / 12,
             originX: 'center',
-            fontFamily: 'Lucida Console'
+            fontFamily: 'Trebuchet MS',
         }),
-        new fabric.Text(String('[DM]' + card.damage + ' [EN]' + card.energy), {
-            fontSize: cardWidth / 9,
-            top: cardWidth / 4,
+        new fabric.Text(String('[DM]' + card.damage + '\n[EN]' + card.energy), {
+            fontSize: cardWidth / 8,
+            top: cardHeight / 2,
+            left: (-1) * cardWidth / 2.1,
             fontFamily: 'Lucida Console',
-            originX: 'center'
         }),
         renderRange(card).set({
             originX: 'center',
-            top: cardWidth / 2,
+            top: cardHeight / 2,
+            left: cardWidth / 4
         })
     ]).set({
         selected: 0,
         damage: card.damage,
         energy: card.energy,
         guard: card.guard,
-        restore: card.restore
+        restore: card.restore,
+        hoverCursor: "pointer"
     });
 }
 
@@ -936,7 +1059,7 @@ function showMinimap() {
 
     var miniField = new fabric.Group(_arr);
     miniField.set({
-        top: cardHeight * 4,
+        top: cardHeight * 5,
         left: cardWidth * 9
     })
     canvas.add(miniField);
@@ -1012,7 +1135,7 @@ function clickCard(e) {
 function refreshTurnCards(turn) {
     for (var i = 0; i < turn.length; i++) {
         turn[i].set({
-            top: cardHeight * 9 / 2,
+            top: cardHeight * 11 / 2,
             left: cardWidth * 4 + cardWidth * i * 3 / 2
         });
         turn[i].setCoords(); // Function after moving objects
@@ -1040,7 +1163,7 @@ function showTurnList() {
                 top: cardHeight / 3
             }),
         ]).set({
-            top: cardHeight * 9 / 2,
+            top: cardHeight * 11 / 2,
             left: cardWidth * 4 + cardWidth * ((i - 1) % 5) * 3 / 2
         });
         canvas.add(turn);
@@ -1065,10 +1188,12 @@ function exitGame() {
         canvas.remove(obj);
     })
     $('#game_lobby').show();
-    refreshRoomInfo();
+    clearRoomInfo();
     $('#waitingRoom_guest').hide();
     $('#waitingRoom_host').hide();
     $('#waitingRoom_host button').attr('disabled', true);
+    $('#waitingRoom_guest button').css('background', 'white');
+    $('#waitingRoom_guest button').css('color', 'grey');
 }
 
 function showContinueBtn() {
@@ -1096,6 +1221,7 @@ function showContinueBtn() {
         originY: 'center',
         left: gaugeWidth * 3 / 2,
         top: gaugeHeight * 13 / 4,
+        hoverCursor: 'pointer'
     });
     continue_btn.on('mousedown', (e) => {
         socket.emit('enterSelectPhase');
@@ -1128,9 +1254,92 @@ function showExitBtn() {
         originY: 'center',
         left: gaugeWidth * 3 / 2,
         top: gaugeHeight * 13 / 4,
+        hoverCursor: 'pointer'
     });
     exit_btn.on('mousedown', (e) => {
         exitGame();
     })
     canvas.add(exit_btn);
+}
+
+async function anim_bounce(char, direction, delay) {
+    const _lib = [
+        ['top', '-=25', '+=25'], // Up
+        ['top', '+=25', '-=25'], // Down
+        ['left', '-=25', '+=25'], // Left
+        ['left', '+=25', '-=25'] // Right
+    ];
+    var _val;
+    if (direction == 'up') {
+        _val = _lib[0];
+    } else if (direction == 'down') {
+        _val = _lib[1];
+    } else if (direction == 'left') {
+        _val = _lib[2];
+    } else if (direction == 'right') {
+        _val = _lib[3];
+    } else {
+        console.error("[ERROR] Something went wrong in anim_bounce().");
+    }
+    char.animate(_val[0], _val[1], {
+        duration: delay,
+        onChange: canvas.renderAll.bind(canvas),
+    });
+    await sleep(delay);
+    char.animate(_val[0], _val[2], {
+        duration: delay,
+        onChange: canvas.renderAll.bind(canvas),
+    });
+}
+
+async function anim_attacked(char, direction) {
+    anim_bounce(char, direction, 300);
+    char.animate('opacity', 0.1, {
+        duration: 300,
+        onChange: canvas.renderAll.bind(canvas),
+    });
+    await sleep(400);
+    char.animate('opacity', 1, {
+        duration: 300,
+        onChange: canvas.renderAll.bind(canvas),
+    });
+}
+
+async function anim_guard(char) {
+    var _guardEffect = new fabric.Circle({
+        originX: 'center',
+        originY: 'center',
+        radius: char.radius,
+        left: char.left + char.radius,
+        top: char.top + char.radius,
+        fill: 'Grey',
+        opacity: 0.6
+    })
+    canvas.add(_guardEffect);
+    _guardEffect.animate('radius', '+=' + char.radius, {
+        duration: 600,
+        onChange: canvas.renderAll.bind(canvas),
+    });
+    await sleep(600);
+    canvas.remove(_guardEffect);
+}
+
+async function anim_restore(char) {
+    var _restoreEffect = new fabric.Rect({
+        originX: 'center',
+        originY: 'center',
+        left: char.left + char.radius,
+        top: char.top + char.radius * 2,
+        width: char.radius * 4,
+        height: char.radius * 2,
+        fill: 'LightCyan',
+        opacity: 0.6
+    })
+    canvas.add(_restoreEffect);
+    _restoreEffect.animate('top', '-=' + char.radius * 2, {
+        duration: 600,
+        onChange: canvas.renderAll.bind(canvas),
+    });
+    await sleep(800);
+    canvas.remove(_restoreEffect);
 }
