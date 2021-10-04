@@ -683,6 +683,13 @@ async function enterSelectPhase() {
             continue_btn._objects[0].set({
                 fill: 'Grey'
             });
+            canvas.getObjects().forEach((obj) => {
+                try {
+                    if (obj._objects[0].objType == 'card') {
+                        obj.off('mousedown');
+                    }
+                } catch (e) {}
+            })
             socket.emit('enterBattlePhase', nextTurn, id);
         }
     })
