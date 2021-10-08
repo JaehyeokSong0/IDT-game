@@ -5,7 +5,7 @@
     - Implement character
     - Implement additional action card
     - Time limit (Selection phase)
-- Maintanance
+- Maintenance
 ## <u>To be worked on later...
 - Waiting Room
     - Action when socket disconnnect
