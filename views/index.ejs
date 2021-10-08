@@ -7,7 +7,7 @@
   <link rel='stylesheet' href='/stylesheets/game.css' />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&display=swap" rel="stylesheet">  
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -26,6 +26,7 @@
   <div id="game_index">
     <p> Input your nickname </p>
     <input id="nickname" placeholder="nickname"></input>
+    <p id="submitID_err_msg">&nbsp;</p>
     <button id="submitID_btn">START</button>
   </div>
   <%- include ("lobby.ejs") %>
