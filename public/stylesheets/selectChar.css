@@ -18,7 +18,7 @@
     border-radius: 10%;
 }
 
-.char_view {
+#char_view {
     width: 4rem;
     height: 4rem;
     border-radius: 50%;

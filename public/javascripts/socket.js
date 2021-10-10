@@ -123,6 +123,14 @@ $('#lobby_table button').click((e) => {
     }
 });
 
+$('#char_shift_left').click(() => {
+    shiftChar('left');
+});
+
+$('#char_shift_right').click(() => {
+    shiftChar('right');
+});
+
 // Verify condition of roomTitle
 function verifyTitle(roomTitle) {
     const regex = /^[a-z|A-Z|0-9]+$/;
@@ -197,4 +205,26 @@ function refreshRoomInfo(roomInfo) {
     $('#roomTitleInfo').html(roomInfo[1]);
     $('#hostInfo').html(roomInfo[2]);
     $('#guestInfo').html(roomInfo[3]);
+}
+
+function shiftChar(dir) {
+    const _char = ['Cyan', 'Magenta', 'Yellow', 'Black'];
+    var _idx = _char.indexOf($('#char_name').html());
+    if(dir == 'left') {
+        if(_idx == 0){
+            _idx = 3;
+        } else {
+            _idx--;
+        }
+        $('#char_view').css('background-color',_char[_idx]);
+        $('#char_name').html(_char[_idx]);
+    } else if (dir == 'right') {
+        if(_idx == 3){
+            _idx = 0;
+        } else {
+            _idx++;
+        }
+        $('#char_view').css('background-color',_char[_idx]);
+        $('#char_name').html(_char[_idx]);
+    }
 }
