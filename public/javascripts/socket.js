@@ -131,6 +131,10 @@ $('#char_shift_right').click(() => {
     shiftChar('right');
 });
 
+$('#char_choice').click(() => {
+    socket.emit('selectChar', $('#char_name').html());
+});
+
 // Verify condition of roomTitle
 function verifyTitle(roomTitle) {
     const regex = /^[a-z|A-Z|0-9]+$/;
@@ -210,21 +214,21 @@ function refreshRoomInfo(roomInfo) {
 function shiftChar(dir) {
     const _char = ['Cyan', 'Magenta', 'Yellow', 'Black'];
     var _idx = _char.indexOf($('#char_name').html());
-    if(dir == 'left') {
-        if(_idx == 0){
+    if (dir == 'left') {
+        if (_idx == 0) {
             _idx = 3;
         } else {
             _idx--;
         }
-        $('#char_view').css('background-color',_char[_idx]);
+        $('#char_view').css('border', '0.5rem solid ' + _char[_idx]);
         $('#char_name').html(_char[_idx]);
     } else if (dir == 'right') {
-        if(_idx == 3){
+        if (_idx == 3) {
             _idx = 0;
         } else {
             _idx++;
         }
-        $('#char_view').css('background-color',_char[_idx]);
+        $('#char_view').css('border', '0.5rem solid ' + _char[_idx]);
         $('#char_name').html(_char[_idx]);
     }
 }

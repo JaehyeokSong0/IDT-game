@@ -22,9 +22,8 @@
     width: 4rem;
     height: 4rem;
     border-radius: 50%;
-    background-color: cyan;
-    margin-left: 0.5rem;
-    margin-top: 0.5rem
+    border: 0.5rem solid cyan;
+    background-color: white;
 }
 
 #char_choice {

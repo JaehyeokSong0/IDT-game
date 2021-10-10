@@ -50,6 +50,7 @@ io.on('connection', (socket) => {
   socket.on('getReady', getReady);
   socket.on('leaveRoom', leaveRoom);
   socket.on('refreshRoom', refreshRoom);
+  socket.on('selectChar', selectChar);
 
   function createId(id) {
     const index = usersId.findIndex((item) => {
@@ -144,6 +145,10 @@ io.on('connection', (socket) => {
       rooms.splice(index, 1);
     }
     io.emit('refreshRoom', rooms);
+  }
+
+  function selectChar(charName) {
+    console.log(charName);
   }
 
   // In game
