@@ -22,8 +22,8 @@
     width: 4rem;
     height: 4rem;
     border-radius: 50%;
-    border: 0.5rem solid cyan;
-    background-color: white;
+    border: 0.5rem solid lightcoral;
+    background-color: transparent;
 }
 
 #char_choice {

@@ -212,7 +212,7 @@ function refreshRoomInfo(roomInfo) {
 }
 
 function shiftChar(dir) {
-    const _char = ['Cyan', 'Magenta', 'Yellow', 'Black'];
+    const _char = ['LightCoral', 'Tan', 'SteelBlue', 'Plum'];
     var _idx = _char.indexOf($('#char_name').html());
     if (dir == 'left') {
         if (_idx == 0) {
