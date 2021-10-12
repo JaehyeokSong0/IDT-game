@@ -55,6 +55,16 @@ socket.on('changeHost', (roomInfo) => {
     refreshRoomInfo(roomInfo);
 });
 
+socket.on('selectChar', (host, guest) => {
+    $('#roomModal').hide();
+    if (id == host) {
+        $('#char_view').css('background-color', 'White');
+    } else if (id == guest) {
+        $('#char_view').css('background-color', 'DarkGrey');
+    }
+    $('#selectCharModal').show();
+})
+
 $('#nickname').keyup((event) => {
     if (event.keyCode == 13) {
         id = $('#nickname').val();
@@ -83,7 +93,7 @@ $('#createRoomInfo button').click(() => {
 });
 
 $('#waitingRoom_host button').click(() => {
-    socket.emit('startGame');
+    socket.emit('selectChar');
 });
 
 $('#waitingRoom_guest button').click(() => {
@@ -132,7 +142,10 @@ $('#char_shift_right').click(() => {
 });
 
 $('#char_choice').click(() => {
-    socket.emit('selectChar', $('#char_name').html());
+    socket.emit('startGame', id, $('#char_name').html());
+    $('#char_choice').attr('disabled', true);
+    $('#char_shift_left').attr('disabled', true);
+    $('#char_shift_right').attr('disabled', true);
 });
 
 // Verify condition of roomTitle

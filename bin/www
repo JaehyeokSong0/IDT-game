@@ -35,6 +35,7 @@ var roomNum = 1;
 var usersId = [];
 var rooms = [];
 
+var p1Char, p2Char;
 var turn_host = [];
 var turn_guest = [];
 
@@ -147,8 +148,16 @@ io.on('connection', (socket) => {
     io.emit('refreshRoom', rooms);
   }
 
-  function selectChar(charName) {
-    console.log(charName);
+  function selectChar() {
+    const roomNum = [...socket.rooms][1];
+    const index = rooms.findIndex((item) => {
+      return item[0] == roomNum
+    });
+    if (index > -1) {
+      const host = rooms[index][2];
+      const guest = rooms[index][3];
+      io.sockets.in(roomNum).emit('selectChar', host, guest);
+    }
   }
 
   // In game
@@ -159,7 +168,7 @@ io.on('connection', (socket) => {
   socket.on('win', win);
   socket.on('draw', draw);
 
-  function startGame() {
+  function startGame(id, char) {
     const roomNum = [...socket.rooms][1];
     const index = rooms.findIndex((item) => {
       return item[0] == roomNum
@@ -167,8 +176,17 @@ io.on('connection', (socket) => {
     if (index > -1) {
       rooms[index][5] = "Gaming";
       const room = rooms[index];
-      io.sockets.in(roomNum).emit('startGame', room);
-      io.emit('refreshRoom', rooms);
+      const host = room[2];
+      const guest = room[3];
+      if (id == host) {
+        p1Char = char;
+      } else if (id == guest) {
+        p2Char = char;
+      }
+      if ((p1Char != undefined) && (p2Char != undefined)) {
+        io.sockets.in(roomNum).emit('startGame', room, p1Char, p2Char);
+        io.emit('refreshRoom', rooms);
+      }
     }
     turn_host = [];
     turn_guest = [];
@@ -237,6 +255,8 @@ io.on('connection', (socket) => {
   function win(player) {
     const roomNum = [...socket.rooms][1];
     io.sockets.in(roomNum).emit('win', player);
+    p1Char = undefined;
+    p2Char = undefined;
     deleteRoom(roomNum);
     socket.leave(roomNum);
   }
@@ -244,6 +264,8 @@ io.on('connection', (socket) => {
   function draw() {
     const roomNum = [...socket.rooms][1];
     io.sockets.in(roomNum).emit('draw');
+    p1Char = undefined;
+    p2Char = undefined;
     deleteRoom(roomNum);
     socket.leave(roomNum);
   }

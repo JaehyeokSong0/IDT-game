@@ -38,10 +38,11 @@ fabric.Image.fromURL('images/background-6008188.png', function (img) {
 });
 
 class Player {
-    constructor(_nickname, _location, _id) {
+    constructor(_nickname, _location, _id, _color) {
         this.nickname = _nickname;
         this.location = _location;
         this.id = _id;
+        this.color = _color;
         this.hp = 100;
         this.en = 100;
     }
@@ -221,13 +222,13 @@ class Player {
     }
 }
 
-socket.on('startGame', (room) => {
-    $('#roomModal').fadeOut();
+socket.on('startGame', (room, p1Char, p2Char) => {
+    $('#selectCharModal').fadeOut();
     roomInfo = room;
     resizeCanvas();
     socket.emit('getPlayer');
     initField(fieldWidth, fieldHeight);
-    initPlayer();
+    initPlayerChar(p1Char, p2Char);
     initGauge(gaugeWidth, gaugeHeight);
     initPlayerInfo(gaugeWidth);
     initLogField();
@@ -494,31 +495,36 @@ function editLog(text) {
     canvas.renderAll();
 }
 
-function initPlayer() {
-    player1 = new Player(roomInfo[2], 5, 'p1');
-    player1.character = setCharacter('magenta', 5, 'player1');
+function initPlayerChar(p1Char, p2Char) {
+    player1 = new Player(roomInfo[2], 5, 'p1', p1Char);
+    player1.character = setCharacter(p1Char, 5, 'player1');
 
-    player2 = new Player(roomInfo[3], 8, 'p2');
-    player2.character = setCharacter('cyan', 8, 'player2');
+    player2 = new Player(roomInfo[3], 8, 'p2', p2Char);
+    player2.character = setCharacter(p2Char, 8, 'player2');
 }
 
 function setCharacter(color, location, playerNum) {
-    var fieldDiv;
+    var _fieldDiv;
     var _field = getFieldByNum(location);
     var _radius = fieldHeight / 6;
+    var _innerColor;
     if (playerNum === 'player1') {
-        fieldDiv = 1;
+        _fieldDiv = 1;
+        _innerColor = 'White';
     } else if (playerNum === 'player2') {
-        fieldDiv = 3;
+        _fieldDiv = 3;
+        _innerColor = 'DarkGrey';
     } else {
         console.error("[ERROR] Something went wrong : Wrong playerNum.");
     }
     return new fabric.Circle({
         objType: 'character',
         radius: _radius,
-        left: _field.left + (fieldWidth / 4) * fieldDiv - _radius,
+        left: _field.left + (fieldWidth / 4) * _fieldDiv - _radius,
         top: _field.top + (fieldHeight / 2) - _radius,
-        fill: color,
+        fill: _innerColor,
+        stroke: color,
+        strokeWidth: 5
     });
 }
 
@@ -833,8 +839,6 @@ function initGauge(gaugeWidth, gaugeHeight) {
 }
 
 function initPlayerInfo(_width) {
-    var player1_color = 'magenta';
-    var player2_color = 'cyan';
     player1.info = new fabric.Group([
         new fabric.Rect({
             objType: 'info',
@@ -862,7 +866,9 @@ function initPlayerInfo(_width) {
             radius: _width / 32,
             top: _width / 16 * 3,
             left: _width / 16 * 3,
-            fill: player1_color
+            fill: 'White',
+            stroke: player1.color,
+            strokeWidth: 4
         })
     ]);
     player2.info = new fabric.Group([
@@ -892,7 +898,9 @@ function initPlayerInfo(_width) {
             radius: _width / 32,
             top: _width / 16 * 3,
             left: _width / 16 * 45,
-            fill: player2_color
+            fill: 'DarkGrey',
+            stroke: player2.color,
+            strokeWidth: 4
         })
     ]);
 }
@@ -1044,17 +1052,17 @@ function showMinimap() {
             },
             colorStops: [{
                     offset: 0,
-                    color: 'magenta'
+                    color: player1.color
                 },
                 {
                     offset: 1,
-                    color: 'cyan'
+                    color: player2.color
                 }
             ]
         }));
     } else {
-        _arr[player1.location - 1].set('fill', 'magenta');
-        _arr[player2.location - 1].set('fill', 'cyan');
+        _arr[player1.location - 1].set('fill', player1.color);
+        _arr[player2.location - 1].set('fill', player2.color);
     }
 
     var miniField = new fabric.Group(_arr);
@@ -1194,6 +1202,9 @@ function exitGame() {
     $('#waitingRoom_host button').attr('disabled', true);
     $('#waitingRoom_guest button').css('background', 'white');
     $('#waitingRoom_guest button').css('color', 'grey');
+    $('#char_choice').attr('disabled', false);
+    $('#char_shift_left').attr('disabled', false);
+    $('#char_shift_right').attr('disabled', false);
 }
 
 function showContinueBtn() {
