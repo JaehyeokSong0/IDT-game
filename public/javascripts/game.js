@@ -1061,8 +1061,46 @@ function showMinimap() {
             ]
         }));
     } else {
-        _arr[player1.location - 1].set('fill', player1.color);
-        _arr[player2.location - 1].set('fill', player2.color);
+        _arr[player1.location - 1].set('fill', new fabric.Gradient({
+            type: 'radial',
+            coords: {
+                r1: _height / 2,
+                r2: 0,
+                x1: _width / 2,
+                y1: _height / 2,
+                x2: _width / 2,
+                y2: _height / 2
+            },
+            colorStops: [{
+                    offset: 0,
+                    color: player1.color
+                },
+                {
+                    offset: 1,
+                    color: 'White'
+                }
+            ]
+        }));
+        _arr[player2.location - 1].set('fill', new fabric.Gradient({
+            type: 'radial',
+            coords: {
+                r1: _height / 2,
+                r2: 0,
+                x1: _width / 2,
+                y1: _height / 2,
+                x2: _width / 2,
+                y2: _height / 2
+            },
+            colorStops: [{
+                    offset: 0,
+                    color: player2.color
+                },
+                {
+                    offset: 1,
+                    color: 'Grey'
+                }
+            ]
+        }));
     }
 
     var miniField = new fabric.Group(_arr);
