@@ -265,11 +265,11 @@ socket.on('battle', (turn_host, turn_guest) => {
 
         // Nested function
         function showTurnCard(num) {
-            host_turn_card.push(makeCard(turn_host[num]).set({
+            host_turn_card.push(makeCard(turn_host[num], 'PaleGreen').set({
                 top: fieldHeight + cardHeight * num * (1.2),
                 left: gaugeWidth / 16
             }));
-            guest_turn_card.push(makeCard(turn_guest[num]).set({
+            guest_turn_card.push(makeCard(turn_guest[num], 'PaleGreen').set({
                 top: fieldHeight + cardHeight * num * (1.2),
                 left: gaugeWidth * 43 / 16
             }));
@@ -928,13 +928,13 @@ function initReadySign() {
     });
 }
 
-function makeCard(card) {
+function makeCard(card, color) {
     return new fabric.Group([
         new fabric.Rect({
             objType: 'card',
             width: cardWidth,
             height: cardHeight,
-            fill: 'PaleGreen',
+            fill: color,
             stroke: 'Black',
             strokeWidth: 2,
             rx: 10,
@@ -1111,12 +1111,37 @@ function showMinimap() {
     canvas.add(miniField);
 }
 
+// function showAllCards() {
+//     $.getJSON('json/card.json', (data) => {
+//         var i = 1;
+//         var j = 1;
+//         while (i <= data.length) {
+//             var card = makeCard(data[i - 1]).set({
+//                 top: cardHeight * 5 / 4 * j,
+//                 left: cardWidth * 5 / 2 + cardWidth * ((i - 1) % 5) * 3 / 2,
+//                 originTop: cardHeight * 5 / 4 * j,
+//                 originLeft: cardWidth * 5 / 2 + cardWidth * ((i - 1) % 5) * 3 / 2,
+//             });
+//             card.on('mousedown', (e) => {
+//                 clickCard(e);
+//             })
+//             canvas.add(card);
+//             if (i % 5 == 0) {
+//                 j += 1;
+//             }
+//             i += 1;
+//         }
+//     });
+// }
+
 function showAllCards() {
     $.getJSON('json/card.json', (data) => {
         var i = 1;
         var j = 1;
-        while (i <= data.length) {
-            var card = makeCard(data[i - 1]).set({
+        // Get common cards
+        var commonCard = data[0].Common;
+        while (i <= commonCard.length) {
+            var card = makeCard(commonCard[i - 1], 'PaleGreen').set({
                 top: cardHeight * 5 / 4 * j,
                 left: cardWidth * 5 / 2 + cardWidth * ((i - 1) % 5) * 3 / 2,
                 originTop: cardHeight * 5 / 4 * j,
@@ -1130,6 +1155,26 @@ function showAllCards() {
                 j += 1;
             }
             i += 1;
+        }
+        // Get character cards
+        var charCard = data[0][client.color];
+        var k = 1;
+        while (k <= charCard.length) {
+            var card = makeCard(charCard[k - 1], client.color).set({
+                top: cardHeight * 5 / 4 * j,
+                left: cardWidth * 5 / 2 + cardWidth * ((i - 1) % 5) * 3 / 2,
+                originTop: cardHeight * 5 / 4 * j,
+                originLeft: cardWidth * 5 / 2 + cardWidth * ((i - 1) % 5) * 3 / 2,
+            });
+            card.on('mousedown', (e) => {
+                clickCard(e);
+            })
+            canvas.add(card);
+            if (i % 5 == 0) {
+                j += 1;
+            }
+            i += 1;
+            k += 1;
         }
     });
 }

@@ -24,7 +24,7 @@ var server = http.createServer(app);
  * Setup Socket env
  */
 const fs = require('fs');
-const card_json = JSON.parse(fs.readFileSync('public/json/card.json', 'utf8'));
+const card_json = JSON.parse(fs.readFileSync('public/json/card.json', 'utf8'))[0];
 
 var io = require('socket.io')(server, {
   cors: {
@@ -43,7 +43,6 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });
-
   // In lobby
   socket.on('createId', createId);
   socket.on('createRoom', createRoom);
@@ -219,22 +218,40 @@ io.on('connection', (socket) => {
     const guest = rooms[index][3];
     if (id == host) {
       for (var i = 0; i < 3; i++) {
-        card_json.filter((data) => {
-          if (data.name == nextTurn[i].objects[1].text) {
-            turn_host.push(data);
-          }
-        })
+        var _cardColor = nextTurn[i].objects[0].fill;
+        if (_cardColor == 'PaleGreen') { // For common card  
+          card_json['Common'].filter((data) => {
+            if (data.name == nextTurn[i].objects[1].text) {
+              turn_host.push(data);
+            }
+          })
+        } else { // For unique card  
+          card_json[_cardColor].filter((data) => {
+            if (data.name == nextTurn[i].objects[1].text) {
+              turn_host.push(data);
+            }
+          })
+        }
       }
       if (turn_guest.length != 3) {
         io.sockets.in(roomNum).emit('selected', "host");
       }
     } else if (id == guest) {
       for (var i = 0; i < 3; i++) {
-        card_json.filter((data) => {
-          if (data.name == nextTurn[i].objects[1].text) {
-            turn_guest.push(data);
-          }
-        })
+        var _cardColor = nextTurn[i].objects[0].fill;
+        if (_cardColor == 'PaleGreen') { // For common card  
+          card_json['Common'].filter((data) => {
+            if (data.name == nextTurn[i].objects[1].text) {
+              turn_guest.push(data);
+            }
+          })
+        } else { // For unique card  
+          card_json[_cardColor].filter((data) => {
+            if (data.name == nextTurn[i].objects[1].text) {
+              turn_guest.push(data);
+            }
+          })
+        }
       }
       if (turn_host.length != 3) {
         io.sockets.in(roomNum).emit('selected', "guest");
