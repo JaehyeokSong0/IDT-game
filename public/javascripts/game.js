@@ -1218,8 +1218,6 @@ function clickCard(e) {
         } else {
             alert("Not enough energy!");
         }
-    } else {
-        console.error("[ERROR] Something went wrong in clickCard().");
     }
 }
 
