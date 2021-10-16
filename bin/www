@@ -53,17 +53,25 @@ io.on('connection', (socket) => {
   socket.on('selectChar', selectChar);
 
   function createId(id) {
-    const index = usersId.findIndex((item) => {
-      return item == id;
-    });
-    var isValidId;
-    if (index > -1) {
+    var isValidId, invalidCode;
+    // Check for ID length
+    if (id.length >= 9) {
       isValidId = false;
+      invalidCode = "The ID is too long! Please make it less than 9.";
     } else {
-      usersId.push(id);
-      isValidId = true;
+      // Check for duplicate ID
+      const index = usersId.findIndex((item) => {
+        return item == id;
+      });
+      if (index > -1) {
+        isValidId = false;
+        invalidCode = "The ID already exists! Please try with a different ID."
+      } else {
+        usersId.push(id);
+        isValidId = true;
+      }
     }
-    io.to(socket.id).emit('checkId', isValidId);
+    io.to(socket.id).emit('checkId', isValidId, invalidCode);
   }
 
   async function createRoom(id, roomTitle) {

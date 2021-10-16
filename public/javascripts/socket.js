@@ -3,14 +3,14 @@ export var id;
 
 var roomFormNum = 5; // Number of room forms created
 
-socket.on('checkId', (isValidId) => {
+socket.on('checkId', (isValidId, invalidCode) => {
     if (isValidId) {
         $('#game_index').hide();
         $('#game_title').fadeOut();
         $('#game_lobby').show();
         socket.emit('refreshRoom');
     } else {
-        $('#submitID_err_msg').html("The ID already exists! Please try with a different ID.");
+        $('#submitID_err_msg').html(invalidCode);
     }
 });
 
