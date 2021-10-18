@@ -1,0 +1,31 @@
+.slider {
+    display: flex;
+    justify-content: center;
+}
+
+.shift_btn {
+    background-color: transparent;
+    border: 0;
+    cursor: pointer;
+    font-weight: bolder;
+    font-size: 4rem;
+    color: slategrey;
+}
+
+#char_view_wrapper {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 10%;
+}
+
+#char_view {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    border: 0.5rem solid lightcoral;
+    background-color: transparent;
+}
+
+#char_choice {
+    margin-top: 4rem;
+}

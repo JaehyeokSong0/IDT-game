@@ -24,7 +24,7 @@ var server = http.createServer(app);
  * Setup Socket env
  */
 const fs = require('fs');
-const card_json = JSON.parse(fs.readFileSync('public/json/card.json', 'utf8'));
+const card_json = JSON.parse(fs.readFileSync('public/json/card.json', 'utf8'))[0];
 
 var io = require('socket.io')(server, {
   cors: {
@@ -35,14 +35,10 @@ var roomNum = 1;
 var usersId = [];
 var rooms = [];
 
-var turn_host = [];
-var turn_guest = [];
-
 io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });
-
   // In lobby
   socket.on('createId', createId);
   socket.on('createRoom', createRoom);
@@ -50,19 +46,28 @@ io.on('connection', (socket) => {
   socket.on('getReady', getReady);
   socket.on('leaveRoom', leaveRoom);
   socket.on('refreshRoom', refreshRoom);
+  socket.on('selectChar', selectChar);
 
   function createId(id) {
-    const index = usersId.findIndex((item) => {
-      return item == id;
-    });
-    var isValidId;
-    if (index > -1) {
+    var isValidId, invalidCode;
+    // Check for ID length
+    if (id.length >= 9) {
       isValidId = false;
+      invalidCode = "The ID is too long! Please make it less than 9.";
     } else {
-      usersId.push(id);
-      isValidId = true;
+      // Check for duplicate ID
+      const index = usersId.findIndex((item) => {
+        return item == id;
+      });
+      if (index > -1) {
+        isValidId = false;
+        invalidCode = "The ID already exists! Please try with a different ID."
+      } else {
+        usersId.push(id);
+        isValidId = true;
+      }
     }
-    io.to(socket.id).emit('checkId', isValidId);
+    io.to(socket.id).emit('checkId', isValidId, invalidCode);
   }
 
   async function createRoom(id, roomTitle) {
@@ -72,7 +77,15 @@ io.on('connection', (socket) => {
     var host = id;
     var guest = "";
     var roomStatus = "Waiting";
-    var roomInfo = [roomNum, roomTitle, host, guest, clientsNum, roomStatus];
+
+    // In-game status for each room
+    var p1Char = undefined;
+    var p2Char = undefined;
+    var turn_host = [];
+    var turn_guest = [];
+    var gameInfo = [p1Char, p2Char, turn_host, turn_guest];
+    var roomInfo = [roomNum, roomTitle, host, guest, clientsNum, roomStatus, gameInfo];
+
     rooms.push(roomInfo);
     io.emit('createRoom', rooms);
     io.sockets.in(roomNum).emit('createdRoom', roomInfo);
@@ -146,6 +159,18 @@ io.on('connection', (socket) => {
     io.emit('refreshRoom', rooms);
   }
 
+  function selectChar() {
+    const roomNum = [...socket.rooms][1];
+    const index = rooms.findIndex((item) => {
+      return item[0] == roomNum
+    });
+    if (index > -1) {
+      const host = rooms[index][2];
+      const guest = rooms[index][3];
+      io.sockets.in(roomNum).emit('selectChar', host, guest);
+    }
+  }
+
   // In game
   socket.on('startGame', startGame);
   socket.on('getPlayer', getPlayer);
@@ -154,7 +179,7 @@ io.on('connection', (socket) => {
   socket.on('win', win);
   socket.on('draw', draw);
 
-  function startGame() {
+  function startGame(id, char) {
     const roomNum = [...socket.rooms][1];
     const index = rooms.findIndex((item) => {
       return item[0] == roomNum
@@ -162,11 +187,19 @@ io.on('connection', (socket) => {
     if (index > -1) {
       rooms[index][5] = "Gaming";
       const room = rooms[index];
-      io.sockets.in(roomNum).emit('startGame', room);
-      io.emit('refreshRoom', rooms);
+      const host = room[2];
+      const guest = room[3];
+      const gameInfo = room[6];
+      if (id == host) {
+        gameInfo[0] = char; // Player 1 character
+      } else if (id == guest) {
+        gameInfo[1] = char; // Player 2 character
+      }
+      if ((gameInfo[0] != undefined) && (gameInfo[1] != undefined)) {
+        io.sockets.in(roomNum).emit('startGame', room, gameInfo[0], gameInfo[1]);
+        io.emit('refreshRoom', rooms);
+      }
     }
-    turn_host = [];
-    turn_guest = [];
   }
 
   function getPlayer() {
@@ -194,24 +227,44 @@ io.on('connection', (socket) => {
     }
     const host = rooms[index][2];
     const guest = rooms[index][3];
+    const turn_host = rooms[index][6][2];
+    const turn_guest = rooms[index][6][3];
     if (id == host) {
       for (var i = 0; i < 3; i++) {
-        card_json.filter((data) => {
-          if (data.name == nextTurn[i].objects[1].text) {
-            turn_host.push(data);
-          }
-        })
+        var _cardColor = nextTurn[i].objects[0].fill;
+        if (_cardColor == 'PaleGreen') { // For common card  
+          card_json['Common'].filter((data) => {
+            if (data.name == nextTurn[i].objects[1].text) {
+              turn_host.push(data);
+            }
+          })
+        } else { // For unique card  
+          card_json[_cardColor].filter((data) => {
+            if (data.name == nextTurn[i].objects[1].text) {
+              turn_host.push(data);
+            }
+          })
+        }
       }
       if (turn_guest.length != 3) {
         io.sockets.in(roomNum).emit('selected', "host");
       }
     } else if (id == guest) {
       for (var i = 0; i < 3; i++) {
-        card_json.filter((data) => {
-          if (data.name == nextTurn[i].objects[1].text) {
-            turn_guest.push(data);
-          }
-        })
+        var _cardColor = nextTurn[i].objects[0].fill;
+        if (_cardColor == 'PaleGreen') { // For common card  
+          card_json['Common'].filter((data) => {
+            if (data.name == nextTurn[i].objects[1].text) {
+              turn_guest.push(data);
+            }
+          })
+        } else { // For unique card  
+          card_json[_cardColor].filter((data) => {
+            if (data.name == nextTurn[i].objects[1].text) {
+              turn_guest.push(data);
+            }
+          })
+        }
       }
       if (turn_host.length != 3) {
         io.sockets.in(roomNum).emit('selected', "guest");
@@ -223,9 +276,16 @@ io.on('connection', (socket) => {
   }
 
   function enterSelectPhase() {
-    turn_host = [];
-    turn_guest = [];
     const roomNum = [...socket.rooms][1];
+    const index = rooms.findIndex((item) => {
+      return item[0] == roomNum
+    });
+    // If no room has been created, terminate the function.
+    if (index == -1) {
+      return;
+    }
+    rooms[index][6][2] = []; // turn_host
+    rooms[index][6][3] = []; // turn_guest
     io.sockets.in(roomNum).emit('select');
   }
 

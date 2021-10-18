@@ -1,83 +1,136 @@
 [{
-        "name": "move_up",
-        "type": "move",
-        "up": 1,
-        "down": 0,
-        "left": 0,
-        "right": 0,
-        "damage": 0,
-        "energy": 0
-    },
-    {
-        "name": "move_down",
-        "type": "move",
-        "up": 0,
-        "down": 1,
-        "left": 0,
-        "right": 0,
-        "damage": 0,
-        "energy": 0
-    },
-    {
-        "name": "move_left",
-        "type": "move",
-        "up": 0,
-        "down": 0,
-        "left": 1,
-        "right": 0,
-        "damage": 0,
-        "energy": 0
-    },
-    {
-        "name": "move_right",
-        "type": "move",
-        "up": 0,
-        "down": 0,
-        "left": 0,
-        "right": 1,
-        "damage": 0,
-        "energy": 0
-    },
-    {
-        "name": "strike_1",
+    "Common": [{
+            "name": "Move_up",
+            "type": "move",
+            "up": 1,
+            "down": 0,
+            "left": 0,
+            "right": 0,
+            "damage": 0,
+            "energy": 0
+        },
+        {
+            "name": "Move_down",
+            "type": "move",
+            "up": 0,
+            "down": 1,
+            "left": 0,
+            "right": 0,
+            "damage": 0,
+            "energy": 0
+        },
+        {
+            "name": "Move_left",
+            "type": "move",
+            "up": 0,
+            "down": 0,
+            "left": 1,
+            "right": 0,
+            "damage": 0,
+            "energy": 0
+        },
+        {
+            "name": "Move_right",
+            "type": "move",
+            "up": 0,
+            "down": 0,
+            "left": 0,
+            "right": 1,
+            "damage": 0,
+            "energy": 0
+        },
+        {
+            "name": "Strike_1",
+            "type": "attack",
+            "range": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+            "damage": 15,
+            "energy": 15
+        },
+        {
+            "name": "Strike_2",
+            "type": "attack",
+            "range": [2, 4, 5, 6, 8],
+            "damage": 25,
+            "energy": 25
+        },
+        {
+            "name": "Strike_3",
+            "type": "attack",
+            "range": [1, 3, 5, 7, 9],
+            "damage": 25,
+            "energy": 25
+        },
+        {
+            "name": "Guard_15",
+            "type": "guard",
+            "damage": 0,
+            "energy": 0,
+            "guard": 15
+        },
+        {
+            "name": "Restore_15",
+            "type": "restore",
+            "damage": 0,
+            "energy": 0,
+            "restore": 15
+        }
+    ],
+    "LightCoral": [{
+        "name": "Explosion",
         "type": "attack",
-        "range": [1,2,3,4,5,6,7,8,9],
-        "damage": 15,
-        "energy": 15
-    },
-    {
-        "name": "strike_2",
-        "type": "attack",
-        "range": [5, 7, 8, 9],
-        "damage": 50,
-        "energy": 50
-    },
-    {
-        "name": "strike_3",
-        "type": "attack",
-        "range": [2, 4, 5, 6, 8],
-        "damage": 25,
-        "energy": 25
-    },
-    {
-        "name": "strike_4",
-        "type": "attack",
-        "range": [1, 3, 5, 7, 9],
-        "damage": 25,
-        "energy": 30
-    },
-    {
-        "name": "guard_15",
-        "type": "guard",
-        "damage": 0,
-        "energy": 0,
-        "guard": 15
-    },
-    {
-        "name": "restore_15",
+        "range": [5],
+        "damage": 80,
+        "energy": 80
+    }, {
+        "name": "Restore_20",
         "type": "restore",
         "damage": 0,
         "energy": 0,
-        "restore": 15
-    }
-]
+        "restore": 20
+    }],
+    "Tan": [{
+        "name": "Tackle",
+        "type": "attack",
+        "range": [4, 5, 6],
+        "damage": 35,
+        "energy": 30
+    }, {
+        "name": "Guard_30",
+        "type": "guard",
+        "damage": 0,
+        "energy": 10,
+        "guard": 30
+    }],
+    "SteelBlue": [{
+        "name": "Scatter",
+        "type": "attack",
+        "range": [1, 2, 3, 7, 8, 9],
+        "damage": 25,
+        "energy": 35
+    }, {
+        "name": "Shot",
+        "type": "attack",
+        "range": [4, 6],
+        "damage": 40,
+        "energy": 35
+    }],
+    "Plum": [{
+        "name": "Jump_left",
+        "type": "move",
+        "up": 0,
+        "down": 0,
+        "left": 2,
+        "right": 0,
+        "damage": 0,
+        "energy": 10
+    }, {
+        "name": "Jump_right",
+        "type": "move",
+        "up": 0,
+        "down": 0,
+        "left": 0,
+        "right": 2,
+        "damage": 0,
+        "energy": 10
+    }]
+}]

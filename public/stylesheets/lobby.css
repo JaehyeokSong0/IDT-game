@@ -53,8 +53,11 @@
     box-shadow: 6rem 0 0 0 grey inset;
 }
 
-#createRoom_btn {
+.btn_style_1 {
     width: 8rem;
+}
+
+.btn_style_1:enabled {
     border: 2px solid grey;
     color: grey;
     text-align: center;
@@ -63,7 +66,12 @@
     background: white;
 }
 
-#createRoom_btn:hover {
+.btn_style_1:enabled:hover {
     color: #fff;
     box-shadow: 8rem 0 0 0 grey inset, -8rem 0 0 0 grey inset;
+}
+
+.btn_style_1:disabled {
+    color: white;
+    background-color: grey;
 }

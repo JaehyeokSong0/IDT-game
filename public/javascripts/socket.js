@@ -3,14 +3,14 @@ export var id;
 
 var roomFormNum = 5; // Number of room forms created
 
-socket.on('checkId', (isValidId) => {
+socket.on('checkId', (isValidId, invalidCode) => {
     if (isValidId) {
         $('#game_index').hide();
         $('#game_title').fadeOut();
         $('#game_lobby').show();
         socket.emit('refreshRoom');
     } else {
-        $('#submitID_err_msg').html("The ID already exists! Please try with a different ID.");
+        $('#submitID_err_msg').html(invalidCode);
     }
 });
 
@@ -55,6 +55,16 @@ socket.on('changeHost', (roomInfo) => {
     refreshRoomInfo(roomInfo);
 });
 
+socket.on('selectChar', (host, guest) => {
+    $('#roomModal').hide();
+    if (id == host) {
+        $('#char_view').css('background-color', 'White');
+    } else if (id == guest) {
+        $('#char_view').css('background-color', 'DarkGrey');
+    }
+    $('#selectCharModal').show();
+})
+
 $('#nickname').keyup((event) => {
     if (event.keyCode == 13) {
         id = $('#nickname').val();
@@ -83,7 +93,7 @@ $('#createRoomInfo button').click(() => {
 });
 
 $('#waitingRoom_host button').click(() => {
-    socket.emit('startGame');
+    socket.emit('selectChar');
 });
 
 $('#waitingRoom_guest button').click(() => {
@@ -121,6 +131,21 @@ $('#lobby_table button').click((e) => {
             alert("The room already has been full!!");
         }
     }
+});
+
+$('#char_shift_left').click(() => {
+    shiftChar('left');
+});
+
+$('#char_shift_right').click(() => {
+    shiftChar('right');
+});
+
+$('#char_choice').click(() => {
+    socket.emit('startGame', id, $('#char_name').html());
+    $('#char_choice').attr('disabled', true);
+    $('#char_shift_left').attr('disabled', true);
+    $('#char_shift_right').attr('disabled', true);
 });
 
 // Verify condition of roomTitle
@@ -197,4 +222,26 @@ function refreshRoomInfo(roomInfo) {
     $('#roomTitleInfo').html(roomInfo[1]);
     $('#hostInfo').html(roomInfo[2]);
     $('#guestInfo').html(roomInfo[3]);
+}
+
+function shiftChar(dir) {
+    const _char = ['LightCoral', 'Tan', 'SteelBlue', 'Plum'];
+    var _idx = _char.indexOf($('#char_name').html());
+    if (dir == 'left') {
+        if (_idx == 0) {
+            _idx = 3;
+        } else {
+            _idx--;
+        }
+        $('#char_view').css('border', '0.5rem solid ' + _char[_idx]);
+        $('#char_name').html(_char[_idx]);
+    } else if (dir == 'right') {
+        if (_idx == 3) {
+            _idx = 0;
+        } else {
+            _idx++;
+        }
+        $('#char_view').css('border', '0.5rem solid ' + _char[_idx]);
+        $('#char_name').html(_char[_idx]);
+    }
 }

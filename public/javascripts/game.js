@@ -38,10 +38,11 @@ fabric.Image.fromURL('images/background-6008188.png', function (img) {
 });
 
 class Player {
-    constructor(_nickname, _location, _id) {
+    constructor(_nickname, _location, _id, _color) {
         this.nickname = _nickname;
         this.location = _location;
         this.id = _id;
+        this.color = _color;
         this.hp = 100;
         this.en = 100;
     }
@@ -221,13 +222,13 @@ class Player {
     }
 }
 
-socket.on('startGame', (room) => {
-    $('#roomModal').fadeOut();
+socket.on('startGame', (room, p1Char, p2Char) => {
+    $('#selectCharModal').fadeOut();
     roomInfo = room;
     resizeCanvas();
     socket.emit('getPlayer');
     initField(fieldWidth, fieldHeight);
-    initPlayer();
+    initPlayerChar(p1Char, p2Char);
     initGauge(gaugeWidth, gaugeHeight);
     initPlayerInfo(gaugeWidth);
     initLogField();
@@ -249,6 +250,7 @@ socket.on('battle', (turn_host, turn_guest) => {
         var result;
         for (var i = 0; i < 3; i++) {
             showTurnCard(i);
+            await sleep(1000);
             result = await calcTurnResult(turn_host[i], turn_guest[i]);
             await sleep(1000);
             if (result == -1) { // Continue game
@@ -260,15 +262,16 @@ socket.on('battle', (turn_host, turn_guest) => {
                 return result;
             }
         }
+        editLog('');
         return result;
 
         // Nested function
         function showTurnCard(num) {
-            host_turn_card.push(makeCard(turn_host[num]).set({
+            host_turn_card.push(makeCard(turn_host[num], 'PaleGreen').set({
                 top: fieldHeight + cardHeight * num * (1.2),
                 left: gaugeWidth / 16
             }));
-            guest_turn_card.push(makeCard(turn_guest[num]).set({
+            guest_turn_card.push(makeCard(turn_guest[num], 'PaleGreen').set({
                 top: fieldHeight + cardHeight * num * (1.2),
                 left: gaugeWidth * 43 / 16
             }));
@@ -494,31 +497,36 @@ function editLog(text) {
     canvas.renderAll();
 }
 
-function initPlayer() {
-    player1 = new Player(roomInfo[2], 5, 'p1');
-    player1.character = setCharacter('magenta', 5, 'player1');
+function initPlayerChar(p1Char, p2Char) {
+    player1 = new Player(roomInfo[2], 5, 'p1', p1Char);
+    player1.character = setCharacter(p1Char, 5, 'player1');
 
-    player2 = new Player(roomInfo[3], 8, 'p2');
-    player2.character = setCharacter('cyan', 8, 'player2');
+    player2 = new Player(roomInfo[3], 8, 'p2', p2Char);
+    player2.character = setCharacter(p2Char, 8, 'player2');
 }
 
 function setCharacter(color, location, playerNum) {
-    var fieldDiv;
+    var _fieldDiv;
     var _field = getFieldByNum(location);
     var _radius = fieldHeight / 6;
+    var _innerColor;
     if (playerNum === 'player1') {
-        fieldDiv = 1;
+        _fieldDiv = 1;
+        _innerColor = 'White';
     } else if (playerNum === 'player2') {
-        fieldDiv = 3;
+        _fieldDiv = 3;
+        _innerColor = 'DarkGrey';
     } else {
         console.error("[ERROR] Something went wrong : Wrong playerNum.");
     }
     return new fabric.Circle({
         objType: 'character',
         radius: _radius,
-        left: _field.left + (fieldWidth / 4) * fieldDiv - _radius,
+        left: _field.left + (fieldWidth / 4) * _fieldDiv - _radius,
         top: _field.top + (fieldHeight / 2) - _radius,
-        fill: color,
+        fill: _innerColor,
+        stroke: color,
+        strokeWidth: 5
     });
 }
 
@@ -833,8 +841,6 @@ function initGauge(gaugeWidth, gaugeHeight) {
 }
 
 function initPlayerInfo(_width) {
-    var player1_color = 'magenta';
-    var player2_color = 'cyan';
     player1.info = new fabric.Group([
         new fabric.Rect({
             objType: 'info',
@@ -862,7 +868,9 @@ function initPlayerInfo(_width) {
             radius: _width / 32,
             top: _width / 16 * 3,
             left: _width / 16 * 3,
-            fill: player1_color
+            fill: 'White',
+            stroke: player1.color,
+            strokeWidth: 4
         })
     ]);
     player2.info = new fabric.Group([
@@ -892,7 +900,9 @@ function initPlayerInfo(_width) {
             radius: _width / 32,
             top: _width / 16 * 3,
             left: _width / 16 * 45,
-            fill: player2_color
+            fill: 'DarkGrey',
+            stroke: player2.color,
+            strokeWidth: 4
         })
     ]);
 }
@@ -920,13 +930,13 @@ function initReadySign() {
     });
 }
 
-function makeCard(card) {
+function makeCard(card, color) {
     return new fabric.Group([
         new fabric.Rect({
             objType: 'card',
             width: cardWidth,
             height: cardHeight,
-            fill: 'PaleGreen',
+            fill: color,
             stroke: 'Black',
             strokeWidth: 2,
             rx: 10,
@@ -1044,17 +1054,55 @@ function showMinimap() {
             },
             colorStops: [{
                     offset: 0,
-                    color: 'magenta'
+                    color: player1.color
                 },
                 {
                     offset: 1,
-                    color: 'cyan'
+                    color: player2.color
                 }
             ]
         }));
     } else {
-        _arr[player1.location - 1].set('fill', 'magenta');
-        _arr[player2.location - 1].set('fill', 'cyan');
+        _arr[player1.location - 1].set('fill', new fabric.Gradient({
+            type: 'radial',
+            coords: {
+                r1: _height / 2,
+                r2: 0,
+                x1: _width / 2,
+                y1: _height / 2,
+                x2: _width / 2,
+                y2: _height / 2
+            },
+            colorStops: [{
+                    offset: 0,
+                    color: player1.color
+                },
+                {
+                    offset: 1,
+                    color: 'White'
+                }
+            ]
+        }));
+        _arr[player2.location - 1].set('fill', new fabric.Gradient({
+            type: 'radial',
+            coords: {
+                r1: _height / 2,
+                r2: 0,
+                x1: _width / 2,
+                y1: _height / 2,
+                x2: _width / 2,
+                y2: _height / 2
+            },
+            colorStops: [{
+                    offset: 0,
+                    color: player2.color
+                },
+                {
+                    offset: 1,
+                    color: 'Grey'
+                }
+            ]
+        }));
     }
 
     var miniField = new fabric.Group(_arr);
@@ -1065,12 +1113,37 @@ function showMinimap() {
     canvas.add(miniField);
 }
 
+// function showAllCards() {
+//     $.getJSON('json/card.json', (data) => {
+//         var i = 1;
+//         var j = 1;
+//         while (i <= data.length) {
+//             var card = makeCard(data[i - 1]).set({
+//                 top: cardHeight * 5 / 4 * j,
+//                 left: cardWidth * 5 / 2 + cardWidth * ((i - 1) % 5) * 3 / 2,
+//                 originTop: cardHeight * 5 / 4 * j,
+//                 originLeft: cardWidth * 5 / 2 + cardWidth * ((i - 1) % 5) * 3 / 2,
+//             });
+//             card.on('mousedown', (e) => {
+//                 clickCard(e);
+//             })
+//             canvas.add(card);
+//             if (i % 5 == 0) {
+//                 j += 1;
+//             }
+//             i += 1;
+//         }
+//     });
+// }
+
 function showAllCards() {
     $.getJSON('json/card.json', (data) => {
         var i = 1;
         var j = 1;
-        while (i <= data.length) {
-            var card = makeCard(data[i - 1]).set({
+        // Get common cards
+        var commonCard = data[0].Common;
+        while (i <= commonCard.length) {
+            var card = makeCard(commonCard[i - 1], 'PaleGreen').set({
                 top: cardHeight * 5 / 4 * j,
                 left: cardWidth * 5 / 2 + cardWidth * ((i - 1) % 5) * 3 / 2,
                 originTop: cardHeight * 5 / 4 * j,
@@ -1084,6 +1157,26 @@ function showAllCards() {
                 j += 1;
             }
             i += 1;
+        }
+        // Get character cards
+        var charCard = data[0][client.color];
+        var k = 1;
+        while (k <= charCard.length) {
+            var card = makeCard(charCard[k - 1], client.color).set({
+                top: cardHeight * 5 / 4 * j,
+                left: cardWidth * 5 / 2 + cardWidth * ((i - 1) % 5) * 3 / 2,
+                originTop: cardHeight * 5 / 4 * j,
+                originLeft: cardWidth * 5 / 2 + cardWidth * ((i - 1) % 5) * 3 / 2,
+            });
+            card.on('mousedown', (e) => {
+                clickCard(e);
+            })
+            canvas.add(card);
+            if (i % 5 == 0) {
+                j += 1;
+            }
+            i += 1;
+            k += 1;
         }
     });
 }
@@ -1127,8 +1220,6 @@ function clickCard(e) {
         } else {
             alert("Not enough energy!");
         }
-    } else {
-        console.error("[ERROR] Something went wrong in clickCard().");
     }
 }
 
@@ -1194,6 +1285,9 @@ function exitGame() {
     $('#waitingRoom_host button').attr('disabled', true);
     $('#waitingRoom_guest button').css('background', 'white');
     $('#waitingRoom_guest button').css('color', 'grey');
+    $('#char_choice').attr('disabled', false);
+    $('#char_shift_left').attr('disabled', false);
+    $('#char_shift_right').attr('disabled', false);
 }
 
 function showContinueBtn() {
