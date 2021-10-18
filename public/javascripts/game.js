@@ -250,6 +250,7 @@ socket.on('battle', (turn_host, turn_guest) => {
         var result;
         for (var i = 0; i < 3; i++) {
             showTurnCard(i);
+            await sleep(1000);
             result = await calcTurnResult(turn_host[i], turn_guest[i]);
             await sleep(1000);
             if (result == -1) { // Continue game
@@ -261,6 +262,7 @@ socket.on('battle', (turn_host, turn_guest) => {
                 return result;
             }
         }
+        editLog('');
         return result;
 
         // Nested function
