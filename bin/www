@@ -35,10 +35,6 @@ var roomNum = 1;
 var usersId = [];
 var rooms = [];
 
-var p1Char, p2Char;
-var turn_host = [];
-var turn_guest = [];
-
 io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('user disconnected');
@@ -81,7 +77,15 @@ io.on('connection', (socket) => {
     var host = id;
     var guest = "";
     var roomStatus = "Waiting";
-    var roomInfo = [roomNum, roomTitle, host, guest, clientsNum, roomStatus];
+
+    // In-game status for each room
+    var p1Char = undefined;
+    var p2Char = undefined;
+    var turn_host = [];
+    var turn_guest = [];
+    var gameInfo = [p1Char, p2Char, turn_host, turn_guest];
+    var roomInfo = [roomNum, roomTitle, host, guest, clientsNum, roomStatus, gameInfo];
+
     rooms.push(roomInfo);
     io.emit('createRoom', rooms);
     io.sockets.in(roomNum).emit('createdRoom', roomInfo);
@@ -185,18 +189,17 @@ io.on('connection', (socket) => {
       const room = rooms[index];
       const host = room[2];
       const guest = room[3];
+      const gameInfo = room[6];
       if (id == host) {
-        p1Char = char;
+        gameInfo[0] = char; // Player 1 character
       } else if (id == guest) {
-        p2Char = char;
+        gameInfo[1] = char; // Player 2 character
       }
-      if ((p1Char != undefined) && (p2Char != undefined)) {
-        io.sockets.in(roomNum).emit('startGame', room, p1Char, p2Char);
+      if ((gameInfo[0] != undefined) && (gameInfo[1] != undefined)) {
+        io.sockets.in(roomNum).emit('startGame', room, gameInfo[0], gameInfo[1]);
         io.emit('refreshRoom', rooms);
       }
     }
-    turn_host = [];
-    turn_guest = [];
   }
 
   function getPlayer() {
@@ -224,6 +227,8 @@ io.on('connection', (socket) => {
     }
     const host = rooms[index][2];
     const guest = rooms[index][3];
+    const turn_host = rooms[index][6][2];
+    const turn_guest = rooms[index][6][3];
     if (id == host) {
       for (var i = 0; i < 3; i++) {
         var _cardColor = nextTurn[i].objects[0].fill;
@@ -271,17 +276,22 @@ io.on('connection', (socket) => {
   }
 
   function enterSelectPhase() {
-    turn_host = [];
-    turn_guest = [];
     const roomNum = [...socket.rooms][1];
+    const index = rooms.findIndex((item) => {
+      return item[0] == roomNum
+    });
+    // If no room has been created, terminate the function.
+    if (index == -1) {
+      return;
+    }
+    rooms[index][6][2] = []; // turn_host
+    rooms[index][6][3] = []; // turn_guest
     io.sockets.in(roomNum).emit('select');
   }
 
   function win(player) {
     const roomNum = [...socket.rooms][1];
     io.sockets.in(roomNum).emit('win', player);
-    p1Char = undefined;
-    p2Char = undefined;
     deleteRoom(roomNum);
     socket.leave(roomNum);
   }
@@ -289,8 +299,6 @@ io.on('connection', (socket) => {
   function draw() {
     const roomNum = [...socket.rooms][1];
     io.sockets.in(roomNum).emit('draw');
-    p1Char = undefined;
-    p2Char = undefined;
     deleteRoom(roomNum);
     socket.leave(roomNum);
   }
