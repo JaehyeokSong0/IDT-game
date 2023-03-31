@@ -5,7 +5,7 @@
 > Note: 현재 16:9 이외의 해상도를 지원하지 않아 특정 환경에서는 원활한 게임 진행이 어려울 수 있는 점 양해 부탁드립니다. (추후 업데이트 예정)
 
 ## Play Game
-https://idt-game.herokuapp.com/
+https://idt-game.onrender.com
 
 ## Update
 - 최근 업데이트 : 2021-10-09
